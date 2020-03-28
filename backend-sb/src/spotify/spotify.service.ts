@@ -1,5 +1,5 @@
 import { Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { SpotifyUrlEnums } from 'src/auth/enums/urls.enum';
 import mainConfig from 'src/config/main.config';
 import axios from 'axios';
@@ -10,10 +10,22 @@ import { SearchQueryDto } from './dto/search-query.dto';
 export class SpotifyService {
   private logger = new Logger('SpotifyService');
 
-  async searchSongs(searchQuery: SearchQueryDto): Promise<string> {
+  async searchSongs(req: Request, searchQuery: SearchQueryDto): Promise<object> {
     // search and return
     const { searchString } = searchQuery;
-    return 'results';
+    const url = `${SpotifyUrlEnums.SPOTIFY_API}/search?${qs.stringify({
+      q: searchString,
+      type: 'album,track,artist,playlist',
+    })}`;
+    const response = await axios
+      .get(url, {
+        headers: { Authorization: `Bearer ${req.signedCookies.spotify_tkn}` },
+      })
+      .catch(e => {
+        this.logger.error(`Unable to authorize Spotify client on ${e}`);
+        throw new InternalServerErrorException(`Unable to authorize Spotify client`);
+      });
+    return response.data;
   }
 
   async authenticate(res: Response) {
@@ -33,7 +45,7 @@ export class SpotifyService {
       });
     const cookieData = response.data as SpotifyPayload;
     res
-      .cookie('spotify_tkn', cookieData, {
+      .cookie('spotify_tkn', cookieData.access_token, {
         maxAge: cookieData.expires_in,
         secure: false,
         signed: true,

@@ -8,6 +8,7 @@ export enum UrlEnums {
 
 export enum SpotifyUrlEnums {
   SPOTIFY_ACCOUNTS = 'https://accounts.spotify.com',
+  SPOTIFY_API = 'https://api.spotify.com/v1',
 }
 
 function getServerModeApiUrl(serverMode: string): any {
