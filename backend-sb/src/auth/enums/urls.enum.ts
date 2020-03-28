@@ -14,7 +14,7 @@ export enum SpotifyUrlEnums {
 function getServerModeApiUrl(serverMode: string): any {
   switch (serverMode) {
     case 'development':
-      return 'http://localhost:3000/v1';
+      return `http://localhost:${mainConfig.serverSettings.port}/v1`;
     case 'staging':
       return 'https://staging.sonicboom.life/v1';
     case 'production':
@@ -27,7 +27,7 @@ function getServerModeApiUrl(serverMode: string): any {
 function getServerModeRedirectUrl(serverMode: string): any {
   switch (serverMode) {
     case 'development':
-      return 'http://localhost:8000';
+      return 'http://localhost:3000';
     case 'staging':
       return 'https://staging.sonicboom.life';
     case 'production':
