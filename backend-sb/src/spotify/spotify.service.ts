@@ -12,7 +12,7 @@ import * as qs from 'qs';
 export class SpotifyService {
   private logger = new Logger('SpotifyService');
 
-  async searchSongs(req: Request, searchQuery: SearchQueryDto): Promise<object> {
+  async searchSongs(searchQuery: SearchQueryDto): Promise<object> {
     const { accessToken, searchString } = searchQuery;
     const url = `${SpotifyUrlEnums.SPOTIFY_API}/search?${qs.stringify({
       q: searchString,
@@ -27,33 +27,6 @@ export class SpotifyService {
         throw new InternalServerErrorException(`Unable to authorize Spotify client`);
       });
     return response.data;
-  }
-
-  async getAuthCookie(res: Response) {
-    const url = `${SpotifyUrlEnums.SPOTIFY_ACCOUNTS}/api/token`;
-    const grant = qs.stringify({ grant_type: 'client_credentials' });
-    const response = await axios
-      .post(url, grant, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          // tslint:disable-next-line: object-literal-key-quotes
-          Authorization: `Basic ${await this.getBase64AuthHeader()}`,
-        },
-      })
-      .catch(e => {
-        this.logger.error(`Unable to authorize Spotify client on ${e}`);
-        throw new InternalServerErrorException(`Unable to authorize Spotify client`);
-      });
-    const cookieData = response.data as SpotifyPayload;
-    res
-      .cookie('spotify_tkn', cookieData.access_token, {
-        maxAge: cookieData.expires_in,
-        secure: false,
-        signed: true,
-        httpOnly: true,
-      })
-      .status(200)
-      .send();
   }
 
   async callback(res: Response, callbackDto: CallbackDto) {

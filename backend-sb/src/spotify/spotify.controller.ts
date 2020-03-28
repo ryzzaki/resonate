@@ -32,16 +32,10 @@ export class SpotifyController {
     return this.spotifyService.refreshToken(req, res);
   }
 
-  @Get('/authcookie')
-  getAuthCookie(@Res() res: Response): Promise<void> {
-    this.logger.verbose('Authenticating');
-    return this.spotifyService.getAuthCookie(res);
-  }
-
   @Get('/search')
   @UseGuards(SpotifyTokenGuard)
-  searchSongs(@Query(ValidationPipe) searchQuery: SearchQueryDto, @Req() req: Request): Promise<object> {
+  searchSongs(@Query(ValidationPipe) searchQuery: SearchQueryDto): Promise<object> {
     this.logger.verbose('Searching');
-    return this.spotifyService.searchSongs(req, searchQuery);
+    return this.spotifyService.searchSongs(searchQuery);
   }
 }
