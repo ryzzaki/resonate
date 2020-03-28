@@ -1,17 +1,16 @@
 import { Injectable, Logger, InternalServerErrorException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { SpotifyUrlEnums } from 'src/auth/enums/urls.enum';
+import { SearchQueryDto } from './dto/search-query.dto';
 import mainConfig from 'src/config/main.config';
 import axios from 'axios';
 import * as qs from 'qs';
-import { SearchQueryDto } from './dto/search-query.dto';
 
 @Injectable()
 export class SpotifyService {
   private logger = new Logger('SpotifyService');
 
   async searchSongs(req: Request, searchQuery: SearchQueryDto): Promise<object> {
-    // search and return
     const { searchString } = searchQuery;
     const url = `${SpotifyUrlEnums.SPOTIFY_API}/search?${qs.stringify({
       q: searchString,
