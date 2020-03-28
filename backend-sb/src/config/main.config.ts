@@ -38,6 +38,10 @@ const mainConfig: MainConfigInterface = {
     facebookId: String(process.env.FACEBOOK_ID),
     facebookSecret: String(process.env.FACEBOOK_SECRET),
   },
+  spotifySettings: {
+    clientId: String(process.env.SPOTIFY_CLIENT_ID),
+    clientSecret: String(process.env.SPOTIFY_CLIENT_SECRET),
+  },
 };
 
 export default mainConfig;

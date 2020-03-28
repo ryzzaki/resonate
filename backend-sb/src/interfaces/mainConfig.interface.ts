@@ -33,6 +33,10 @@ export interface MainConfigInterface {
     facebookId: string;
     facebookSecret: string;
   };
+  spotifySettings: {
+    clientId: string;
+    clientSecret: string;
+  };
 }
 
 export type Algorithm =

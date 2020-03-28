@@ -1,4 +1,4 @@
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, Unique } from 'typeorm';
+import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn } from 'typeorm';
 import { Length } from 'class-validator';
 
 @Entity()
@@ -6,6 +6,9 @@ import { Length } from 'class-validator';
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn({ type: 'bigint' })
   id: number;
+
+  @CreateDateColumn()
+  dateCreated: Date;
 
   @Column()
   email: string;

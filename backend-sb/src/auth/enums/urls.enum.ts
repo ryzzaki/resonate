@@ -2,11 +2,15 @@ import mainConfig from '../../config/main.config';
 import { InternalServerErrorException } from '@nestjs/common';
 
 export enum UrlEnums {
-  AUTH_API_URL = getServerModeBasedApiUrl(mainConfig.serverSettings.serverMode),
-  REDIRECT_URL = getServerModeBasedRedirectUrl(mainConfig.serverSettings.serverMode),
+  AUTH_API_URL = getServerModeApiUrl(mainConfig.serverSettings.serverMode),
+  REDIRECT_URL = getServerModeRedirectUrl(mainConfig.serverSettings.serverMode),
 }
 
-function getServerModeBasedApiUrl(serverMode: string): any {
+export enum SpotifyUrlEnums {
+  SPOTIFY_ACCOUNTS = 'https://accounts.spotify.com',
+}
+
+function getServerModeApiUrl(serverMode: string): any {
   switch (serverMode) {
     case 'development':
       return 'http://localhost:3000/v1';
@@ -19,7 +23,7 @@ function getServerModeBasedApiUrl(serverMode: string): any {
   }
 }
 
-function getServerModeBasedRedirectUrl(serverMode: string): any {
+function getServerModeRedirectUrl(serverMode: string): any {
   switch (serverMode) {
     case 'development':
       return 'http://localhost:8000';
