@@ -8,14 +8,14 @@ const LandingPage: React.FC<RouteComponentProps> = () => {
     <section>
       <Header />
       <div className="flex flex-wrap text-center items-center md:flex-no-wrap mb-4">
-        <div className="flex-auto hidden md:block w-1/3 bg-blue-400">
+        <div className="flex-auto hidden md:block w-1/3 bg-blue">
           <p>Lorem Ipsum</p>
         </div>
-        <div className="flex-auto w-1/3 bg-red-300">
+        <div className="flex-auto w-1/3 bg-red">
           <h1>Middle Box</h1>
           <p>Lorem Ipsum</p>
         </div>
-        <div className="flex-auto hidden md:block w-1/3 bg-green-200">
+        <div className="flex-auto hidden md:block w-1/3 bg-green">
           <p>Lorem Ipsum</p>
         </div>
       </div>
