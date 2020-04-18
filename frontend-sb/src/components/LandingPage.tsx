@@ -3,6 +3,7 @@ import { RouteComponentProps } from '@reach/router';
 import Header from './Header';
 import Footer from './Footer';
 import spotifyLogo from '../assets/icons/spotifyLogo.svg';
+import { UrlEnums } from '../enums/urls.enum';
 
 const LandingPage: React.FC<RouteComponentProps> = () => {
   return (
@@ -106,16 +107,18 @@ const LandingPage: React.FC<RouteComponentProps> = () => {
               </p>
             </div>
           </div>
-          <button className="bg-white hover:bg-darkgray text-green hover:text-green border border-green font-heading py-5 px-10 m-20 rounded">
-            <img
-              className="inline mr-3 bg-transparent rounded-full"
-              src={spotifyLogo}
-              width="15"
-              height="15"
-              alt="Spotify Logo"
-            />
-            Login with Spotify
-          </button>
+          <a href={`${UrlEnums.API_URL}/auth/spotify`}>
+            <button className="bg-white hover:bg-darkgray text-green hover:text-green border border-green font-heading py-5 px-10 m-20 rounded">
+              <img
+                className="inline mr-3 bg-transparent rounded-full"
+                src={spotifyLogo}
+                width="15"
+                height="15"
+                alt="Spotify Logo"
+              />
+              Login with Spotify
+            </button>
+          </a>
         </div>
       </div>
       <Footer />
