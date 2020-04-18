@@ -75,7 +75,7 @@ const LandingPage: React.FC<RouteComponentProps> = () => {
           </div>
           <hr className="p-5 mx-40" />
           <div className="flex justify-center m-15">
-            <div className="md:w-1/2 p-5">
+            <div className="w-full md:w-1/2 p-5">
               <h1 className="font-heading text-26 p-10 m-10">
                 Does it cost anything?{' '}
                 <span role="img" aria-label="Money Emoji">
