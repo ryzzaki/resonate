@@ -6,14 +6,12 @@ import { cookieConfig } from '../config/cookie.config';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserRepository } from './repositories/user.repository';
-import { UserFacebookRepository } from './repositories/user-facebook.repository';
-import { UserGoogleRepository } from './repositories/user-google.repository';
 import { RedisService } from 'nestjs-redis';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayloadInterface } from '../interfaces/token-payload.interface';
 import { UserDataInterface } from '../interfaces/user-data.interface';
 import { UpdateUserDto } from './dto/update.dto';
-import { AuthSourceEnums, AuthTypeEnums } from './enums/auth.enum';
+import { AuthTypeEnums } from './enums/auth.enum';
 import { UrlEnums } from './enums/urls.enum';
 
 @Injectable()
@@ -23,10 +21,6 @@ export class AuthService {
   constructor(
     @InjectRepository(UserRepository)
     private readonly userRepository: UserRepository,
-    @InjectRepository(UserFacebookRepository)
-    private readonly userFacebookRepository: UserFacebookRepository,
-    @InjectRepository(UserGoogleRepository)
-    private readonly userGoogleRepository: UserGoogleRepository,
     private readonly jwtService: JwtService,
     private readonly redisService: RedisService
   ) {}
@@ -42,16 +36,20 @@ export class AuthService {
       .clearCookie('refresh_tkn_v1', {
         domain: cookieConfig.domain,
       })
-      .redirect(String(UrlEnums.REDIRECT_URL));
+      .redirect(String(UrlEnums.BASE_URL));
   }
 
-  async authenticateExternalSource(userData: UserDataInterface): Promise<User> {
-    const { id, email, displayName, source } = userData;
+  async authenticateOnCallback(userData: UserDataInterface, refreshToken: string): Promise<User> {
+    const { email, userName, displayName, country, subscription } = userData;
     try {
-      const user: User = await this.userRepository.externalAuthentication(email, displayName);
-      source === AuthSourceEnums.FACEBOOK
-        ? await this.userFacebookRepository.createFacebookIdentity(user, id)
-        : await this.userGoogleRepository.createGoogleIdentity(user, id);
+      const user: User = await this.userRepository.externalAuthentication(
+        email,
+        userName,
+        displayName,
+        country,
+        subscription,
+        refreshToken
+      );
       return user;
     } catch (error) {
       this.logger.error(`Unable to authenticate from external source on error: ${error}`);
@@ -59,24 +57,21 @@ export class AuthService {
     }
   }
 
-  async sendCredentials(req: Request, res: Response, user: User, source: AuthSourceEnums): Promise<void> {
+  async sendCredentials(req: Request, res: Response, user: User): Promise<void> {
     const existingToken = req.signedCookies.refresh_tkn_v1;
     if (existingToken) {
+      await this.validateRefreshToken(existingToken);
+      await this.blackListToken(existingToken);
       res.clearCookie('refresh_tkn_v1', {
         domain: cookieConfig.domain,
       });
-      throw new BadRequestException(`Client is already logged in with an active token`);
     }
     const refreshToken = await this.generateToken(user.id, AuthTypeEnums.REFRESH, user.tokenVer);
-    const accessToken = await this.generateToken(user.id, AuthTypeEnums.ACCESS, null);
-    if (source === AuthSourceEnums.LOCAL) {
-      res
-        .cookie('refresh_tkn_v1', refreshToken, cookieConfig)
-        .status(200)
-        .send({ accessToken });
-    } else {
-      res.cookie('refresh_tkn_v1', refreshToken, cookieConfig).redirect(`${UrlEnums.REDIRECT_URL}/auth/redirect?access_token=${accessToken}`);
-    }
+    const accessToken = await this.generateToken(user.id, AuthTypeEnums.ACCESS);
+    res
+      .cookie('refresh_tkn_v1', refreshToken, cookieConfig)
+      .status(302)
+      .redirect(`${UrlEnums.BASE_URL}/auth/#access_token=${accessToken}`);
     return;
   }
 
@@ -106,11 +101,11 @@ export class AuthService {
     return await this.userRepository.findUserById(user.id);
   }
 
-  async getUserById(id: number): Promise<User> {
+  async getUserById(id: string): Promise<User> {
     return await this.userRepository.findUserById(id);
   }
 
-  async getBasicUserById(id: number): Promise<{ id: number; displayName: string }> {
+  async getBasicUserById(id: string): Promise<{ id: string; displayName: string }> {
     const { displayName } = await this.userRepository.findUserById(id);
     return { id, displayName };
   }
@@ -124,10 +119,10 @@ export class AuthService {
     return generatedToken;
   }
 
-  private async generateToken(id: number, type: AuthTypeEnums, ver?: number): Promise<string> {
+  private async generateToken(id: string, type: AuthTypeEnums, ver?: number): Promise<string> {
     const payload: TokenPayloadInterface = { id, ver, type };
     const generatedToken = await this.jwtService.signAsync(payload, {
-      expiresIn: type === AuthTypeEnums.REFRESH ? mainConfig.serverSettings.refreshTokenAge : '15m',
+      expiresIn: type === AuthTypeEnums.REFRESH ? mainConfig.serverSettings.refreshTokenAge : '1h',
       jwtid: uuid.v4(),
     });
     return generatedToken;
@@ -169,7 +164,11 @@ export class AuthService {
     });
   }
 
-  private async validateRefreshToken(refreshJwtToken: string): Promise<{ id: number; ver: number }> {
+  async setSpotifyRefreshToken(userId: string, refreshToken: string): Promise<void> {
+    return await this.userRepository.updateUserRefreshTokenById(userId, refreshToken);
+  }
+
+  private async validateRefreshToken(refreshJwtToken: string): Promise<{ id: string; ver: number }> {
     try {
       const { jti, id, ver } = await this.jwtService.verifyAsync(refreshJwtToken);
       const client = this.redisService.getClient();

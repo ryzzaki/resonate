@@ -27,12 +27,6 @@ export interface MainConfigInterface {
     refreshPrivateKey: string;
     algorithm: Algorithm;
   };
-  authProviderSettings: {
-    googleId: string;
-    googleSecret: string;
-    facebookId: string;
-    facebookSecret: string;
-  };
   spotifySettings: {
     clientId: string;
     clientSecret: string;

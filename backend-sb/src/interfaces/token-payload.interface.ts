@@ -1,7 +1,7 @@
 import { AuthTypeEnums } from '../auth/enums/auth.enum';
 
 export interface TokenPayloadInterface {
-  id: number;
+  id: string;
   ver: number;
   type: AuthTypeEnums;
   iat?: number;

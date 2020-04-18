@@ -4,18 +4,30 @@ import { Length } from 'class-validator';
 @Entity()
 @Unique(['email'])
 export class User extends BaseEntity {
-  @PrimaryGeneratedColumn({ type: 'bigint' })
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @CreateDateColumn()
-  dateCreated: Date;
+  @CreateDateColumn({ type: 'timestamp', precision: 3, default: () => `timezone('utc', now())`, readonly: true })
+  dateCreated: string;
 
   @Column()
   email: string;
 
   @Column()
+  userName: string;
+
+  @Column()
   @Length(2, 25)
   displayName: string;
+
+  @Column()
+  country: string;
+
+  @Column()
+  subscription: string;
+
+  @Column()
+  refreshToken: string;
 
   @Column()
   tokenVer: number;

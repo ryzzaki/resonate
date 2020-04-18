@@ -32,12 +32,6 @@ const mainConfig: MainConfigInterface = {
     refreshPrivateKey: String(process.env.REFRESH_JWT_PRIVATE),
     algorithm: process.env.JWT_HASHING_ALGORITHM as Algorithm,
   },
-  authProviderSettings: {
-    googleId: String(process.env.GOOGLE_ID),
-    googleSecret: String(process.env.GOOGLE_SECRET),
-    facebookId: String(process.env.FACEBOOK_ID),
-    facebookSecret: String(process.env.FACEBOOK_SECRET),
-  },
   spotifySettings: {
     clientId: String(process.env.SPOTIFY_CLIENT_ID),
     clientSecret: String(process.env.SPOTIFY_CLIENT_SECRET),

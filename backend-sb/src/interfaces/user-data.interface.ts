@@ -1,8 +1,7 @@
-import { AuthSourceEnums } from '../auth/enums/auth.enum';
-
 export interface UserDataInterface {
-  id: string;
+  userName: string;
   email: string;
   displayName: string;
-  source: AuthSourceEnums;
+  subscription: string;
+  country: string;
 }

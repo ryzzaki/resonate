@@ -2,8 +2,8 @@ import mainConfig from '../../config/main.config';
 import { InternalServerErrorException } from '@nestjs/common';
 
 export enum UrlEnums {
-  AUTH_API_URL = getServerModeApiUrl(mainConfig.serverSettings.serverMode),
-  REDIRECT_URL = getServerModeRedirectUrl(mainConfig.serverSettings.serverMode),
+  API_URL = getServerModeApiUrl(mainConfig.serverSettings.serverMode),
+  BASE_URL = getServerModeRedirectUrl(mainConfig.serverSettings.serverMode),
 }
 
 export enum SpotifyUrlEnums {

@@ -5,22 +5,15 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UserRepository } from './repositories/user.repository';
-import { UserFacebookRepository } from './repositories/user-facebook.repository';
-import { UserGoogleRepository } from './repositories/user-google.repository';
-import { FacebookStrategy } from './strategies/facebook.strategy';
-import { GoogleStrategy } from './strategies/google.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { dynamicJwtConfig } from '../config/jwt.config';
 import { passportConfig } from '../config/passport.config';
+import { SpotifyStrategy } from './strategies/spotify.strategy';
 
 @Module({
-  imports: [
-    PassportModule.register(passportConfig),
-    JwtModule.register(dynamicJwtConfig),
-    TypeOrmModule.forFeature([UserRepository, UserFacebookRepository, UserGoogleRepository]),
-  ],
+  imports: [PassportModule.register(passportConfig), JwtModule.register(dynamicJwtConfig), TypeOrmModule.forFeature([UserRepository])],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, FacebookStrategy, GoogleStrategy],
+  providers: [AuthService, JwtStrategy, SpotifyStrategy],
   exports: [AuthService, PassportModule, JwtStrategy],
 })
 export class AuthModule {}

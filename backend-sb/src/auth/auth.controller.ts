@@ -3,7 +3,6 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './decorators/get-user.decorator';
 import { User } from './entities/user.entity';
-import { AuthSourceEnums } from './enums/auth.enum';
 import { Request, Response } from 'express';
 import { UpdateUserDto } from './dto/update.dto';
 
@@ -13,32 +12,18 @@ export class AuthController {
 
   constructor(private readonly authService: AuthService) {}
 
-  @Get('/facebook')
-  @UseGuards(AuthGuard('facebook'))
-  authenticateFacebook(): Promise<void> {
+  @Get('/spotify')
+  @UseGuards(AuthGuard('spotify'))
+  authenticateSpotify(): Promise<void> {
     // start the authentication flow
     return;
   }
 
-  @Get('/facebook/callback')
-  @UseGuards(AuthGuard('facebook'))
-  facebookCallBack(@Req() req: Request, @Res() res: Response, @GetUser() user: User): Promise<void> {
-    this.logger.verbose('GET on /facebook/callback called');
-    return this.authService.sendCredentials(req, res, user, AuthSourceEnums.FACEBOOK);
-  }
-
-  @Get('/google')
-  @UseGuards(AuthGuard('google'))
-  authenticateGoogle(): Promise<void> {
-    // start the authentication flow
-    return;
-  }
-
-  @Get('/google/callback')
-  @UseGuards(AuthGuard('google'))
+  @Get('/spotify/callback')
+  @UseGuards(AuthGuard('spotify'))
   googleCallBack(@Req() req: Request, @Res() res: Response, @GetUser() user: User): Promise<void> {
-    this.logger.verbose('GET on /google/callback called');
-    return this.authService.sendCredentials(req, res, user, AuthSourceEnums.GOOGLE);
+    this.logger.verbose('GET on /spotify/callback called');
+    return this.authService.sendCredentials(req, res, user);
   }
 
   @Get('/signout')
@@ -61,7 +46,7 @@ export class AuthController {
   }
 
   @Get('/public/user/:userId')
-  getBasicUserById(@Param('userId', ParseIntPipe) userId: number): Promise<{ id: number; displayName: string }> {
+  getBasicUserById(@Param('userId') userId: string): Promise<{ id: string; displayName: string }> {
     this.logger.verbose(`GET on /public/user/${userId} called`);
     return this.authService.getBasicUserById(userId);
   }
