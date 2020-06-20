@@ -5,9 +5,15 @@ import Footer from './Footer';
 import spotifyLogo from '../assets/icons/spotifyLogo.svg';
 import { UrlEnums } from '../enums/urls.enum';
 
-const LandingPage: React.FC<RouteComponentProps> = () => {
+interface LandingPageProps {
+  something?: string;
+}
+
+const LandingPage: React.FC<RouteComponentProps<LandingPageProps>> = (
+  props
+) => {
   return (
-    <section>
+    <section className="bg-white">
       <Header />
       <div className="min-h-screen flex flex-col text-center font-body">
         <div className="flex-grow w-full p-10 md:p-25">
@@ -108,7 +114,7 @@ const LandingPage: React.FC<RouteComponentProps> = () => {
             </div>
           </div>
           <a href={`${UrlEnums.API_URL}/auth/spotify`}>
-            <button className="bg-white hover:bg-darkgray text-green hover:text-green border border-green font-heading py-5 px-10 m-20 rounded">
+            <button className="bg-transparent hover:bg-darkgray text-green hover:text-green border border-green font-heading py-5 px-10 m-20 rounded">
               <img
                 className="inline mr-3 bg-transparent rounded-full"
                 src={spotifyLogo}
@@ -120,8 +126,8 @@ const LandingPage: React.FC<RouteComponentProps> = () => {
             </button>
           </a>
         </div>
+        <Footer />
       </div>
-      <Footer />
     </section>
   );
 };

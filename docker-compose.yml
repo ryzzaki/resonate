@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  redis:
+    image: 'redis:alpine'
+    command: redis-server --requirepass requirePassword
+    ports:
+      - '6379:6379'
+
+  postgres:
+    image: 'postgres:11.8-alpine'
+    environment: 
+      POSTGRES_DB: sonic_boom
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    ports:
+      - '5432:5432'
+
+  backend-sb:
+    build: 
+      context: ./backend-sb/
+      dockerfile: Dockerfile.dev
+    env_file: ./backend-sb/.env.compose
+    ports:
+      - '3000:3000'
+    depends_on:
+      - redis
+      - postgres
+
+  frontend-sb:
+    build: 
+      context: ./frontend-sb/
+      dockerfile: Dockerfile.dev
+    env_file: ./frontend-sb/.env.compose
+    ports:
+      - '3001:3000'
+    depends_on:
+      - backend-sb
+    stdin_open: true
