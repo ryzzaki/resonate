@@ -8,7 +8,7 @@ export enum UrlEnums {
 function getServerModeApiUrl(serverMode: string): any {
   switch (serverMode) {
     case 'development':
-      return `http://localhost:4000/v1`;
+      return `http://localhost:3000/v1`;
     case 'staging':
       return 'https://staging.sonicboom.life/v1';
     case 'production':

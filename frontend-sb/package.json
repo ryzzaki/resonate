@@ -22,7 +22,7 @@
     "typescript": "~3.7.2"
   },
   "scripts": {
-    "dev": "cross-env NODE_ENV=development yarn watch:css && react-scripts start",
+    "dev": "cross-env NODE_ENV=development yarn watch:css && PORT=3001 react-scripts start",
     "start": "cross-env NODE_ENV=production yarn build:css && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
