@@ -9,9 +9,10 @@ interface LandingPageProps {
   something?: string;
 }
 
-const LandingPage: React.FC<RouteComponentProps<LandingPageProps>> = (
+export const LandingPage: React.FC<RouteComponentProps<LandingPageProps>> = (
   props
 ) => {
+  // TODO redirect
   return (
     <section className="bg-white">
       <Header />
@@ -131,5 +132,3 @@ const LandingPage: React.FC<RouteComponentProps<LandingPageProps>> = (
     </section>
   );
 };
-
-export default LandingPage;

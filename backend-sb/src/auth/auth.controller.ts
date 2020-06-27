@@ -5,6 +5,7 @@ import { GetUser } from './decorators/get-user.decorator';
 import { User } from './entities/user.entity';
 import { Request, Response } from 'express';
 import { UpdateUserDto } from './dto/update.dto';
+import { UserWithAccessToken } from './strategies/spotify.strategy';
 
 @Controller('/v1/auth')
 export class AuthController {
@@ -21,7 +22,7 @@ export class AuthController {
 
   @Get('/spotify/callback')
   @UseGuards(AuthGuard('spotify'))
-  googleCallBack(@Req() req: Request, @Res() res: Response, @GetUser() user: User): Promise<void> {
+  googleCallBack(@Req() req: Request, @Res() res: Response, @GetUser() user: UserWithAccessToken): Promise<void> {
     this.logger.verbose('GET on /spotify/callback called');
     return this.authService.sendCredentials(req, res, user);
   }

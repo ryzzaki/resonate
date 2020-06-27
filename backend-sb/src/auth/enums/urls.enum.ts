@@ -27,7 +27,7 @@ function getServerModeApiUrl(serverMode: string): any {
 function getServerModeRedirectUrl(serverMode: string): any {
   switch (serverMode) {
     case 'development':
-      return 'http://localhost:3000';
+      return 'http://localhost:3001';
     case 'staging':
       return 'https://staging.sonicboom.life';
     case 'production':

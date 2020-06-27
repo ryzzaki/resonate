@@ -43,3 +43,9 @@ body {
 h2 {
   @apply font-heading text-30;
 } */
+
+.gradient-text {
+  background: linear-gradient(90deg, #00d2ff 0%, #2455b1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
