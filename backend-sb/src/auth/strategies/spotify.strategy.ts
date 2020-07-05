@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-spotify';
 import { AuthService } from '../auth.service';
@@ -14,15 +14,15 @@ export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
       clientID: mainConfig.spotifySettings.clientId,
       clientSecret: mainConfig.spotifySettings.clientSecret,
       callbackURL: `${UrlEnums.API_URL}/auth/spotify/callback`,
-      scope: ['user-read-email', 'user-read-private', 'streaming'],
+      scope: ['user-read-currently-playing', 'user-read-playback-state', 'user-read-email', 'user-read-private', 'streaming'],
     });
   }
 
   async validate(accessToken: string, refreshToken: string, profile: IProfile, done: (err: any, result: any) => void) {
     try {
       if (profile._json.product !== 'premium') {
+        Logger.error(`User does not have a premium subscription. Web SDK does not work with ${profile._json.product}.`);
         done(null, false);
-        throw new BadRequestException(`User does not have a premium subscription. Web SDK does not work with ${profile._json.product}.`);
       }
       const userData: UserDataInterface = {
         userName: profile._json.id,
@@ -31,7 +31,8 @@ export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
         country: profile._json.country,
         subscription: profile._json.product,
       };
-      const user: User = await this.authService.authenticateOnCallback(userData, refreshToken);
+      const user = (await this.authService.authenticateOnCallback(userData, refreshToken)) as UserWithAccessToken;
+      user.accessToken = accessToken;
       done(null, user);
     } catch (error) {
       done(error, false);
@@ -49,4 +50,8 @@ interface IProfile {
     product: string;
     uri: string;
   };
+}
+
+export interface UserWithAccessToken extends User {
+  accessToken: string;
 }

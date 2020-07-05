@@ -13,6 +13,7 @@ import { UserDataInterface } from '../interfaces/user-data.interface';
 import { UpdateUserDto } from './dto/update.dto';
 import { AuthTypeEnums } from './enums/auth.enum';
 import { UrlEnums } from './enums/urls.enum';
+import { UserWithAccessToken } from './strategies/spotify.strategy';
 
 @Injectable()
 export class AuthService {
@@ -57,7 +58,7 @@ export class AuthService {
     }
   }
 
-  async sendCredentials(req: Request, res: Response, user: User): Promise<void> {
+  async sendCredentials(req: Request, res: Response, user: UserWithAccessToken): Promise<void> {
     const existingToken = req.signedCookies.refresh_tkn_v1;
     if (existingToken) {
       await this.validateRefreshToken(existingToken);
@@ -66,8 +67,8 @@ export class AuthService {
         domain: cookieConfig.domain,
       });
     }
-    const refreshToken = await this.generateToken(user.id, AuthTypeEnums.REFRESH, user.tokenVer);
-    const accessToken = await this.generateToken(user.id, AuthTypeEnums.ACCESS);
+    const refreshToken = await this.generateToken(user.id, AuthTypeEnums.REFRESH, null, user.tokenVer);
+    const accessToken = await this.generateToken(user.id, AuthTypeEnums.ACCESS, user.accessToken);
     res
       .cookie('refresh_tkn_v1', refreshToken, cookieConfig)
       .status(302)
@@ -81,7 +82,7 @@ export class AuthService {
       throw new UnauthorizedException('Access Denied: no Refresh Token found in cookies');
     }
     const { id, ver } = await this.validateRefreshToken(req.signedCookies.refresh_tkn_v1);
-    const refreshToken = await this.generateToken(id, AuthTypeEnums.REFRESH, ver);
+    const refreshToken = await this.generateToken(id, AuthTypeEnums.REFRESH, null, ver);
     const accessToken = await this.generateToken(id, AuthTypeEnums.ACCESS, null);
 
     res
@@ -119,8 +120,8 @@ export class AuthService {
     return generatedToken;
   }
 
-  private async generateToken(id: string, type: AuthTypeEnums, ver?: number): Promise<string> {
-    const payload: TokenPayloadInterface = { id, ver, type };
+  private async generateToken(id: string, type: AuthTypeEnums, accessToken?: string, ver?: number): Promise<string> {
+    const payload: TokenPayloadInterface = { id, ver, type, accessToken };
     const generatedToken = await this.jwtService.signAsync(payload, {
       expiresIn: type === AuthTypeEnums.REFRESH ? mainConfig.serverSettings.refreshTokenAge : '1h',
       jwtid: uuid.v4(),
