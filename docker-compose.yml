@@ -9,7 +9,7 @@ services:
 
   postgres:
     image: 'postgres:11.8-alpine'
-    environment: 
+    environment:
       POSTGRES_DB: sonic_boom
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
@@ -17,23 +17,26 @@ services:
       - '5432:5432'
 
   backend-sb:
-    build: 
+    build:
       context: ./backend-sb/
       dockerfile: Dockerfile.dev
+    volumes:
+      - ./backend-sb:/home/app
     env_file: ./backend-sb/.env.compose
     ports:
       - '3000:3000'
+    stdin_open: true
     depends_on:
       - redis
       - postgres
 
   frontend-sb:
-    build: 
+    build:
       context: ./frontend-sb/
       dockerfile: Dockerfile.dev
+    volumes:
+      - ./frontend-sb:/home/app
     env_file: ./frontend-sb/.env.compose
     ports:
-      - '3001:3000'
-    depends_on:
-      - backend-sb
+      - '3001:3001'
     stdin_open: true
