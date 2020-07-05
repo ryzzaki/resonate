@@ -25,7 +25,6 @@ services:
     env_file: ./backend-sb/.env.compose
     ports:
       - '3000:3000'
-    stdin_open: true
     depends_on:
       - redis
       - postgres
