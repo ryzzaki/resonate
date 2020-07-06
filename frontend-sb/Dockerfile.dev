@@ -24,6 +24,6 @@ RUN chown app:app -R /home/app && chmod 777 /tmp
 
 USER app
 
-EXPOSE 3000
+EXPOSE 3001
 
 CMD yarn dev
