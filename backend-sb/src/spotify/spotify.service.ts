@@ -14,27 +14,28 @@ export class SpotifyService {
   constructor(private readonly authService: AuthService) {}
 
   async searchSongs(searchQuery: SearchQueryDto, user: User): Promise<object> {
-    const { accessToken, searchString } = searchQuery;
+    const { searchString } = searchQuery;
     const url = `${SpotifyUrlEnums.SPOTIFY_API}/search?${qs.stringify({
       q: searchString,
       type: 'album,track,artist,playlist',
     })}`;
     const response = await axios
       .get(url, {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: { Authorization: `Bearer ${user.accessToken}` },
       })
       .catch(async e => {
         if (e.response.status === 401 || e.response.status === 403) {
-          const credentials = await this.refreshToken(user.refreshToken);
-          await this.authService.setSpotifyRefreshToken(user.id, credentials.refreshToken);
+          const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await this.refreshSpotifyTokens(user.refreshToken);
+          await this.authService.updateUserSpotifyTokensById(user.id, newAccessToken, newRefreshToken);
+          // send the user back to frontend
         }
-        this.logger.error(`Unable to authorize Spotify client on ${e}`);
-        throw new InternalServerErrorException(`Unable to authorize Spotify client`);
+        this.logger.error(`Unable to authorize Spotify client on ${e} using the current refresh token!`);
+        throw new InternalServerErrorException(`Unable to authorize Spotify client using the current refresh token!`);
       });
     return response.data;
   }
 
-  async refreshToken(refreshTkn: string): Promise<{ accessToken: string; refreshToken: string }> {
+  async refreshSpotifyTokens(refreshTkn: string): Promise<{ accessToken: string; refreshToken: string }> {
     const url = `${SpotifyUrlEnums.SPOTIFY_ACCOUNTS}/api/token`;
     const grant = qs.stringify({
       grant_type: 'refresh_token',

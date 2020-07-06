@@ -15,7 +15,6 @@ export class SpotifyController {
   @Get('/search')
   @UseGuards(AuthGuard())
   searchSongs(@Query(ValidationPipe) searchQuery: SearchQueryDto, @GetUser() user: User): Promise<object> {
-    this.logger.verbose('Searching');
     return this.spotifyService.searchSongs(searchQuery, user);
   }
 }

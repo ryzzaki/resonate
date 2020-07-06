@@ -31,8 +31,7 @@ export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
         country: profile._json.country,
         subscription: profile._json.product,
       };
-      const user = (await this.authService.authenticateOnCallback(userData, refreshToken)) as UserWithAccessToken;
-      user.accessToken = accessToken;
+      const user = (await this.authService.authenticateOnCallback(userData, accessToken, refreshToken)) as User;
       done(null, user);
     } catch (error) {
       done(error, false);
@@ -50,8 +49,4 @@ interface IProfile {
     product: string;
     uri: string;
   };
-}
-
-export interface UserWithAccessToken extends User {
-  accessToken: string;
 }

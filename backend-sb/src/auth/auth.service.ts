@@ -13,7 +13,6 @@ import { UserDataInterface } from '../interfaces/user-data.interface';
 import { UpdateUserDto } from './dto/update.dto';
 import { AuthTypeEnums } from './enums/auth.enum';
 import { UrlEnums } from './enums/urls.enum';
-import { UserWithAccessToken } from './strategies/spotify.strategy';
 
 @Injectable()
 export class AuthService {
@@ -40,7 +39,7 @@ export class AuthService {
       .redirect(String(UrlEnums.BASE_URL));
   }
 
-  async authenticateOnCallback(userData: UserDataInterface, refreshToken: string): Promise<User> {
+  async authenticateOnCallback(userData: UserDataInterface, accessToken: string, refreshToken: string): Promise<User> {
     const { email, userName, displayName, country, subscription } = userData;
     try {
       const user: User = await this.userRepository.externalAuthentication(
@@ -49,6 +48,7 @@ export class AuthService {
         displayName,
         country,
         subscription,
+        accessToken,
         refreshToken
       );
       return user;
@@ -58,7 +58,7 @@ export class AuthService {
     }
   }
 
-  async sendCredentials(req: Request, res: Response, user: UserWithAccessToken): Promise<void> {
+  async sendCredentials(req: Request, res: Response, user: User): Promise<void> {
     const existingToken = req.signedCookies.refresh_tkn_v1;
     if (existingToken) {
       await this.validateRefreshToken(existingToken);
@@ -67,8 +67,8 @@ export class AuthService {
         domain: cookieConfig.domain,
       });
     }
-    const refreshToken = await this.generateToken(user.id, AuthTypeEnums.REFRESH, null, user.tokenVer);
-    const accessToken = await this.generateToken(user.id, AuthTypeEnums.ACCESS, user.accessToken);
+    const refreshToken = await this.generateToken(user.id, AuthTypeEnums.REFRESH, user.tokenVer);
+    const accessToken = await this.generateToken(user.id, AuthTypeEnums.ACCESS);
     res
       .cookie('refresh_tkn_v1', refreshToken, cookieConfig)
       .status(302)
@@ -82,8 +82,8 @@ export class AuthService {
       throw new UnauthorizedException('Access Denied: no Refresh Token found in cookies');
     }
     const { id, ver } = await this.validateRefreshToken(req.signedCookies.refresh_tkn_v1);
-    const refreshToken = await this.generateToken(id, AuthTypeEnums.REFRESH, null, ver);
-    const accessToken = await this.generateToken(id, AuthTypeEnums.ACCESS, null);
+    const refreshToken = await this.generateToken(id, AuthTypeEnums.REFRESH, ver);
+    const accessToken = await this.generateToken(id, AuthTypeEnums.ACCESS);
 
     res
       .clearCookie('refresh_tkn_v1', {
@@ -111,17 +111,17 @@ export class AuthService {
     return { id, displayName };
   }
 
-  async generateInvitationToken(groupId: number): Promise<string> {
-    const payload = { groupId };
-    const generatedToken = await this.jwtService.signAsync(payload, {
-      expiresIn: '60m',
-      jwtid: uuid.v4(),
-    });
-    return generatedToken;
-  }
+  // async generateInvitationToken(groupId: number): Promise<string> {
+  //   const payload = { groupId };
+  //   const generatedToken = await this.jwtService.signAsync(payload, {
+  //     expiresIn: '60m',
+  //     jwtid: uuid.v4(),
+  //   });
+  //   return generatedToken;
+  // }
 
-  private async generateToken(id: string, type: AuthTypeEnums, accessToken?: string, ver?: number): Promise<string> {
-    const payload: TokenPayloadInterface = { id, ver, type, accessToken };
+  private async generateToken(id: string, type: AuthTypeEnums, ver?: number): Promise<string> {
+    const payload: TokenPayloadInterface = { id, ver, type };
     const generatedToken = await this.jwtService.signAsync(payload, {
       expiresIn: type === AuthTypeEnums.REFRESH ? mainConfig.serverSettings.refreshTokenAge : '1h',
       jwtid: uuid.v4(),
@@ -129,20 +129,20 @@ export class AuthService {
     return generatedToken;
   }
 
-  async validateInvitationToken(invitationToken: string): Promise<{ jti: string; groupId: number }> {
-    try {
-      const { jti, groupId } = await this.jwtService.verifyAsync(invitationToken);
-      const client = this.redisService.getClient();
-      const token: string = await client.get(String(jti));
-      if (token) {
-        throw new BadRequestException('Token is invalid');
-      }
-      return { jti, groupId };
-    } catch (err) {
-      this.logger.error(`Invitation Token validation has failed on error: ${err}`);
-      throw new UnauthorizedException(`Invitation Token validation has failed on error: ${err}`);
-    }
-  }
+  // private async validateInvitationToken(invitationToken: string): Promise<{ jti: string; groupId: number }> {
+  //   try {
+  //     const { jti, groupId } = await this.jwtService.verifyAsync(invitationToken);
+  //     const client = this.redisService.getClient();
+  //     const token: string = await client.get(String(jti));
+  //     if (token) {
+  //       throw new BadRequestException('Token is invalid');
+  //     }
+  //     return { jti, groupId };
+  //   } catch (err) {
+  //     this.logger.error(`Invitation Token validation has failed on error: ${err}`);
+  //     throw new UnauthorizedException(`Invitation Token validation has failed on error: ${err}`);
+  //   }
+  // }
 
   async getAllUsersCount(): Promise<{ total: number }> {
     return await this.userRepository.getAllUsersCount();
@@ -165,8 +165,8 @@ export class AuthService {
     });
   }
 
-  async setSpotifyRefreshToken(userId: string, refreshToken: string): Promise<void> {
-    return await this.userRepository.updateUserRefreshTokenById(userId, refreshToken);
+  async updateUserSpotifyTokensById(userId: string, accessToken: string, refreshToken: string): Promise<void> {
+    return await this.userRepository.updateUserSpotifyTokensById(userId, accessToken, refreshToken);
   }
 
   private async validateRefreshToken(refreshJwtToken: string): Promise<{ id: string; ver: number }> {
