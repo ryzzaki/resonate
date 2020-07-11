@@ -1,11 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { Router, navigate } from '@reach/router';
+import { Router, navigate, Redirect } from '@reach/router';
 import { LandingPage } from './components/LandingPage';
 import { RedirectPage } from './components/RedirectPage';
 import { DJPage } from './components/DJPage';
 import { AuthContext } from './context/AuthContext';
 import { UserContext } from './context/UserContext';
 import fetchUser from './utils/fetchUser';
+
+type Props = {
+  component: React.FC;
+  path: string;
+  allowed: boolean;
+};
+
+const ProtectedRoute: React.FC<Props> = ({
+  component: Component,
+  allowed,
+  ...props
+}) => (allowed ? <Component {...props} /> : <Redirect to="/" noThrow />);
+
+const PublicRoute: React.FC<Props> = ({
+  component: Component,
+  allowed,
+  ...props
+}) => (allowed ? <Component {...props} /> : <Redirect to="/dj" noThrow />);
 
 function App() {
   const [token, setToken] = useState<string>('');
@@ -19,8 +37,7 @@ function App() {
         setUser(data);
         navigate('/dj');
       } catch (err) {
-        console.log(err);
-        navigate('/');
+        alert(err);
       }
     }
     if (access_token) {
@@ -34,9 +51,13 @@ function App() {
       <AuthContext.Provider value={{ token, setToken }}>
         <UserContext.Provider value={{ user, setUser }}>
           <Router>
-            <DJPage path="/dj" />
-            <RedirectPage path="/auth" />
-            <LandingPage path="/" />
+            <ProtectedRoute path="/dj" allowed={!!token} component={DJPage} />
+            <PublicRoute
+              path="/auth"
+              allowed={!token}
+              component={RedirectPage}
+            />
+            <PublicRoute path="/" allowed={!token} component={LandingPage} />
           </Router>
         </UserContext.Provider>
       </AuthContext.Provider>
