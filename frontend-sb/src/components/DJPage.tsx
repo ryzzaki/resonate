@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
-import { RouteComponentProps, Redirect } from '@reach/router';
-import { AuthContext } from '../context/AuthContext';
+import { RouteComponentProps } from '@reach/router';
 import SpotifyPlayer from 'react-spotify-web-playback';
+import { AuthContext } from '../context/AuthContext';
+import { UserContext } from '../context/UserContext';
 import { ICallbackState } from 'react-spotify-web-playback/lib/types/common';
 
 type Props = {};
@@ -10,23 +11,35 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
   const {} = props;
 
   const { token, setToken } = useContext(AuthContext);
-
-  if (!token) return <Redirect noThrow to="/" />;
+  const { user, setUser } = useContext(UserContext);
 
   const handleCallback = (res: ICallbackState) => {
     if (res.errorType === 'authentication_error') {
-      setToken('');
+      console.log(res);
+      handleSignOut();
     }
+  };
+
+  const handleSignOut = () => {
+    localStorage.removeItem('access_key');
   };
 
   return (
     <div className="min-h-screen flex flex-col">
-      <h1 className="self-center gradient-text text-30 text-center pt-20">
-        SonicBoom
-      </h1>
+      <nav className="relative p-30">
+        <h1 className="self-center gradient-text text-30 text-center">
+          SonicBoom
+        </h1>
+        <a
+          className="absolute right-0 top-0 p-30 text-blue cursor-pointer"
+          onClick={handleSignOut}
+        >
+          Logout
+        </a>
+      </nav>
       <div className="mt-auto">
         <SpotifyPlayer
-          token="da"
+          token={user.accessToken}
           callback={handleCallback}
           styles={{
             height: '70px',
