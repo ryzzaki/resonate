@@ -22,7 +22,7 @@ export class UserRepository extends Repository<User> {
     return await this.createUser(email, userName, displayName, country, subscription, accessToken, refreshToken);
   }
 
-  async findUserByIdToken(id: number, tokenVer: number): Promise<User> {
+  async getUserByIdToken(id: number, tokenVer: number): Promise<User> {
     try {
       return await this.findOneOrFail({ where: { id, tokenVer } });
     } catch (error) {
@@ -31,7 +31,7 @@ export class UserRepository extends Repository<User> {
     }
   }
 
-  async findUserById(id: string): Promise<User> {
+  async getUserById(id: string): Promise<User> {
     try {
       return await this.findOneOrFail({ where: { id } });
     } catch (error) {
@@ -40,7 +40,7 @@ export class UserRepository extends Repository<User> {
     }
   }
 
-  async findUserByEmail(email: string): Promise<User> {
+  async getUserByEmail(email: string): Promise<User> {
     try {
       return await this.findOneOrFail({ where: { email } });
     } catch (error) {

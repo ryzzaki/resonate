@@ -79,18 +79,18 @@ export class AuthService {
     return;
   }
 
-  async refreshCredentials(req: Request, res: Response, user: User): Promise<void> {
+  async refreshCredentials(req: Request, res: Response): Promise<void> {
     if (!req.signedCookies.refresh_tkn_v1) {
       this.logger.log('Access Denied: no Refresh Token found in cookies');
       throw new UnauthorizedException('Access Denied: no Refresh Token found in cookies');
     }
     const { id, ver } = await this.validateRefreshToken(req.signedCookies.refresh_tkn_v1);
+    const user = await this.userRepository.getUserById(id);
     const refreshToken = await this.generateToken(id, AuthTypeEnums.REFRESH, ver);
     const accessToken = await this.generateToken(id, AuthTypeEnums.ACCESS);
-
+    // refresh the spotify tokens
     const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await this.refreshSpotifyTokens(user.refreshToken);
-    await this.userRepository.updateUserSpotifyTokensById(user.id, newAccessToken, newRefreshToken);
-
+    await this.userRepository.updateUserSpotifyTokensById(user.id, newAccessToken, newRefreshToken ? newRefreshToken : user.refreshToken);
     res
       .clearCookie('refresh_tkn_v1', {
         domain: cookieConfig.domain,
@@ -105,15 +105,15 @@ export class AuthService {
     const { displayName } = updateDetailsDto;
     await this.userRepository.updateUserDisplayNameById(user.id, displayName);
 
-    return await this.userRepository.findUserById(user.id);
+    return await this.userRepository.getUserById(user.id);
   }
 
   async getUserById(id: string): Promise<User> {
-    return await this.userRepository.findUserById(id);
+    return await this.userRepository.getUserById(id);
   }
 
   async getBasicUserById(id: string): Promise<{ id: string; displayName: string }> {
-    const { displayName } = await this.userRepository.findUserById(id);
+    const { displayName } = await this.userRepository.getUserById(id);
     return { id, displayName };
   }
 
