@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { RouteComponentProps, navigate } from '@reach/router';
 import Header from './Header';
 import Footer from './Footer';
 import spotifyLogo from '../assets/icons/spotifyLogo.svg';
 import { UrlEnums } from '../enums/urls.enum';
+import { AuthContext } from '../context/AuthContext';
 
 type Props = {};
 
 export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
-  if (localStorage.getItem('access_key')) navigate('/dj');
+  const { token, setToken } = useContext(AuthContext);
+
+  if (token) navigate('/dj');
 
   return (
     <section className="bg-white">

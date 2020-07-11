@@ -1,6 +1,8 @@
 import React, { useEffect, useContext } from 'react';
 import { RouteComponentProps, navigate } from '@reach/router';
 import { AuthContext } from '../context/AuthContext';
+import { UserContext } from '../context/UserContext';
+import fetchUser from '../utils/fetchUser';
 
 type Props = {};
 
@@ -8,13 +10,24 @@ export const RedirectPage: React.FC<RouteComponentProps<Props>> = (props) => {
   const { location } = props;
 
   const { token, setToken } = useContext(AuthContext);
+  const { user, setUser } = useContext(UserContext);
 
   useEffect(() => {
+    async function fetchUserAndRedirect(token: string) {
+      try {
+        const { data } = await fetchUser(token);
+        setUser(data);
+        navigate('/dj');
+      } catch (err) {
+        console.log(err);
+        navigate('/');
+      }
+    }
     if (location?.hash && !localStorage.getItem('access_key')) {
       const access_token = location?.hash.replace('#access_token=', '');
       localStorage.setItem('access_key', access_token);
       setToken(access_token);
-      navigate('/dj');
+      fetchUserAndRedirect(access_token);
     } else {
       navigate('/');
     }

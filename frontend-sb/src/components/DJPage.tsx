@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
-import { RouteComponentProps, Redirect } from '@reach/router';
+import { RouteComponentProps, navigate } from '@reach/router';
 import { AuthContext } from '../context/AuthContext';
+import { UserContext } from '../context/UserContext';
 import SpotifyPlayer from 'react-spotify-web-playback';
 import { ICallbackState } from 'react-spotify-web-playback/lib/types/common';
 
@@ -10,12 +11,18 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
   const {} = props;
 
   const { token, setToken } = useContext(AuthContext);
+  const { user, setUser } = useContext(UserContext);
 
-  if (!token) return <Redirect noThrow to="/" />;
+  if (!token) navigate('/');
+
+  console.log(user);
 
   const handleCallback = (res: ICallbackState) => {
     if (res.errorType === 'authentication_error') {
-      setToken('');
+      console.log(res);
+      // localStorage.removeItem('access_key');
+      // setToken('');
+      // setUser('');
     }
   };
 
@@ -26,7 +33,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
       </h1>
       <div className="mt-auto">
         <SpotifyPlayer
-          token="da"
+          token={user.accessToken}
           callback={handleCallback}
           styles={{
             height: '70px',
