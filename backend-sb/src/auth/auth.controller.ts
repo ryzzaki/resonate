@@ -5,6 +5,7 @@ import { GetUser } from './decorators/get-user.decorator';
 import { User } from './entities/user.entity';
 import { Request, Response } from 'express';
 import { UpdateUserDto } from './dto/update.dto';
+import * as _ from 'lodash';
 
 @Controller('/v1/auth')
 export class AuthController {
@@ -40,7 +41,7 @@ export class AuthController {
 
   @Put('/user/update')
   @UseGuards(AuthGuard())
-  updateUserDetails(@Body(ValidationPipe) updateDetailsDto: UpdateUserDto, @GetUser() user: User): Promise<User> {
+  updateUserDetails(@Body(ValidationPipe) updateDetailsDto: UpdateUserDto, @GetUser() user: User): Promise<_.Omit<User, 'refreshToken'>> {
     this.logger.verbose('GET on /user/total/detail called');
     return this.authService.updateUserDetails(updateDetailsDto, user);
   }
@@ -53,7 +54,7 @@ export class AuthController {
 
   @Get('/private/user/')
   @UseGuards(AuthGuard())
-  getPrivateUserById(@GetUser() user: User): Promise<User> {
+  getPrivateUserById(@GetUser() user: User): Promise<_.Omit<User, 'refreshToken'>> {
     this.logger.verbose(`GET on /private/user called`);
     return this.authService.getUserById(user.id);
   }
