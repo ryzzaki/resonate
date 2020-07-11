@@ -17,3 +17,7 @@ export const refreshUser = async (token: string | null) => {
     },
   });
 };
+
+export const searchSongs = async (search: string) => {
+  return axios.post(`${UrlEnums.API_URL}/spotify/search?searchQuery=${search}`);
+};

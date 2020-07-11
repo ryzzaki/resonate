@@ -19,8 +19,9 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
     console.log(res);
     if (res.errorType === 'authentication_error') {
       try {
-        // const { data } = await refreshUser(token);
-        // console.log(data);
+        const { data } = await refreshUser(token);
+
+        console.log(data);
       } catch (err) {
         console.log(err);
         handleSignOut();
