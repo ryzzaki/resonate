@@ -22,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
   async validate(jwt: TokenPayloadInterface, done: (err: any, result: any) => void) {
     try {
-      const user: User = await this.userRepository.findUserById(jwt.id);
+      const user: User = await this.userRepository.getUserById(jwt.id);
       done(null, user);
     } catch (error) {
       done(error, false);

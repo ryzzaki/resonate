@@ -34,9 +34,9 @@ export class AuthController {
   }
 
   @Get('/user/refresh')
-  refreshCredentials(@Req() req: Request, @Res() res: Response, @GetUser() user: User): Promise<void> {
+  refreshCredentials(@Req() req: Request, @Res() res: Response): Promise<void> {
     this.logger.verbose('GET on /user/refresh called');
-    return this.authService.refreshCredentials(req, res, user);
+    return this.authService.refreshCredentials(req, res);
   }
 
   @Put('/user/update')
