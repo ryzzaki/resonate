@@ -5,7 +5,7 @@ import { RedirectPage } from './components/RedirectPage';
 import { DJPage } from './components/DJPage';
 import { AuthContext } from './context/AuthContext';
 import { UserContext } from './context/UserContext';
-import fetchUser from './utils/fetchUser';
+import { fetchUser } from './utils/api';
 
 type Props = {
   component: React.FC;
