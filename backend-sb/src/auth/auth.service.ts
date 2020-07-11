@@ -1,6 +1,5 @@
 import { Injectable, UnauthorizedException, BadRequestException, Logger, InternalServerErrorException } from '@nestjs/common';
 import { Request, Response } from 'express';
-import * as uuid from 'uuid';
 import mainConfig from '../config/main.config';
 import { cookieConfig } from '../config/cookie.config';
 import { User } from './entities/user.entity';
@@ -10,9 +9,13 @@ import { RedisService } from 'nestjs-redis';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayloadInterface } from '../interfaces/token-payload.interface';
 import { UserDataInterface } from '../interfaces/user-data.interface';
+import { SpotifyPayloadInterface } from '../interfaces/spotifyPayload.interface';
 import { UpdateUserDto } from './dto/update.dto';
 import { AuthTypeEnums } from './enums/auth.enum';
-import { UrlEnums } from './enums/urls.enum';
+import { UrlEnums, SpotifyUrlEnums } from './enums/urls.enum';
+import axios from 'axios';
+import * as qs from 'qs';
+import * as uuid from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -76,7 +79,7 @@ export class AuthService {
     return;
   }
 
-  async refreshCredentials(req: Request, res: Response): Promise<void> {
+  async refreshCredentials(req: Request, res: Response, user: User): Promise<void> {
     if (!req.signedCookies.refresh_tkn_v1) {
       this.logger.log('Access Denied: no Refresh Token found in cookies');
       throw new UnauthorizedException('Access Denied: no Refresh Token found in cookies');
@@ -84,6 +87,9 @@ export class AuthService {
     const { id, ver } = await this.validateRefreshToken(req.signedCookies.refresh_tkn_v1);
     const refreshToken = await this.generateToken(id, AuthTypeEnums.REFRESH, ver);
     const accessToken = await this.generateToken(id, AuthTypeEnums.ACCESS);
+
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await this.refreshSpotifyTokens(user.refreshToken);
+    await this.userRepository.updateUserSpotifyTokensById(user.id, newAccessToken, newRefreshToken);
 
     res
       .clearCookie('refresh_tkn_v1', {
@@ -165,10 +171,6 @@ export class AuthService {
     });
   }
 
-  async updateUserSpotifyTokensById(userId: string, accessToken: string, refreshToken: string): Promise<void> {
-    return await this.userRepository.updateUserSpotifyTokensById(userId, accessToken, refreshToken);
-  }
-
   private async validateRefreshToken(refreshJwtToken: string): Promise<{ id: string; ver: number }> {
     try {
       const { jti, id, ver } = await this.jwtService.verifyAsync(refreshJwtToken);
@@ -182,5 +184,32 @@ export class AuthService {
       this.logger.error(`Refresh Token validation has failed on error: ${err}`);
       throw new UnauthorizedException(`Refresh Token validation has failed on error: ${err}`);
     }
+  }
+
+  private async refreshSpotifyTokens(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
+    const url = `${SpotifyUrlEnums.SPOTIFY_ACCOUNTS}/api/token`;
+    const grant = qs.stringify({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+    });
+    const responseData = (
+      await axios
+        .post(url, grant, {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            // tslint:disable-next-line: object-literal-key-quotes
+            Authorization: `Basic ${await this.getBase64AuthHeader()}`,
+          },
+        })
+        .catch(e => {
+          this.logger.error(`Unable to authorize Spotify client on ${e}`);
+          throw new InternalServerErrorException(`Unable to authorize Spotify client`);
+        })
+    ).data as SpotifyPayloadInterface;
+    return { accessToken: responseData.access_token, refreshToken: responseData.refresh_token };
+  }
+
+  private async getBase64AuthHeader(): Promise<string> {
+    return Buffer.from(`${mainConfig.spotifySettings.clientId}:${mainConfig.spotifySettings.clientSecret}`).toString('base64');
   }
 }
