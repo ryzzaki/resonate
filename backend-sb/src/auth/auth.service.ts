@@ -97,7 +97,7 @@ export class AuthService {
       })
       .cookie('refresh_tkn_v1', refreshToken, cookieConfig)
       .status(200)
-      .send({ accessToken });
+      .send({ accessToken, spotifyAccessToken: newAccessToken });
     return;
   }
 
