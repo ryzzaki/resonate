@@ -10,7 +10,7 @@ export const RedirectPage: React.FC<RouteComponentProps<Props>> = (props) => {
   const { token, setToken } = useContext(AuthContext);
 
   useEffect(() => {
-    if (location?.hash) {
+    if (location?.hash && !localStorage.getItem('access_key')) {
       const access_token = location?.hash.replace('#access_token=', '');
       localStorage.setItem('access_key', access_token);
       setToken(access_token);

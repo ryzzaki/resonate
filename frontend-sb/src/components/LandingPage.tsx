@@ -1,18 +1,15 @@
 import React from 'react';
-import { RouteComponentProps } from '@reach/router';
+import { RouteComponentProps, navigate } from '@reach/router';
 import Header from './Header';
 import Footer from './Footer';
 import spotifyLogo from '../assets/icons/spotifyLogo.svg';
 import { UrlEnums } from '../enums/urls.enum';
 
-interface LandingPageProps {
-  something?: string;
-}
+type Props = {};
 
-export const LandingPage: React.FC<RouteComponentProps<LandingPageProps>> = (
-  props
-) => {
-  // TODO redirect
+export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
+  if (localStorage.getItem('access_key')) navigate('/dj');
+
   return (
     <section className="bg-white">
       <Header />

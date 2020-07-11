@@ -3,7 +3,6 @@ import { RouteComponentProps, Redirect } from '@reach/router';
 import { AuthContext } from '../context/AuthContext';
 import SpotifyPlayer from 'react-spotify-web-playback';
 import { ICallbackState } from 'react-spotify-web-playback/lib/types/common';
-import decode from 'jwt-decode';
 
 type Props = {};
 
@@ -13,8 +12,6 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
   const { token, setToken } = useContext(AuthContext);
 
   if (!token) return <Redirect noThrow to="/" />;
-
-  const { accessToken } = decode(token);
 
   const handleCallback = (res: ICallbackState) => {
     if (res.errorType === 'authentication_error') {
@@ -29,7 +26,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
       </h1>
       <div className="mt-auto">
         <SpotifyPlayer
-          token={accessToken}
+          token="da"
           callback={handleCallback}
           styles={{
             height: '70px',
