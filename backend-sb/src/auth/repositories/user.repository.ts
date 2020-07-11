@@ -51,7 +51,7 @@ export class UserRepository extends Repository<User> {
 
   async updateUserDisplayNameById(id: string, displayName: string): Promise<void> {
     try {
-      await this.update(id, { displayName });
+      await this.update({ id }, { displayName });
     } catch (error) {
       this.logger.error(`Failed to update user display name for: ${id} on error: ${error}`);
       throw new InternalServerErrorException('Failed to update user display name for: ${id} on error: ${error}');
@@ -60,7 +60,7 @@ export class UserRepository extends Repository<User> {
 
   async updateUserSpotifyTokensById(id: string, accessToken: string, refreshToken: string): Promise<void> {
     try {
-      await this.update(id, { accessToken, refreshToken });
+      await this.update({ id }, { accessToken, refreshToken });
     } catch (error) {
       this.logger.error(`Failed to update user refreshToken for: ${id} on error: ${error}`);
       throw new InternalServerErrorException('Failed to update user refreshToken for: ${id} on error: ${error}');
