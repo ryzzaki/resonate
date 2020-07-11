@@ -54,6 +54,13 @@ module.exports = {
       green: '#1db954',
       lightgreen: '#15d600',
       blue: '#0282eb',
+      // yellow100: '#373416',
+      // yellow200: '##28240f',
+      // yellow300: '#191919',
+      skinpink: '#f8ccd2',
+      darkskinpink: '#e4a7af',
+      pink: '#f453a9',
+      darkblue: '#203264',
     },
     fontSize: sizes,
     fontFamily: {

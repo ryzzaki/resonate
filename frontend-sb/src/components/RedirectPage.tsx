@@ -2,7 +2,7 @@ import React, { useEffect, useContext } from 'react';
 import { RouteComponentProps, navigate } from '@reach/router';
 import { AuthContext } from '../context/AuthContext';
 import { UserContext } from '../context/UserContext';
-import fetchUser from '../utils/fetchUser';
+import { fetchUser } from '../utils/api';
 
 type Props = {};
 
