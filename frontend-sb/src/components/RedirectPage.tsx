@@ -17,7 +17,7 @@ export const RedirectPage: React.FC<RouteComponentProps<Props>> = (props) => {
       try {
         const { data } = await fetchUser(token);
         setUser(data);
-        navigate('/dj');
+        navigate('/party');
       } catch (err) {
         console.log(err);
       }

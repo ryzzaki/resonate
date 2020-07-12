@@ -47,7 +47,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
           </li>
           <li className="mr-2 0">
             <a className="cursor-pointer" onClick={handleSignOut}>
-              Logout
+              Sign Out
             </a>
           </li>
         </ul>

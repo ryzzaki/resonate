@@ -23,7 +23,7 @@ const PublicRoute: React.FC<Props> = ({
   component: Component,
   allowed,
   ...props
-}) => (allowed ? <Component {...props} /> : <Redirect to="/dj" noThrow />);
+}) => (allowed ? <Component {...props} /> : <Redirect to="/party" noThrow />);
 
 function App() {
   const [token, setToken] = useState<string>('');
@@ -35,7 +35,7 @@ function App() {
       try {
         const { data } = await fetchUser(access_token);
         setUser(data);
-        navigate('/dj');
+        navigate('/party');
       } catch (err) {
         console.log(err);
       }
@@ -51,7 +51,11 @@ function App() {
       <AuthContext.Provider value={{ token, setToken }}>
         <UserContext.Provider value={{ user, setUser }}>
           <Router>
-            <ProtectedRoute path="/dj" allowed={!!token} component={DJPage} />
+            <ProtectedRoute
+              path="/party"
+              allowed={!!token}
+              component={DJPage}
+            />
             <PublicRoute
               path="/auth"
               allowed={!token}
