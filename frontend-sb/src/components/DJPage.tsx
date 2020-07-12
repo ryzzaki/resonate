@@ -38,7 +38,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
   return (
     <div className="min-h-screen flex">
       <aside className="w-30rem bg-skinpink flex flex-col px-20 py-40 fixed h-full">
-        <h1 className="font-bold tracking-tighter text-40 text-pink">
+        <h1 className="font-bold tracking-tighter text-40 text-darkblue">
           SonicBoom
         </h1>
         <ul className="mt-auto flex text-darkblue font-medium">
@@ -59,6 +59,13 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
         <div className="mt-auto sticky bottom-0">
           <SpotifyPlayer
             token={user.accessToken}
+            // set URIs here to play the selected songs
+            // uris={[
+            //   'spotify:track:7kzKAuUzOITUauHAhoMoxA',
+            //   'spotify:track:2LMloFiV7DHpBhITOaBSam',
+            // ]}
+            autoPlay={true}
+            showSaveIcon={true}
             callback={handleCallback}
             styles={{
               height: '70px',
@@ -69,6 +76,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
               errorColor: '#f8ccd2',
               bgColor: '#203264',
               loaderSize: 50,
+              trackNameColor: '#f453a9',
             }}
           />
         </div>
