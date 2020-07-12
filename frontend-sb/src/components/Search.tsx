@@ -11,10 +11,12 @@ function debouncer(func: (...params: any[]) => any, delay: number) {
 
 type Props = {
   token: string;
+  setIsPlaying: (state: boolean) => void;
+  setURIs: (state: string[]) => void;
 };
 
 export const Search: React.FC<Props> = (props) => {
-  const { token } = props;
+  const { token, setIsPlaying, setURIs } = props;
 
   const [results, setResults] = useState<any>(null);
 
@@ -32,6 +34,13 @@ export const Search: React.FC<Props> = (props) => {
     debounceSearch(e);
   };
 
+  const handleClickURIs = useCallback((e) => {
+    e.preventDefault();
+    const { uris } = e.currentTarget.dataset;
+    setURIs(uris.split(','));
+    setIsPlaying(true);
+  }, []);
+
   return (
     <div>
       <div className="sticky top-0 bg-darkblue pb-20">
@@ -43,7 +52,12 @@ export const Search: React.FC<Props> = (props) => {
       </div>
       <ul className="px-20">
         {results?.tracks.items.map((result: any) => (
-          <li key={result.id} className="flex mb-15">
+          <li
+            data-uris={result.uri}
+            key={result.id}
+            className="group flex mb-10 cursor-pointer hover:bg-skinpink"
+            onClick={handleClickURIs}
+          >
             <img
               className="h-60 w-60 object-cover mr-10"
               src={result.album?.images[2].url}
@@ -52,7 +66,10 @@ export const Search: React.FC<Props> = (props) => {
               <h5 className="font-semibold text-pink">{result.name}</h5>
               <ul className="flex">
                 {result.artists?.map((artist: any) => (
-                  <li key={artist.id} className="text-skinpink text-14 mr-10">
+                  <li
+                    key={artist.id}
+                    className="text-skinpink group-hover:text-darkblue text-14 mr-10 leading-none"
+                  >
                     {artist.name}
                   </li>
                 ))}

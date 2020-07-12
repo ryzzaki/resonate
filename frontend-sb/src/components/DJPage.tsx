@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { RouteComponentProps } from '@reach/router';
 import SpotifyPlayer from 'react-spotify-web-playback';
 import { AuthContext } from '../context/AuthContext';
@@ -14,6 +14,11 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
 
   const { token, setToken } = useContext(AuthContext);
   const { user, setUser } = useContext(UserContext);
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [URIs, setURIs] = useState<string[]>([
+    'spotify:track:3e91QYrWXIBXesEjrR3a7F',
+  ]);
 
   const handleCallback = async (res: ICallbackState) => {
     console.log(res);
@@ -54,18 +59,17 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
       </aside>
       <main className="flex-col flex flex-1 bg-darkblue ml-30rem">
         <div className="p-20 pr-40 flex-1">
-          <Search token={token} />
+          <Search token={token} setURIs={setURIs} setIsPlaying={setIsPlaying} />
         </div>
         <div className="mt-auto sticky bottom-0">
           <SpotifyPlayer
+            autoPlay
+            showSaveIcon
             token={user.accessToken}
+            play={isPlaying}
             // set URIs here to play the selected songs
-            // uris={[
-            //   'spotify:track:7kzKAuUzOITUauHAhoMoxA',
-            //   'spotify:track:2LMloFiV7DHpBhITOaBSam',
-            // ]}
-            autoPlay={true}
-            showSaveIcon={true}
+            // spotify:track:2LMloFiV7DHpBhITOaBSam
+            uris={URIs}
             callback={handleCallback}
             styles={{
               height: '70px',
@@ -77,6 +81,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
               bgColor: '#203264',
               loaderSize: 50,
               trackNameColor: '#f453a9',
+              trackArtistColor: '#f8ccd2',
             }}
           />
         </div>

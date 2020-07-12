@@ -77,6 +77,8 @@ module.exports = {
       maxWidth: sizes,
     },
   },
-  variants: {},
+  variants: {
+    textColor: ['group-hover'],
+  },
   plugins: [],
 };
