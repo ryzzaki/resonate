@@ -31,6 +31,9 @@ const sizes = {
   '36': '36px',
   '38': '38px',
   '40': '40px',
+  '60': '60px',
+  '100': '100px',
+  '30rem': '30rem',
 };
 
 module.exports = {

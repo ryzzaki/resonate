@@ -37,7 +37,7 @@ function App() {
         setUser(data);
         navigate('/dj');
       } catch (err) {
-        alert(err);
+        console.log(err);
       }
     }
     if (access_token) {

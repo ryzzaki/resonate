@@ -18,6 +18,13 @@ export const refreshUser = async (token: string | null) => {
   });
 };
 
-export const searchSongs = async (search: string) => {
-  return axios.post(`${UrlEnums.API_URL}/spotify/search?searchQuery=${search}`);
+export const searchSongs = async (token: string, search: string) => {
+  return axios.get(
+    `${UrlEnums.API_URL}/spotify/search?searchString=${search}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 };

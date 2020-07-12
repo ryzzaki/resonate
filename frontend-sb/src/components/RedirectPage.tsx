@@ -19,7 +19,7 @@ export const RedirectPage: React.FC<RouteComponentProps<Props>> = (props) => {
         setUser(data);
         navigate('/dj');
       } catch (err) {
-        alert(err);
+        console.log(err);
       }
     }
     if (location?.hash) {
