@@ -1031,10 +1031,10 @@
   resolved "https://registry.yarnpkg.com/@csstools/normalize.css/-/normalize.css-10.1.0.tgz#f0950bba18819512d42f7197e56c518aa491cf18"
   integrity sha512-ij4wRiunFfaJxjB0BdrYHIH8FxBJpOwNPhhAcunlmPdXudL1WQV1qoP9un6JsEBAgQH+7UXyyjh0g7jTxXK6tg==
 
-"@gilbarbara/react-range-slider@^0.4.4":
-  version "0.4.4"
-  resolved "https://registry.yarnpkg.com/@gilbarbara/react-range-slider/-/react-range-slider-0.4.4.tgz#84c3421126882d8c19fbdfb6b717bf8dcd8f3fb4"
-  integrity sha512-giG4zGnijbXrLKyLrndjQiJ6qwsyFqxMvZdSBPRrTVICrbjlaKPznHYOXDt8CfbFZsxIRmERJJvFE49qRa/U0A==
+"@gilbarbara/react-range-slider@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@gilbarbara/react-range-slider/-/react-range-slider-0.5.0.tgz#261ea50a40a8396fef757df82cae7abed1647db5"
+  integrity sha512-A66hpJooeToCzOzVGjDMsmhf0owD8PpXLEF1KEMZ5g4ub5ozh9XHoiSAizyYwnJ+CIvF00GGbrne9agcZzst2g==
   dependencies:
     blacklist "^1.1.4"
     deepmerge "^4.0.0"
@@ -6877,6 +6877,11 @@ mem@^4.0.0:
     mimic-fn "^2.0.0"
     p-is-promise "^2.0.0"
 
+memoize-one@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/memoize-one/-/memoize-one-5.1.1.tgz#047b6e3199b508eaec03504de71229b8eb1d75c0"
+  integrity sha512-HKeeBpWvqiVJD57ZUAsJNm71eHTykffzcLZVYWiVfQeI1rJtuEaS7hQiEpWfVVk18donPwJEcFKIkCmPJNOhHA==
+
 memory-fs@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/memory-fs/-/memory-fs-0.4.1.tgz#3a9a20b8462523e447cfbc7e8bb80ed667bfc552"
@@ -7143,7 +7148,7 @@ nan@^2.12.1:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
   integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==
 
-nano-css@^5.2.0:
+nano-css@^5.3.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/nano-css/-/nano-css-5.3.0.tgz#9d3cd29788d48b6a07f52aa4aec7cf4da427b6b5"
   integrity sha512-uM/9NGK9/E9/sTpbIZ/bQ9xOLOIHZwrrb/CRlbDHBU/GFS7Gshl24v/WJhwsVViWkpOXUmiZ66XO7fSB4Wd92Q==
@@ -9043,14 +9048,14 @@ react-scripts@3.4.1:
   optionalDependencies:
     fsevents "2.1.2"
 
-react-spotify-web-playback@^0.6.0:
+"react-spotify-web-playback@https://pkg.csb.dev/gilbarbara/react-spotify-web-playback/commit/e2c38749/react-spotify-web-playback":
   version "0.6.0"
-  resolved "https://registry.yarnpkg.com/react-spotify-web-playback/-/react-spotify-web-playback-0.6.0.tgz#1ad3dc0f93df41663714d7b763b1263cbe7b2868"
-  integrity sha512-AOw6P2VubyUQxkw29umugb+Jhg8JyybrMs2PUd6IOiJee5EPhJkG3EbwccZDYtRMusYyyyzZu0CaD+5ReiphYQ==
+  resolved "https://pkg.csb.dev/gilbarbara/react-spotify-web-playback/commit/e2c38749/react-spotify-web-playback#3236e7168a0046e726747afaa84c8ed01d100ae1"
   dependencies:
-    "@gilbarbara/react-range-slider" "^0.4.4"
+    "@gilbarbara/react-range-slider" "^0.5.0"
     exenv "^1.2.2"
-    nano-css "^5.2.0"
+    memoize-one "^5.1.1"
+    nano-css "^5.3.0"
 
 react@^16.13.1:
   version "16.13.1"

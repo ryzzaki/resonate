@@ -3,7 +3,7 @@ import { RouteComponentProps } from '@reach/router';
 import SpotifyPlayer from 'react-spotify-web-playback';
 import { AuthContext } from '../context/AuthContext';
 import { UserContext } from '../context/UserContext';
-import { ICallbackState } from 'react-spotify-web-playback/lib/types/common';
+import { CallbackState } from 'react-spotify-web-playback/lib/types/common';
 import { Search } from './Search';
 import { refreshUser } from '../utils/api';
 
@@ -20,7 +20,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
     'spotify:track:3e91QYrWXIBXesEjrR3a7F',
   ]);
 
-  const handleCallback = async (res: ICallbackState) => {
+  const handleCallback = async (res: CallbackState) => {
     console.log(res);
     if (res.errorType === 'authentication_error') {
       try {

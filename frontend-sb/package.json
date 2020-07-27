@@ -21,7 +21,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
-    "react-spotify-web-playback": "^0.6.0",
+    "react-spotify-web-playback": "https://pkg.csb.dev/gilbarbara/react-spotify-web-playback/commit/e2c38749/react-spotify-web-playback",
     "typescript": "~3.7.2"
   },
   "scripts": {
