@@ -1,6 +1,5 @@
 import { Injectable, UnauthorizedException, BadRequestException, Logger, InternalServerErrorException } from '@nestjs/common';
 import { Request, Response } from 'express';
-import * as uuid from 'uuid';
 import mainConfig from '../config/main.config';
 import { cookieConfig } from '../config/cookie.config';
 import { User } from './entities/user.entity';
@@ -10,10 +9,13 @@ import { RedisService } from 'nestjs-redis';
 import { JwtService } from '@nestjs/jwt';
 import { TokenPayloadInterface } from '../interfaces/token-payload.interface';
 import { UserDataInterface } from '../interfaces/user-data.interface';
+import { SpotifyPayloadInterface } from '../interfaces/spotifyPayload.interface';
 import { UpdateUserDto } from './dto/update.dto';
 import { AuthTypeEnums } from './enums/auth.enum';
-import { UrlEnums } from './enums/urls.enum';
-import { UserWithAccessToken } from './strategies/spotify.strategy';
+import { UrlEnums, SpotifyUrlEnums } from './enums/urls.enum';
+import axios from 'axios';
+import * as qs from 'qs';
+import * as uuid from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -40,7 +42,7 @@ export class AuthService {
       .redirect(String(UrlEnums.BASE_URL));
   }
 
-  async authenticateOnCallback(userData: UserDataInterface, refreshToken: string): Promise<User> {
+  async authenticateOnCallback(userData: UserDataInterface, accessToken: string, refreshToken: string): Promise<User> {
     const { email, userName, displayName, country, subscription } = userData;
     try {
       const user: User = await this.userRepository.externalAuthentication(
@@ -49,6 +51,7 @@ export class AuthService {
         displayName,
         country,
         subscription,
+        accessToken,
         refreshToken
       );
       return user;
@@ -58,7 +61,7 @@ export class AuthService {
     }
   }
 
-  async sendCredentials(req: Request, res: Response, user: UserWithAccessToken): Promise<void> {
+  async sendCredentials(req: Request, res: Response, user: User): Promise<void> {
     const existingToken = req.signedCookies.refresh_tkn_v1;
     if (existingToken) {
       await this.validateRefreshToken(existingToken);
@@ -67,8 +70,8 @@ export class AuthService {
         domain: cookieConfig.domain,
       });
     }
-    const refreshToken = await this.generateToken(user.id, AuthTypeEnums.REFRESH, null, user.tokenVer);
-    const accessToken = await this.generateToken(user.id, AuthTypeEnums.ACCESS, user.accessToken);
+    const refreshToken = await this.generateToken(user.id, AuthTypeEnums.REFRESH, user.tokenVer);
+    const accessToken = await this.generateToken(user.id, AuthTypeEnums.ACCESS);
     res
       .cookie('refresh_tkn_v1', refreshToken, cookieConfig)
       .status(302)
@@ -82,16 +85,19 @@ export class AuthService {
       throw new UnauthorizedException('Access Denied: no Refresh Token found in cookies');
     }
     const { id, ver } = await this.validateRefreshToken(req.signedCookies.refresh_tkn_v1);
-    const refreshToken = await this.generateToken(id, AuthTypeEnums.REFRESH, null, ver);
-    const accessToken = await this.generateToken(id, AuthTypeEnums.ACCESS, null);
-
+    const user = await this.userRepository.getUserById(id);
+    const refreshToken = await this.generateToken(id, AuthTypeEnums.REFRESH, ver);
+    const accessToken = await this.generateToken(id, AuthTypeEnums.ACCESS);
+    // refresh the spotify tokens
+    const { accessToken: newAccessToken, refreshToken: newRefreshToken } = await this.refreshSpotifyTokens(user.refreshToken);
+    await this.userRepository.updateUserSpotifyTokensById(user.id, newAccessToken, newRefreshToken ? newRefreshToken : user.refreshToken);
     res
       .clearCookie('refresh_tkn_v1', {
         domain: cookieConfig.domain,
       })
       .cookie('refresh_tkn_v1', refreshToken, cookieConfig)
       .status(200)
-      .send({ accessToken });
+      .send({ accessToken, spotifyAccessToken: newAccessToken });
     return;
   }
 
@@ -99,29 +105,29 @@ export class AuthService {
     const { displayName } = updateDetailsDto;
     await this.userRepository.updateUserDisplayNameById(user.id, displayName);
 
-    return await this.userRepository.findUserById(user.id);
+    return await this.userRepository.getUserById(user.id);
   }
 
   async getUserById(id: string): Promise<User> {
-    return await this.userRepository.findUserById(id);
+    return await this.userRepository.getUserById(id);
   }
 
   async getBasicUserById(id: string): Promise<{ id: string; displayName: string }> {
-    const { displayName } = await this.userRepository.findUserById(id);
+    const { displayName } = await this.userRepository.getUserById(id);
     return { id, displayName };
   }
 
-  async generateInvitationToken(groupId: number): Promise<string> {
-    const payload = { groupId };
-    const generatedToken = await this.jwtService.signAsync(payload, {
-      expiresIn: '60m',
-      jwtid: uuid.v4(),
-    });
-    return generatedToken;
-  }
+  // async generateInvitationToken(groupId: number): Promise<string> {
+  //   const payload = { groupId };
+  //   const generatedToken = await this.jwtService.signAsync(payload, {
+  //     expiresIn: '60m',
+  //     jwtid: uuid.v4(),
+  //   });
+  //   return generatedToken;
+  // }
 
-  private async generateToken(id: string, type: AuthTypeEnums, accessToken?: string, ver?: number): Promise<string> {
-    const payload: TokenPayloadInterface = { id, ver, type, accessToken };
+  private async generateToken(id: string, type: AuthTypeEnums, ver?: number): Promise<string> {
+    const payload: TokenPayloadInterface = { id, ver, type };
     const generatedToken = await this.jwtService.signAsync(payload, {
       expiresIn: type === AuthTypeEnums.REFRESH ? mainConfig.serverSettings.refreshTokenAge : '1h',
       jwtid: uuid.v4(),
@@ -129,20 +135,20 @@ export class AuthService {
     return generatedToken;
   }
 
-  async validateInvitationToken(invitationToken: string): Promise<{ jti: string; groupId: number }> {
-    try {
-      const { jti, groupId } = await this.jwtService.verifyAsync(invitationToken);
-      const client = this.redisService.getClient();
-      const token: string = await client.get(String(jti));
-      if (token) {
-        throw new BadRequestException('Token is invalid');
-      }
-      return { jti, groupId };
-    } catch (err) {
-      this.logger.error(`Invitation Token validation has failed on error: ${err}`);
-      throw new UnauthorizedException(`Invitation Token validation has failed on error: ${err}`);
-    }
-  }
+  // private async validateInvitationToken(invitationToken: string): Promise<{ jti: string; groupId: number }> {
+  //   try {
+  //     const { jti, groupId } = await this.jwtService.verifyAsync(invitationToken);
+  //     const client = this.redisService.getClient();
+  //     const token: string = await client.get(String(jti));
+  //     if (token) {
+  //       throw new BadRequestException('Token is invalid');
+  //     }
+  //     return { jti, groupId };
+  //   } catch (err) {
+  //     this.logger.error(`Invitation Token validation has failed on error: ${err}`);
+  //     throw new UnauthorizedException(`Invitation Token validation has failed on error: ${err}`);
+  //   }
+  // }
 
   async getAllUsersCount(): Promise<{ total: number }> {
     return await this.userRepository.getAllUsersCount();
@@ -165,10 +171,6 @@ export class AuthService {
     });
   }
 
-  async setSpotifyRefreshToken(userId: string, refreshToken: string): Promise<void> {
-    return await this.userRepository.updateUserRefreshTokenById(userId, refreshToken);
-  }
-
   private async validateRefreshToken(refreshJwtToken: string): Promise<{ id: string; ver: number }> {
     try {
       const { jti, id, ver } = await this.jwtService.verifyAsync(refreshJwtToken);
@@ -182,5 +184,32 @@ export class AuthService {
       this.logger.error(`Refresh Token validation has failed on error: ${err}`);
       throw new UnauthorizedException(`Refresh Token validation has failed on error: ${err}`);
     }
+  }
+
+  private async refreshSpotifyTokens(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
+    const url = `${SpotifyUrlEnums.SPOTIFY_ACCOUNTS}/api/token`;
+    const grant = qs.stringify({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+    });
+    const responseData = (
+      await axios
+        .post(url, grant, {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            // tslint:disable-next-line: object-literal-key-quotes
+            Authorization: `Basic ${await this.getBase64AuthHeader()}`,
+          },
+        })
+        .catch(e => {
+          this.logger.error(`Unable to authorize Spotify client on ${e}`);
+          throw new InternalServerErrorException(`Unable to authorize Spotify client`);
+        })
+    ).data as SpotifyPayloadInterface;
+    return { accessToken: responseData.access_token, refreshToken: responseData.refresh_token };
+  }
+
+  private async getBase64AuthHeader(): Promise<string> {
+    return Buffer.from(`${mainConfig.spotifySettings.clientId}:${mainConfig.spotifySettings.clientSecret}`).toString('base64');
   }
 }

@@ -27,6 +27,9 @@ export class User extends BaseEntity {
   subscription: string;
 
   @Column()
+  accessToken: string;
+
+  @Column()
   refreshToken: string;
 
   @Column()

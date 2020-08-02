@@ -13,15 +13,16 @@ export class UserRepository extends Repository<User> {
     displayName: string,
     country: string,
     subscription: string,
+    accessToken: string,
     refreshToken: string
   ): Promise<User> {
     if (await this.isAnExistingUser(email)) {
       return this.existingUser;
     }
-    return await this.createUser(email, userName, displayName, country, subscription, refreshToken);
+    return await this.createUser(email, userName, displayName, country, subscription, accessToken, refreshToken);
   }
 
-  async findUserByIdToken(id: number, tokenVer: number): Promise<User> {
+  async getUserByIdToken(id: number, tokenVer: number): Promise<User> {
     try {
       return await this.findOneOrFail({ where: { id, tokenVer } });
     } catch (error) {
@@ -30,7 +31,7 @@ export class UserRepository extends Repository<User> {
     }
   }
 
-  async findUserById(id: string): Promise<User> {
+  async getUserById(id: string): Promise<User> {
     try {
       return await this.findOneOrFail({ where: { id } });
     } catch (error) {
@@ -39,7 +40,7 @@ export class UserRepository extends Repository<User> {
     }
   }
 
-  async findUserByEmail(email: string): Promise<User> {
+  async getUserByEmail(email: string): Promise<User> {
     try {
       return await this.findOneOrFail({ where: { email } });
     } catch (error) {
@@ -50,16 +51,16 @@ export class UserRepository extends Repository<User> {
 
   async updateUserDisplayNameById(id: string, displayName: string): Promise<void> {
     try {
-      await this.update(id, { displayName });
+      await this.update({ id }, { displayName });
     } catch (error) {
       this.logger.error(`Failed to update user display name for: ${id} on error: ${error}`);
       throw new InternalServerErrorException('Failed to update user display name for: ${id} on error: ${error}');
     }
   }
 
-  async updateUserRefreshTokenById(id: string, refreshToken: string): Promise<void> {
+  async updateUserSpotifyTokensById(id: string, accessToken: string, refreshToken: string): Promise<void> {
     try {
-      await this.update(id, { refreshToken });
+      await this.update({ id }, { accessToken, refreshToken });
     } catch (error) {
       this.logger.error(`Failed to update user refreshToken for: ${id} on error: ${error}`);
       throw new InternalServerErrorException('Failed to update user refreshToken for: ${id} on error: ${error}');
@@ -82,6 +83,7 @@ export class UserRepository extends Repository<User> {
     displayName: string,
     country: string,
     subscription: string,
+    accessToken: string,
     refreshToken: string
   ): Promise<User> {
     const u = new User();
@@ -90,6 +92,7 @@ export class UserRepository extends Repository<User> {
     u.displayName = displayName;
     u.country = country;
     u.subscription = subscription;
+    u.accessToken = accessToken;
     u.refreshToken = refreshToken;
     u.tokenVer = 1;
     try {

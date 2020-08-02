@@ -31,6 +31,9 @@ const sizes = {
   '36': '36px',
   '38': '38px',
   '40': '40px',
+  '60': '60px',
+  '100': '100px',
+  '30rem': '30rem',
 };
 
 module.exports = {
@@ -54,6 +57,13 @@ module.exports = {
       green: '#1db954',
       lightgreen: '#15d600',
       blue: '#0282eb',
+      // yellow100: '#373416',
+      // yellow200: '##28240f',
+      // yellow300: '#191919',
+      skinpink: '#f8ccd2',
+      darkskinpink: '#e4a7af',
+      pink: '#f453a9',
+      darkblue: '#203264',
     },
     fontSize: sizes,
     fontFamily: {
@@ -67,6 +77,8 @@ module.exports = {
       maxWidth: sizes,
     },
   },
-  variants: {},
+  variants: {
+    textColor: ['group-hover'],
+  },
   plugins: [],
 };

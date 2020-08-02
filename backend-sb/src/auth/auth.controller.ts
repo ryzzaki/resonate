@@ -1,11 +1,11 @@
-import { Controller, Body, ValidationPipe, Get, UseGuards, Req, Res, Logger, Param, ParseIntPipe, Put } from '@nestjs/common';
+import { Controller, Body, ValidationPipe, Get, UseGuards, Req, Res, Logger, Param, Put } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from './decorators/get-user.decorator';
 import { User } from './entities/user.entity';
 import { Request, Response } from 'express';
 import { UpdateUserDto } from './dto/update.dto';
-import { UserWithAccessToken } from './strategies/spotify.strategy';
+import * as _ from 'lodash';
 
 @Controller('/v1/auth')
 export class AuthController {
@@ -22,7 +22,7 @@ export class AuthController {
 
   @Get('/spotify/callback')
   @UseGuards(AuthGuard('spotify'))
-  googleCallBack(@Req() req: Request, @Res() res: Response, @GetUser() user: UserWithAccessToken): Promise<void> {
+  googleCallBack(@Req() req: Request, @Res() res: Response, @GetUser() user: User): Promise<void> {
     this.logger.verbose('GET on /spotify/callback called');
     return this.authService.sendCredentials(req, res, user);
   }
@@ -41,7 +41,7 @@ export class AuthController {
 
   @Put('/user/update')
   @UseGuards(AuthGuard())
-  updateUserDetails(@Body(ValidationPipe) updateDetailsDto: UpdateUserDto, @GetUser() user: User): Promise<User> {
+  updateUserDetails(@Body(ValidationPipe) updateDetailsDto: UpdateUserDto, @GetUser() user: User): Promise<_.Omit<User, 'refreshToken'>> {
     this.logger.verbose('GET on /user/total/detail called');
     return this.authService.updateUserDetails(updateDetailsDto, user);
   }
@@ -54,7 +54,7 @@ export class AuthController {
 
   @Get('/private/user/')
   @UseGuards(AuthGuard())
-  getPrivateUserById(@GetUser() user: User): Promise<User> {
+  getPrivateUserById(@GetUser() user: User): Promise<_.Omit<User, 'refreshToken'>> {
     this.logger.verbose(`GET on /private/user called`);
     return this.authService.getUserById(user.id);
   }
