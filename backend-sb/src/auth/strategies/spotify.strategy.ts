@@ -18,7 +18,7 @@ export class SpotifyStrategy extends PassportStrategy(Strategy, 'spotify') {
     });
   }
 
-  async validate(accessToken: string, refreshToken: string, profile: IProfile, done: (err: any, result: any) => void) {
+  async validate(accessToken: string, refreshToken: string, profile: IProfile, done: (err: any | null, result: User | boolean) => void) {
     try {
       if (profile._json.product !== 'premium') {
         Logger.error(`User does not have a premium subscription. Web SDK does not work with ${profile._json.product}.`);

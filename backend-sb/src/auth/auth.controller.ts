@@ -22,7 +22,7 @@ export class AuthController {
 
   @Get('/spotify/callback')
   @UseGuards(AuthGuard('spotify'))
-  googleCallBack(@Req() req: Request, @Res() res: Response, @GetUser() user: User): Promise<void> {
+  spotifyCallBack(@Req() req: Request, @Res() res: Response, @GetUser() user: User): Promise<void> {
     this.logger.verbose('GET on /spotify/callback called');
     return this.authService.sendCredentials(req, res, user);
   }

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { RouteComponentProps } from '@reach/router';
 import SpotifyPlayer from 'react-spotify-web-playback';
 import { AuthContext } from '../context/AuthContext';
@@ -6,22 +6,43 @@ import { UserContext } from '../context/UserContext';
 import { CallbackState } from 'react-spotify-web-playback/lib/types/common';
 import { Search } from './Search';
 import { refreshUser } from '../utils/api';
+import { UrlEnums } from '../enums/urls.enum';
+import io from 'socket.io-client';
 
 type Props = {};
 
-export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
-  const {} = props;
+const connectSocket = (token: string): SocketIOClient.Socket => {
+  // socket testing
+  return io(UrlEnums.BASE_URL.toString(), {
+    transportOptions: {
+      extraHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  });
+};
 
+export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
   const { token, setToken } = useContext(AuthContext);
   const { user, setUser } = useContext(UserContext);
-
   const [isPlaying, setIsPlaying] = useState(false);
-  const [URIs, setURIs] = useState<string[]>([
-    'spotify:track:3e91QYrWXIBXesEjrR3a7F',
-  ]);
+  const [URIs, setURIs] = useState<string[] | undefined>(undefined);
+  const [socket, setSocket] = useState<SocketIOClient.Socket | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    setSocket(connectSocket(token));
+  }, [token]);
+
+  if (socket) {
+    // enumerate the events later
+    socket.on('receiveSelectedURI', (data: string[]) => {
+      setURIs(data);
+    });
+  }
 
   const handleCallback = async (res: CallbackState) => {
-    console.log(res);
     if (res.errorType === 'authentication_error') {
       try {
         const { data } = await refreshUser(token);
@@ -40,6 +61,12 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
     setToken('');
   };
 
+  const emitSearchedURIs = (uris: string[]) => {
+    if (socket) {
+      socket.emit('rebroadcastSelectedURI', uris);
+    }
+  };
+
   return (
     <div className="min-h-screen flex">
       <aside className="w-30rem bg-skinpink flex flex-col px-20 py-40 fixed h-full">
@@ -48,18 +75,22 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
         </h1>
         <ul className="mt-auto flex text-darkblue font-medium">
           <li className="mr-20">
-            <a className="cursor-pointer">Settings</a>
+            <u className="cursor-pointer">Settings</u>
           </li>
           <li className="mr-2 0">
-            <a className="cursor-pointer" onClick={handleSignOut}>
+            <u className="cursor-pointer" onClick={handleSignOut}>
               Sign Out
-            </a>
+            </u>
           </li>
         </ul>
       </aside>
       <main className="flex-col flex flex-1 bg-darkblue ml-30rem">
         <div className="p-20 pr-40 flex-1">
-          <Search token={token} setURIs={setURIs} setIsPlaying={setIsPlaying} />
+          <Search
+            token={token}
+            emitSearchedURIs={emitSearchedURIs}
+            setIsPlaying={setIsPlaying}
+          />
         </div>
         <div className="mt-auto sticky bottom-0">
           <SpotifyPlayer
@@ -67,8 +98,6 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = (props) => {
             showSaveIcon
             token={user.accessToken}
             play={isPlaying}
-            // set URIs here to play the selected songs
-            // spotify:track:2LMloFiV7DHpBhITOaBSam
             uris={URIs}
             callback={handleCallback}
             styles={{
