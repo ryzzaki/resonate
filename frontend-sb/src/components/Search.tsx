@@ -22,9 +22,12 @@ export const Search: React.FC<Props> = (props) => {
 
   const debounceSearch = useCallback(
     debouncer(async (e) => {
+      if (!e.target.value) {
+        setResults(null);
+        return;
+      }
       const { data } = await searchSongs(token, e.target.value);
       setResults(data);
-      console.log(data);
     }, 600),
     []
   );
