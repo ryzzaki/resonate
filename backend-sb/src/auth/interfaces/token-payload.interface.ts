@@ -1,4 +1,4 @@
-import { AuthTypeEnums } from '../auth/enums/auth.enum';
+import { AuthTypeEnums } from './auth.enum';
 
 export interface TokenPayloadInterface {
   id: string;

@@ -4864,10 +4864,10 @@ neo-async@^2.5.0, neo-async@^2.6.1:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.1.tgz#ac27ada66167fa8849a6addd837f6b189ad2081c"
   integrity sha512-iyam8fBuCUpWeKPGpaNMetEocMt364qkCsfL9JuhjXX6dRnguRVOfk2GZaDpPjcOKiiXCPINZC1GczQ7iTq3Zw==
 
-nestjs-redis@1.2.7:
-  version "1.2.7"
-  resolved "https://registry.yarnpkg.com/nestjs-redis/-/nestjs-redis-1.2.7.tgz#5ff98ece039b739f52741d39734e05ff639a3d10"
-  integrity sha512-gXhMXPaUkg1lz0o67pIwdeNbrHiwC60a5CLebCfeTAAZRYA4Z20pRSBKt0qso4DnfDjJrLBo16R+4J7Dz7HOJA==
+nestjs-redis@1.2.8:
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/nestjs-redis/-/nestjs-redis-1.2.8.tgz#0b62a533b3abf7fad18e4bd2f0c8f19845d56582"
+  integrity sha512-h3lDq/F4xbA++1OY63Lh2LjJgdJ3RvCPFbM+oRbs5M4Ep/9zgWwtfaVlcx31al/wBXUeaJ4HTNv5IAQZLkdIBA==
   dependencies:
     "@nestjs/common" "6.3.1"
     "@nestjs/core" "^6.6.7"

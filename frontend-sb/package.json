@@ -1,6 +1,9 @@
 {
   "name": "frontend-sb",
   "version": "0.1.0",
+  "description": "SonicBoom Frontend Application",
+  "author": "Cuong Nguyen <cuong.nugi@gmail.com>",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=development yarn watch:css && PORT=3001 react-scripts start",

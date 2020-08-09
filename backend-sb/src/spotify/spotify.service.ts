@@ -1,6 +1,6 @@
 import { User } from '../auth/entities/user.entity';
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
-import { SpotifyUrlEnums } from 'src/auth/enums/urls.enum';
+import { SpotifyUrlEnums } from 'src/auth/interfaces/urls.enum';
 import { SearchQueryDto } from './dto/search-query.dto';
 import axios from 'axios';
 import * as qs from 'qs';

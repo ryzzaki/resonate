@@ -26,4 +26,4 @@ USER app
 
 EXPOSE 3000
 
-CMD yarn start:dev
+CMD yarn db:setup && yarn db:migrate && yarn start:dev

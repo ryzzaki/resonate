@@ -26,4 +26,4 @@ USER app
 
 EXPOSE 3000
 
-CMD yarn build && yarn start:prod
+CMD yarn prestart:prod && yarn build && yarn start:prod

@@ -24,7 +24,7 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
 
     this.logger.verbose(`Current number of users: ${this.users}`);
 
-    // Notify connected clients of current users
+    // Play a default song if the state is fresh
     this.logger.verbose(
       `${this.currentURI ? `Initiating with current URI: ${this.currentURI}` : `No current URI found... playing default`}`
     );
@@ -36,13 +36,10 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
   }
 
   async handleDisconnect() {
-    // A client has connected
+    // A client has disconnected
     this.users--;
 
     this.logger.verbose(`Current number of users: ${this.users}`);
-
-    // Notify connected clients of current users
-    this.server.emit('users', this.users);
     return;
   }
 
