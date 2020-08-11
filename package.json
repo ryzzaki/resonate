@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "be:install": "cd ./backend-sb && yarn install --prod=false && yarn prestart:build && yarn prestart:prod",
-    "fe:install": "cd ./frontend-sb && yarn install && yarn build",
+    "fe:install": "cd ./frontend-sb && yarn install --prod=false && yarn build",
     "install": "yarn be:install && yarn fe:install",
     "be:prod": "cd ./backend-sb && yarn start:prod",
     "fe:prod": "cd ./frontend-sb && yarn start",
