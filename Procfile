@@ -1,2 +1,2 @@
 release: yarn install
-web: yarn start:prod
+web: yarn start

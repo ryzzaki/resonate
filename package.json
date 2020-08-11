@@ -5,12 +5,10 @@
   "author": "Cuong Nguyen <cuong.nugi@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "be:install": "cd ./backend-sb && yarn install --prod=false && yarn prestart:build && yarn prestart:prod",
+    "be:install": "cd ./backend-sb && yarn install --prod=false && yarn build && yarn prestart:prod",
     "fe:install": "cd ./frontend-sb && yarn install --prod=false && yarn build",
     "install": "yarn be:install && yarn fe:install",
-    "be:prod": "cd ./backend-sb && yarn start:prod",
-    "fe:prod": "cd ./frontend-sb && yarn start",
-    "start:prod": "yarn be:prod && yarn fe:prod"
+    "start": "cd ./backend-sb && yarn start:prod"
   },
   "engines": {
     "node": "12.18.1"
