@@ -16,7 +16,7 @@ function getServerModeApiUrl(serverMode: string): any {
     case 'development':
       return `http://localhost:${mainConfig.serverSettings.port}/v1`;
     case 'production':
-      return `${mainConfig.serverSettings.baseUrl}/v1`;
+      return `https://${mainConfig.serverSettings.baseUrl}/v1`;
     default:
       throw new InternalServerErrorException(`Server mode ${serverMode} for AUTH_API_URL is not supported`);
   }
@@ -27,7 +27,7 @@ function getServerModeRedirectUrl(serverMode: string): any {
     case 'development':
       return `http://localhost:${mainConfig.serverSettings.frontendPort}`;
     case 'production':
-      return `${mainConfig.serverSettings.baseUrl}`;
+      return `https://${mainConfig.serverSettings.baseUrl}`;
     default:
       throw new InternalServerErrorException(`Server mode ${serverMode} for REDIRECT_URL is not supported`);
   }
