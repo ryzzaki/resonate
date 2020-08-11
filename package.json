@@ -12,6 +12,9 @@
     "fe:prod": "cd ./frontend-sb && yarn start",
     "start:prod": "yarn be:prod && yarn fe:prod"
   },
+  "engines": {
+    "node": "12.18.1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ryzzaki/SonicBoom.git"
