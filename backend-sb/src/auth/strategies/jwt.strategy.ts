@@ -1,7 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { Injectable } from '@nestjs/common';
-import { TokenPayloadInterface } from '../../interfaces/token-payload.interface';
+import { TokenPayloadInterface } from '../interfaces/token-payload.interface';
 import { UserRepository } from '../repositories/user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
@@ -20,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(jwt: TokenPayloadInterface, done: (err: any, result: any) => void) {
+  async validate(jwt: TokenPayloadInterface, done: (err: any | null, result: User | boolean) => void) {
     try {
       const user: User = await this.userRepository.getUserById(jwt.id);
       done(null, user);

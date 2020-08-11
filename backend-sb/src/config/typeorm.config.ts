@@ -1,5 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import mainConfig from './main.config';
+import { join } from 'path';
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
   type: 'postgres',
@@ -8,13 +9,17 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   username: mainConfig.typeOrmSettings.username,
   password: mainConfig.typeOrmSettings.password,
   database: mainConfig.typeOrmSettings.name,
-  entities: [__dirname + '/../**/*.entity.{js,ts}'],
-  synchronize: mainConfig.typeOrmSettings.synchronize,
+  autoLoadEntities: true,
+  entities: [join(__dirname, '..', '/**/*.entity.{js,ts}')],
+  migrations: [join(__dirname, '..', '..', 'migrations', '*.{js,ts}')],
+  migrationsTransactionMode: 'all',
+  synchronize: mainConfig.serverSettings.serverMode === 'test',
+  dropSchema: mainConfig.serverSettings.serverMode === 'test',
   logging: false,
-  ssl:
-    mainConfig.serverSettings.serverMode === 'development'
-      ? false
-      : {
-          ca: Buffer.from(mainConfig.typeOrmSettings.ca, 'base64'),
-        },
+  cli: {
+    migrationsDir: 'migrations',
+  },
+  ssl: mainConfig.serverSettings.serverMode === 'production' && {
+    rejectUnauthorized: false,
+  },
 };

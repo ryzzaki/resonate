@@ -1,29 +1,10 @@
 {
   "name": "frontend-sb",
   "version": "0.1.0",
+  "description": "SonicBoom Frontend Application",
+  "author": "Cuong Nguyen <cuong.nugi@gmail.com>",
+  "license": "MIT",
   "private": true,
-  "dependencies": {
-    "@reach/router": "^1.3.3",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "@types/jest": "^24.0.0",
-    "@types/jwt-decode": "^2.2.1",
-    "@types/node": "^12.0.0",
-    "@types/reach__router": "^1.3.4",
-    "@types/react": "^16.9.0",
-    "@types/react-dom": "^16.9.0",
-    "axios": "^0.19.2",
-    "jwt-decode": "^2.2.0",
-    "postcss-import": "^12.0.1",
-    "postcss-nested": "^4.2.1",
-    "postcss-preset-env": "^6.7.0",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1",
-    "react-spotify-web-playback": "https://pkg.csb.dev/gilbarbara/react-spotify-web-playback/commit/e2c38749/react-spotify-web-playback",
-    "typescript": "~3.7.2"
-  },
   "scripts": {
     "dev": "cross-env NODE_ENV=development yarn watch:css && PORT=3001 react-scripts start",
     "start": "cross-env NODE_ENV=production yarn build:css && react-scripts start",
@@ -32,6 +13,40 @@
     "eject": "react-scripts eject",
     "build:css": "postcss src/assets/styles/tailwind.css -o src/assets/styles/main.css",
     "watch:css": "postcss src/assets/styles/tailwind.css -o src/assets/styles/main.css"
+  },
+  "dependencies": {
+    "@reach/router": "1.3.3",
+    "@testing-library/jest-dom": "4.2.4",
+    "@testing-library/react": "9.3.2",
+    "@testing-library/user-event": "7.1.2",
+    "@types/jest": "24.0.0",
+    "@types/jwt-decode": "2.2.1",
+    "@types/node": "12.0.0",
+    "@types/reach__router": "1.3.4",
+    "@types/react": "16.9.0",
+    "@types/react-dom": "16.9.0",
+    "axios": "0.19.2",
+    "jwt-decode": "2.2.0",
+    "postcss-import": "12.0.1",
+    "postcss-nested": "4.2.1",
+    "postcss-preset-env": "6.7.0",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-scripts": "3.4.1",
+    "react-spotify-web-playback": "https://pkg.csb.dev/gilbarbara/react-spotify-web-playback/commit/e2c38749/react-spotify-web-playback",
+    "socket.io-client": "2.3.0",
+    "typescript": "3.7.2"
+  },
+  "devDependencies": {
+    "@types/socket.io-client": "1.4.33",
+    "autoprefixer": "9.7.6",
+    "cross-env": "7.0.2",
+    "postcss-cli": "7.1.0",
+    "prettier": "2.0.4",
+    "tailwindcss": "1.2.0",
+    "tslint": "6.1.1",
+    "tslint-config-prettier": "1.18.0",
+    "tslint-react": "4.2.0"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -47,15 +62,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "autoprefixer": "^9.7.6",
-    "cross-env": "^7.0.2",
-    "postcss-cli": "^7.1.0",
-    "prettier": "^2.0.4",
-    "tailwindcss": "^1.2.0",
-    "tslint": "^6.1.1",
-    "tslint-config-prettier": "^1.18.0",
-    "tslint-react": "^4.2.0"
   }
 }

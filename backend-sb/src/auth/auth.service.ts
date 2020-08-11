@@ -7,12 +7,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserRepository } from './repositories/user.repository';
 import { RedisService } from 'nestjs-redis';
 import { JwtService } from '@nestjs/jwt';
-import { TokenPayloadInterface } from '../interfaces/token-payload.interface';
-import { UserDataInterface } from '../interfaces/user-data.interface';
-import { SpotifyPayloadInterface } from '../interfaces/spotifyPayload.interface';
+import { TokenPayloadInterface } from './interfaces/token-payload.interface';
+import { UserDataInterface } from './interfaces/user-data.interface';
+import { SpotifyPayloadInterface } from './interfaces/spotifyPayload.interface';
 import { UpdateUserDto } from './dto/update.dto';
-import { AuthTypeEnums } from './enums/auth.enum';
-import { UrlEnums, SpotifyUrlEnums } from './enums/urls.enum';
+import { AuthTypeEnums } from './interfaces/auth.enum';
+import { UrlEnums, SpotifyUrlEnums } from './interfaces/urls.enum';
 import axios from 'axios';
 import * as qs from 'qs';
 import * as uuid from 'uuid';
@@ -192,20 +192,18 @@ export class AuthService {
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
     });
-    const responseData = (
-      await axios
-        .post(url, grant, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            // tslint:disable-next-line: object-literal-key-quotes
-            Authorization: `Basic ${await this.getBase64AuthHeader()}`,
-          },
-        })
-        .catch(e => {
-          this.logger.error(`Unable to authorize Spotify client on ${e}`);
-          throw new InternalServerErrorException(`Unable to authorize Spotify client`);
-        })
-    ).data as SpotifyPayloadInterface;
+    const responseData = (await axios
+      .post(url, grant, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          // tslint:disable-next-line: object-literal-key-quotes
+          Authorization: `Basic ${await this.getBase64AuthHeader()}`,
+        },
+      })
+      .catch(e => {
+        this.logger.error(`Unable to authorize Spotify client on ${e}`);
+        throw new InternalServerErrorException(`Unable to authorize Spotify client`);
+      })).data as SpotifyPayloadInterface;
     return { accessToken: responseData.access_token, refreshToken: responseData.refresh_token };
   }
 

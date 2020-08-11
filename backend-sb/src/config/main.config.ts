@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-import { MainConfigInterface, Algorithm } from '../interfaces/mainConfig.interface';
+import { MainConfigInterface, Algorithm } from './mainConfig.interface';
 
 dotenv.config();
 

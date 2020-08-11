@@ -9,8 +9,8 @@ type Props = {};
 export const RedirectPage: React.FC<RouteComponentProps<Props>> = (props) => {
   const { location } = props;
 
-  const { token, setToken } = useContext(AuthContext);
-  const { user, setUser } = useContext(UserContext);
+  const { setToken } = useContext(AuthContext);
+  const { setUser } = useContext(UserContext);
 
   useEffect(() => {
     async function fetchUserAndRedirect(token: string) {
@@ -30,7 +30,7 @@ export const RedirectPage: React.FC<RouteComponentProps<Props>> = (props) => {
     } else {
       navigate('/');
     }
-  }, []);
+  }, [location, setToken, setUser]);
 
   return <h1 className="mt-30 text-center text-white">loading...</h1>;
 };
