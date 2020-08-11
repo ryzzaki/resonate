@@ -19,7 +19,7 @@ import { join } from 'path';
     SpotifyModule,
     WebplayerModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', './frontend-sb/build'),
+      rootPath: join(__dirname, '..', '..', '..', './frontend-sb/build'),
     }),
   ],
   controllers: [AppController],
