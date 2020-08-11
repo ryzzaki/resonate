@@ -7,8 +7,10 @@ const mainConfig: MainConfigInterface = {
   serverSettings: {
     serverMode: String(process.env.NODE_ENV),
     port: Number(process.env.PORT),
+    frontendPort: Number(process.env.FE_PORT),
     cookieSecret: String(process.env.COOKIE_SECRET),
     refreshTokenAge: Number(process.env.REFRESH_TOKEN_AGE),
+    baseUrl: String(process.env.BASE_URL),
   },
   typeOrmSettings: {
     host: String(process.env.DB_HOST),

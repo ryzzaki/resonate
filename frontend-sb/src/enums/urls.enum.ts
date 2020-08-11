@@ -8,21 +8,17 @@ export enum UrlEnums {
 function getServerModeApiUrl(serverMode: string): any {
   switch (serverMode) {
     case 'development':
-      return `http://localhost:3000/v1`;
-    case 'staging':
-      return 'https://staging.sonicboom.life/v1';
+      return `http://localhost:${appConfig.serverSettings.backendPort}/v1`;
     case 'production':
-      return 'https://sonicboom.life/v1';
+      return `${appConfig.serverSettings.baseUrl}/v1`;
   }
 }
 
 function getServerModeRedirectUrl(serverMode: string): any {
   switch (serverMode) {
     case 'development':
-      return 'http://localhost:3000';
-    case 'staging':
-      return 'https://staging.sonicboom.life';
+      return `http://localhost:${appConfig.serverSettings.backendPort}`;
     case 'production':
-      return 'https://sonicboom.life';
+      return `${appConfig.serverSettings.baseUrl}`;
   }
 }

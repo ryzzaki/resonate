@@ -15,10 +15,8 @@ function getServerModeApiUrl(serverMode: string): any {
   switch (serverMode) {
     case 'development':
       return `http://localhost:${mainConfig.serverSettings.port}/v1`;
-    case 'staging':
-      return 'https://staging.sonicboom.life/v1';
     case 'production':
-      return 'https://sonicboom.life/v1';
+      return `${mainConfig.serverSettings.baseUrl}/v1`;
     default:
       throw new InternalServerErrorException(`Server mode ${serverMode} for AUTH_API_URL is not supported`);
   }
@@ -27,11 +25,9 @@ function getServerModeApiUrl(serverMode: string): any {
 function getServerModeRedirectUrl(serverMode: string): any {
   switch (serverMode) {
     case 'development':
-      return 'http://localhost:3001';
-    case 'staging':
-      return 'https://staging.sonicboom.life';
+      return `http://localhost:${mainConfig.serverSettings.frontendPort}`;
     case 'production':
-      return 'https://sonicboom.life';
+      return `${mainConfig.serverSettings.baseUrl}`;
     default:
       throw new InternalServerErrorException(`Server mode ${serverMode} for REDIRECT_URL is not supported`);
   }
