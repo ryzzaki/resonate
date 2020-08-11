@@ -6,7 +6,8 @@ dotenv.config();
 const AppConfig: IGlobalConfig = {
   serverSettings: {
     serverMode: String(process.env.NODE_ENV),
-    port: Number(process.env.PORT),
+    backendPort: String(process.env.REACT_APP_BE_PORT),
+    baseUrl: String(process.env.REACT_APP_BASE_URL),
   },
 };
 

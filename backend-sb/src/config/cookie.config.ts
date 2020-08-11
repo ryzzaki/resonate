@@ -6,5 +6,5 @@ export const cookieConfig = {
   signed: true,
   httpOnly: true,
   overwrite: true,
-  domain: mainConfig.serverSettings.serverMode === 'development' ? '' : '.sonicboom.life',
+  domain: mainConfig.serverSettings.serverMode === 'development' ? '' : `.${mainConfig.serverSettings.baseUrl}`,
 };

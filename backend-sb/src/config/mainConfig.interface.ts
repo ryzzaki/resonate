@@ -1,11 +1,11 @@
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-
 export interface MainConfigInterface {
   serverSettings: {
     serverMode: string;
     port: number;
+    frontendPort: number;
     cookieSecret: string;
     refreshTokenAge: number;
+    baseUrl: string;
   };
   typeOrmSettings: {
     host: string;

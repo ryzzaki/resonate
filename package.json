@@ -1,0 +1,24 @@
+{
+  "name": "sonicboom",
+  "version": "0.0.1",
+  "description": "A Spotify Web Player which lets your friends DJ the playlist for a specific amount of time before randomly selecting someone else.",
+  "author": "Cuong Nguyen <cuong.nugi@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "be:install": "cd ./backend-sb && yarn install --prod=false && yarn build && yarn prestart:prod",
+    "fe:install": "cd ./frontend-sb && yarn install --prod=false && yarn build",
+    "install": "yarn be:install && yarn fe:install",
+    "start": "cd ./backend-sb && yarn start:prod"
+  },
+  "engines": {
+    "node": "12.18.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryzzaki/SonicBoom.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ryzzaki/SonicBoom/issues"
+  },
+  "homepage": "https://github.com/ryzzaki/SonicBoom#readme"
+}
