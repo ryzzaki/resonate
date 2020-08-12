@@ -5,7 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import { UserContext } from '../context/UserContext';
 import { CallbackState } from 'react-spotify-web-playback/lib/types/common';
 import { Search } from './Search';
-import { refreshUser } from '../utils/api';
+import { refreshUser, signOutUser } from '../utils/api';
 import { UrlEnums } from '../enums/urls.enum';
 import io from 'socket.io-client';
 
@@ -59,6 +59,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
     localStorage.removeItem('access_key');
     setUser({});
     setToken('');
+    return signOutUser();
   };
 
   const emitSearchedURIs = (uris: string[]) => {

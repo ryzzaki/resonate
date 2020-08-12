@@ -18,6 +18,10 @@ export const refreshUser = async (token: string | null) => {
   });
 };
 
+export const signOutUser = async () => {
+  return axios.get(`${UrlEnums.API_URL}/auth/signout`);
+};
+
 export const searchSongs = async (token: string, search: string) => {
   return axios.get(
     `${UrlEnums.API_URL}/spotify/search?searchString=${search}`,
