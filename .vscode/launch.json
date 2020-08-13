@@ -6,12 +6,10 @@
   "configurations": [
     {
       "type": "node",
-      "request": "attach",
-      "name": "Attach Debugger",
-      "port": 9229,
-      "restart": true,
-      "stopOnEntry": false,
-      "protocol": "inspector"
+      "request": "launch",
+      "name": "Launch test",
+      "runtimeVersion": "12.18.1",
+      "program": "${workspaceFolder}/test.js"
     }
   ]
 }

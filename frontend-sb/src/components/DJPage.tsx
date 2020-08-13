@@ -1,48 +1,55 @@
 import React, { useContext, useState, useEffect } from 'react';
+import io from 'socket.io-client';
+import { ICallbackState } from 'react-spotify-web-playback/lib/types/common';
+import { UrlEnums } from '../enums/urls.enum';
 import { RouteComponentProps } from '@reach/router';
-import SpotifyPlayer from 'react-spotify-web-playback';
 import { AuthContext } from '../context/AuthContext';
 import { UserContext } from '../context/UserContext';
-import { CallbackState } from 'react-spotify-web-playback/lib/types/common';
-import { Search } from './Search';
 import { refreshUser, signOutUser } from '../utils/api';
-import { UrlEnums } from '../enums/urls.enum';
-import io from 'socket.io-client';
+import { Search } from './Search';
+import { Webplayer } from './Webplayer';
 
 type Props = {};
 
-const connectSocket = (token: string): SocketIOClient.Socket => {
-  // socket testing
-  return io(UrlEnums.BASE_URL.toString(), {
-    transportOptions: {
-      extraHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  });
-};
+// const connectSocket = (token: string): SocketIOClient.Socket => {
+//   // socket testing
+//   return io(UrlEnums.BASE_URL.toString(), {
+//     transportOptions: {
+//       extraHeaders: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     },
+//   });
+// };
 
 export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
   const { token, setToken } = useContext(AuthContext);
   const { user, setUser } = useContext(UserContext);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [URIs, setURIs] = useState<string[] | undefined>(undefined);
-  const [socket, setSocket] = useState<SocketIOClient.Socket | undefined>(
-    undefined
-  );
 
-  useEffect(() => {
-    setSocket(connectSocket(token));
-  }, [token]);
+  const [player, setPlayer] = useState({
+    isPlaying: false,
+    uris: [],
+    socket: null,
+  });
 
-  if (socket) {
-    // enumerate the events later
-    socket.on('receiveSelectedURI', (data: string[]) => {
-      setURIs(data);
-    });
-  }
+  // useEffect(() => {
+  //   setSocket(connectSocket(token));
+  // }, [token]);
 
-  const handleCallback = async (res: CallbackState) => {
+  // if (socket) {
+  //   // enumerate the events later
+  //   socket.on('receiveSelectedURI', (data: string[]) => {
+  //     setURIs(data);
+  //   });
+  // }
+
+  // const emitSearchedURIs = (uris: string[]) => {
+  //   if (socket) {
+  //     socket.emit('rebroadcastSelectedURI', uris);
+  //   }
+  // };
+
+  const handleCallback = async (res: ICallbackState) => {
     if (res.errorType === 'authentication_error') {
       try {
         const { data } = await refreshUser(token);
@@ -60,12 +67,6 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
     setUser({});
     setToken('');
     return signOutUser();
-  };
-
-  const emitSearchedURIs = (uris: string[]) => {
-    if (socket) {
-      socket.emit('rebroadcastSelectedURI', uris);
-    }
   };
 
   return (
@@ -87,32 +88,18 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       </aside>
       <main className="flex-col flex flex-1 bg-darkblue ml-30rem">
         <div className="p-20 pr-40 flex-1">
-          <Search
+          {/* <Search
             token={token}
             emitSearchedURIs={emitSearchedURIs}
             setIsPlaying={setIsPlaying}
-          />
+          /> */}
         </div>
         <div className="mt-auto sticky bottom-0">
-          <SpotifyPlayer
-            autoPlay
-            showSaveIcon
+          <Webplayer
             token={user.accessToken}
-            play={isPlaying}
-            uris={URIs}
-            callback={handleCallback}
-            styles={{
-              height: '70px',
-              sliderColor: '#f453a9',
-              sliderTrackColor: '#f8ccd2',
-              sliderHandleColor: '#f453a9',
-              color: '#f8ccd2',
-              errorColor: '#f8ccd2',
-              bgColor: '#203264',
-              loaderSize: 50,
-              trackNameColor: '#f453a9',
-              trackArtistColor: '#f8ccd2',
-            }}
+            isPlaying={player.isPlaying}
+            uris={player.uris}
+            handleCallback={handleCallback}
           />
         </div>
       </main>
