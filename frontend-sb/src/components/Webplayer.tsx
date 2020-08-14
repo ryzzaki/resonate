@@ -3,28 +3,29 @@ import { ReactComponent as Play } from '../assets/icons/play.svg';
 import { ReactComponent as Pause } from '../assets/icons/pause.svg';
 import loadScript from '../utils/loadScript';
 import playerStatus from '../types/playerStatus';
+import { playSong, pauseSong } from '../utils/api';
 
 type Props = {
-  token: string;
   playerStatus: playerStatus;
+  token: string;
   handleAuthError: () => void;
-  handlePlay: (deviceId: string) => void;
-  handlePause: () => void;
 };
 
 export const Webplayer: React.FC<Props> = (props) => {
-  const {
-    token,
-    playerStatus,
-    handleAuthError,
-    handlePlay,
-    handlePause,
-  } = props;
+  const { playerStatus, token, handleAuthError } = props;
 
-  const [status, setStatus] = useState({
+  const [status, setStatus] = useState<{
+    isInitializing: boolean;
+    paused: boolean;
+    errorType: string;
+    deviceId: string;
+    currentTrack: any;
+  }>({
     isInitializing: false,
+    paused: true,
     errorType: '',
     deviceId: '',
+    currentTrack: {},
   });
 
   const player = useRef<any>(null);
@@ -37,10 +38,13 @@ export const Webplayer: React.FC<Props> = (props) => {
 
     (async () => {
       await loadScript();
-      // await play();
     })();
-    // cleanup function
+    // cleanup function for removing script
   }, []);
+
+  useEffect(() => {
+    play(status.deviceId);
+  }, [playerStatus.uris]);
 
   const initialization = () => {
     // @ts-ignore
@@ -71,14 +75,26 @@ export const Webplayer: React.FC<Props> = (props) => {
     });
 
     // Status handling + connection
-    player.current.addListener('player_state_changed', (state) => {
-      console.log(state);
+    player.current.addListener('player_state_changed', (songState) => {
+      console.log(songState);
+      if (!songState) {
+        setStatus((state) => ({ ...state, paused: true }));
+      } else {
+        setStatus((state) => ({
+          ...state,
+          paused: songState.paused,
+          currentTrack: songState.track_window.current_track,
+        }));
+      }
     });
     player.current.addListener('ready', ({ device_id }) => {
       console.log('Ready with Device ID', device_id);
-      setStatus((state) => ({ ...state, isInitializing: false }));
-      setStatus((state) => ({ ...state, deviceId: device_id }));
-      handlePlay(device_id);
+      setStatus((state) => ({
+        ...state,
+        deviceId: device_id,
+        isInitializing: false,
+      }));
+      play(device_id);
     });
     player.current.addListener('not_ready', ({ device_id }) => {
       console.log('Device ID has gone offline', device_id);
@@ -87,6 +103,13 @@ export const Webplayer: React.FC<Props> = (props) => {
     player.current.connect();
   };
 
+  const play = (deviceId: string) =>
+    playSong(token, deviceId, {
+      uris: playerStatus.uris,
+    });
+
+  const pause = () => pauseSong(token);
+
   console.log(status);
 
   return (
@@ -94,23 +117,31 @@ export const Webplayer: React.FC<Props> = (props) => {
       <div className="">
         <div></div>
       </div>
-      <div className="grid grid-cols-3 py-10 px-20">
+      <div className="grid grid-cols-3 p-10">
         <div className="flex items-center">
-          <div>
-            <img />
+          <div className="flex-shrink-0 mr-10">
+            <img src={status.currentTrack.album?.images[1].url} />
           </div>
-          <div className="text-skinpink ">
-            <h3>Song name</h3>
-            <p className="text-14	leading-none">artist</p>
+          <div className="w-full">
+            <h3 className="text-pink font-semibold w-full whitespace-no-wrap overflow-hidden">
+              {status.currentTrack.name}
+            </h3>
+            <ul className="text-14 text-skinpink flex leading-snug ">
+              {status.currentTrack.artists?.map((artist) => (
+                <li key={artist.name} className="pr-15">
+                  {artist.name}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
         <div className="flex justify-center">
-          {!playerStatus.play ? (
+          {status.paused ? (
             <button>
               <Play className="w-60 h-60 fill-current text-skinpink" />
             </button>
           ) : (
-            <button onClick={handlePause}>
+            <button onClick={pause}>
               <Pause className="w-60 h-60 fill-current text-skinpink" />
             </button>
           )}

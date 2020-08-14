@@ -11,12 +11,11 @@ function debouncer(func: (...params: any[]) => any, delay: number) {
 
 type Props = {
   token: string;
-  setIsPlaying: (state: boolean) => void;
   emitSearchedURIs: (state: string[]) => void;
 };
 
 export const Search: React.FC<Props> = (props) => {
-  const { token, setIsPlaying, emitSearchedURIs } = props;
+  const { token, emitSearchedURIs } = props;
 
   const [results, setResults] = useState<any>(null);
 
@@ -37,15 +36,11 @@ export const Search: React.FC<Props> = (props) => {
     debounceSearch(e);
   };
 
-  const handleClickURIs = useCallback(
-    (e) => {
-      e.preventDefault();
-      const { uris } = e.currentTarget.dataset;
-      emitSearchedURIs(uris.split(','));
-      setIsPlaying(true);
-    },
-    [emitSearchedURIs, setIsPlaying]
-  );
+  const handleClickURIs = useCallback((e) => {
+    e.preventDefault();
+    const { uris } = e.currentTarget.dataset;
+    emitSearchedURIs(uris.split(','));
+  }, []);
 
   return (
     <div>

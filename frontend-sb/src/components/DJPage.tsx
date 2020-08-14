@@ -4,7 +4,7 @@ import { UrlEnums } from '../enums/urls.enum';
 import { RouteComponentProps } from '@reach/router';
 import { AuthContext } from '../context/AuthContext';
 import { UserContext } from '../context/UserContext';
-import { refreshUser, signOutUser, playSong, pauseSong } from '../utils/api';
+import { refreshUser, signOutUser } from '../utils/api';
 import { Search } from './Search';
 import { Webplayer } from './Webplayer';
 import playerStatus from '../types/playerStatus';
@@ -26,7 +26,6 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
   const { user, setUser } = useContext(UserContext);
 
   const [playerStatus, setPlayerStatus] = useState<playerStatus>({
-    play: false,
     uris: [],
   });
 
@@ -40,28 +39,14 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       console.error(err);
     });
     socket.current.on('receiveSelectedURI', (uris: string[]) => {
-      setPlayerStatus((state) => ({ ...state, uris, play: true }));
+      setPlayerStatus((state) => ({ ...state, uris }));
     });
   }, []);
 
-  // const emitSearchedURIs = (uris: string[]) => {
-  //   if (socket) {
-  //     socket.emit('rebroadcastSelectedURI', uris);
-  //   }
-  // };
-
-  // const setIsPlaying = (playState: boolean) => {
-  //   setPlayer((state) => ({ ...state, isPlaying: playState }));
-  // };
-
-  const handlePlay = (deviceId: string) =>
-    playSong(user.accessToken, deviceId, {
-      uris: playerStatus.uris,
-    });
-
-  const handlePause = () => {
-    pauseSong(user.accessToken);
-    setPlayerStatus((state) => ({ ...state, play: false }));
+  const emitSearchedURIs = (uris: string[]) => {
+    if (socket) {
+      socket.current.emit('rebroadcastSelectedURI', uris);
+    }
   };
 
   const handleAuthError = async () => {
@@ -101,20 +86,14 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       </aside>
       <main className="flex-col flex flex-1 bg-darkblue ml-30rem">
         <div className="p-20 pr-40 flex-1">
-          {/* <Search
-            token={token}
-            emitSearchedURIs={emitSearchedURIs}
-            setIsPlaying={setIsPlaying}
-          /> */}
+          <Search token={token} emitSearchedURIs={emitSearchedURIs} />
         </div>
-        <div className="mt-auto sticky bottom-0">
-          {socket.current && playerStatus.uris.length && (
+        <div className="mt-auto sticky bottom-0 bg-darkblue">
+          {socket.current && (
             <Webplayer
-              token={user.accessToken}
               playerStatus={playerStatus}
+              token={user.accessToken}
               handleAuthError={handleAuthError}
-              handlePlay={handlePlay}
-              handlePause={handlePause}
             />
           )}
         </div>
