@@ -3,7 +3,7 @@ import { ReactComponent as Play } from '../assets/icons/play.svg';
 import { ReactComponent as Pause } from '../assets/icons/pause.svg';
 import loadScript from '../utils/loadScript';
 import playerStatus from '../types/playerStatus';
-import { playSong } from '../utils/api';
+import { playSong, resumeSong, pauseSong } from '../utils/api';
 
 type Props = {
   playerStatus: playerStatus;
@@ -45,7 +45,15 @@ export const Webplayer: React.FC<Props> = (props) => {
 
   useEffect(() => {
     play(status.deviceId);
-  }, [playerStatus.uris]);
+  }, [playerStatus.currentURI]);
+
+  useEffect(() => {
+    if (playerStatus.webplayer.isPlaying) {
+      resumeSong(token);
+    } else {
+      pauseSong(token);
+    }
+  }, [playerStatus.webplayer.isPlaying]);
 
   const initialization = () => {
     // @ts-ignore
@@ -106,7 +114,7 @@ export const Webplayer: React.FC<Props> = (props) => {
 
   const play = (deviceId: string) =>
     playSong(token, deviceId, {
-      uris: playerStatus.uris,
+      uris: playerStatus.currentURI,
     });
 
   return (

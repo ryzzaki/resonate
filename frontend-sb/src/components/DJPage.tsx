@@ -4,7 +4,7 @@ import { UrlEnums } from '../enums/urls.enum';
 import { RouteComponentProps } from '@reach/router';
 import { AuthContext } from '../context/AuthContext';
 import { UserContext } from '../context/UserContext';
-import { refreshUser, signOutUser, resumeSong, pauseSong } from '../utils/api';
+import { refreshUser, signOutUser } from '../utils/api';
 import { Search } from './Search';
 import { Webplayer } from './Webplayer';
 import playerStatus from '../types/playerStatus';
@@ -26,7 +26,15 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
   const { user, setUser } = useContext(UserContext);
 
   const [playerStatus, setPlayerStatus] = useState<playerStatus>({
-    uris: [],
+    currentURI: [],
+    currentDJ: {},
+    connectedUsers: {},
+    startsAt: 0,
+    endsAt: 0,
+    webplayer: {
+      isPlaying: false,
+      positionMs: 0,
+    },
   });
 
   const socket = useRef<any>(null);
@@ -40,21 +48,19 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
     });
     socket.current.on('receiveCurrentSession', (session: any) => {
       console.log(session);
+      setPlayerStatus(session);
+    });
+    socket.current.on('receiveCurrentURI', (currentURI: string[]) => {
+      setPlayerStatus((state) => ({ ...state, currentURI }));
+    });
+    socket.current.on('receiveCurrentWebplayerState', (isPlaying: boolean) => {
       setPlayerStatus((state) => ({
         ...state,
-        uris: session.currentURI,
-        play: true,
+        webplayer: {
+          ...state.webplayer,
+          isPlaying,
+        },
       }));
-    });
-    socket.current.on('receiveCurrentURI', (uris: string[]) => {
-      setPlayerStatus((state) => ({ ...state, uris }));
-    });
-    socket.current.on('receiveCurrentWebplayerState', (state: boolean) => {
-      if (state) {
-        resumeSong(user.accessToken);
-      } else {
-        pauseSong(user.accessToken);
-      }
     });
   }, []);
 
