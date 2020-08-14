@@ -94,14 +94,14 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
           SonicBoom
         </h1>
         <h2 className="pt-25 p-1 text-darkblue font-bold">
-          Connected Listeners
+          Connected Listeners ♥️
         </h2>
-        <div className="p-15 pb-10 border-2 border-darkblue">
-          <ul className="list-disc">
+        <div className="py-5">
+          <ul>
             {playerStatus?.connectedUsers.map((result: any) => (
-              <li key={result.id} className="group flex mb-10">
+              <li key={result.id} className="group flex mb-5">
                 <div className="pt-5">
-                  <h5 className="font-semibold text-darkblue">
+                  <h5 className="font-semibold text-darkblue w-full whitespace-no-wrap overflow-hidden">
                     {playerStatus?.currentDJ?.id === result.id ? (
                       <span className="text-blue">
                         [DJ] 🎧 {result.displayName}
