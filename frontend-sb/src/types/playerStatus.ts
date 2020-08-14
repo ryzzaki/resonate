@@ -1,15 +1,9 @@
-import sessionUser from './sessionUser';
-
 type playerStatus = {
-  currentDJ: sessionUser | undefined;
-  currentURI: string[] | undefined;
-  connectedUsers: sessionUser[];
-  startsAt: number;
-  endsAt: number;
-  webplayer: {
-    isPlaying: boolean;
-    positionMs: number;
-  };
+  isInitializing: boolean;
+  paused: boolean;
+  errorType: string;
+  deviceId: string;
+  currentTrack: any;
 };
 
 export default playerStatus;

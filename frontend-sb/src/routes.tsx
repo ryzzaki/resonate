@@ -2,7 +2,7 @@ import React from 'react';
 import { Router, Redirect } from '@reach/router';
 import { LandingPage } from './components/LandingPage';
 import { RedirectPage } from './components/RedirectPage';
-import { DJPage } from './components/DJPage';
+import { DJPage } from './components/DJPage/DJPage';
 
 type RouterProps = {
   component: React.FC;

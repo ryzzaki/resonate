@@ -25,8 +25,6 @@ function App() {
     }
   }, []);
 
-  console.log('app');
-
   return (
     <div className="App">
       <AuthContext.Provider value={{ token, setToken }}>

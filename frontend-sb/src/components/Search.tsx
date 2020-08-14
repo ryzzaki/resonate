@@ -11,7 +11,7 @@ function debouncer(func: (...params: any[]) => any, delay: number) {
 
 type Props = {
   token: string;
-  emitSearchedURIs: (state: string[]) => void;
+  emitSearchedURIs: (uris: string[]) => void;
 };
 
 export const Search: React.FC<Props> = (props) => {
