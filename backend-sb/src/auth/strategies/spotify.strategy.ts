@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-spotify';
 import { AuthService } from '../auth.service';
 import mainConfig from '../../config/main.config';
-import { UserDataInterface } from '../interfaces/user-data.interface';
+import { UserDataInterface } from '../interfaces/userData.interface';
 import { User } from '../entities/user.entity';
 import { UrlEnums } from '../interfaces/urls.enum';
 

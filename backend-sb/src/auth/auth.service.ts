@@ -7,8 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserRepository } from './repositories/user.repository';
 import { RedisService } from 'nestjs-redis';
 import { JwtService } from '@nestjs/jwt';
-import { TokenPayloadInterface } from './interfaces/token-payload.interface';
-import { UserDataInterface } from './interfaces/user-data.interface';
+import { TokenPayloadInterface } from './interfaces/tokenPayload.interface';
+import { UserDataInterface } from './interfaces/userData.interface';
 import { SpotifyPayloadInterface } from './interfaces/spotifyPayload.interface';
 import { UpdateUserDto } from './dto/update.dto';
 import { AuthTypeEnums } from './interfaces/auth.enum';
@@ -156,6 +156,10 @@ export class AuthService {
 
   async getAllUsersDetail(): Promise<{ total: number; users: User[] }> {
     return await this.userRepository.getAllUsersCount();
+  }
+
+  async decodeTokenPayload(token: string): Promise<TokenPayloadInterface> {
+    return this.jwtService.decode(token) as TokenPayloadInterface;
   }
 
   private async blackListToken(blackListedToken: string): Promise<void> {

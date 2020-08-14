@@ -37,8 +37,8 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
 
   if (socket) {
     // enumerate the events later
-    socket.on('receiveSelectedURI', (data: string[]) => {
-      setURIs(data);
+    socket.on('receiveCurrentSession', (data: any) => {
+      setURIs(data.currentURI);
     });
   }
 
