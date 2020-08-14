@@ -6,7 +6,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "cross-env NODE_ENV=development yarn watch:css && react-scripts start",
+    "dev": "cross-env NODE_ENV=development yarn watch:css && PORT=3001 react-scripts start",
     "start": "cross-env NODE_ENV=production && react-scripts start",
     "build": "yarn build:css && react-scripts build",
     "test": "react-scripts test",
@@ -33,7 +33,6 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-scripts": "3.4.1",
-    "react-spotify-web-playback": "https://pkg.csb.dev/gilbarbara/react-spotify-web-playback/commit/e2c38749/react-spotify-web-playback",
     "socket.io-client": "2.3.0",
     "typescript": "3.7.2"
   },

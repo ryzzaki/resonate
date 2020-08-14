@@ -54,8 +54,9 @@ export class AuthController {
 
   @Get('/private/user/')
   @UseGuards(AuthGuard())
-  getPrivateUserById(@GetUser() user: User): Promise<_.Omit<User, 'refreshToken'>> {
+  async getPrivateUserById(@GetUser() user: User): Promise<_.Omit<User, 'refreshToken'>> {
     this.logger.verbose(`GET on /private/user called`);
-    return this.authService.getUserById(user.id);
+    const fetchedUser = await this.authService.getUserById(user.id);
+    return _.omit(fetchedUser, ['refreshToken']);
   }
 }
