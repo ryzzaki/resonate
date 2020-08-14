@@ -14,10 +14,10 @@ type Props = {};
 const connectSocket = (token: string): SocketIOClient.Socket => {
   // socket testing
   return io(UrlEnums.BASE_URL.toString(), {
-    transportOptions: {
-      extraHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
+    transports: ['websocket'],
+    path: '/v1/webplayer',
+    query: {
+      token: `Bearer ${token}`,
     },
   });
 };

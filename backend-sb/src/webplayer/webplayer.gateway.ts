@@ -5,11 +5,13 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
   MessageBody,
+  GatewayMetadata,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { Logger } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
+import { WsAuthGuard } from '../auth/decorators/websocket.guard';
 
-@WebSocketGateway()
+@WebSocketGateway(<GatewayMetadata>{ path: '/v1/webplayer', transports: ['websocket'] })
 export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private logger = new Logger('WebplayerGateway');
 
@@ -43,8 +45,9 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     return;
   }
 
+  @UseGuards(WsAuthGuard)
   @SubscribeMessage('rebroadcastSelectedURI')
-  async onChat(@MessageBody() uris: string[]) {
+  async onURIChange(@MessageBody() uris: string[]) {
     this.currentURI = uris;
     this.logger.verbose(`Newly selected URI: ${this.currentURI}`);
     this.server.emit('receiveSelectedURI', uris);
