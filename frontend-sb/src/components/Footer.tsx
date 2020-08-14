@@ -4,7 +4,7 @@ const Footer: React.FC = (props) => {
   return (
     <div className="bg-darkgray">
       <footer className="font-body text-white w-full text-left text-12 p-15">
-        Sonic Boom - @cngng 2020
+        SonicBoom - @cngng 2020
       </footer>
     </div>
   );
