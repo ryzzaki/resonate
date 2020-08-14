@@ -7,13 +7,13 @@ import { WebplayerView } from './Webplayer.view';
 
 type Props = {
   roomStatus: roomStatus;
-  token: string;
+  spotifyToken: string;
   handleAuthError: () => void;
   emitPlayState: (state: boolean) => void;
 };
 
 export const Webplayer: React.FC<Props> = (props) => {
-  const { roomStatus, token, handleAuthError, emitPlayState } = props;
+  const { roomStatus, spotifyToken, handleAuthError, emitPlayState } = props;
 
   const [status, setStatus] = useState<playerStatus>({
     isInitializing: false,
@@ -36,24 +36,22 @@ export const Webplayer: React.FC<Props> = (props) => {
   }, []);
 
   useEffect(() => {
-    // if (!status.isInitializing) {
-    //   play(status.deviceId);
-    // }
-  }, [roomStatus.currentURI, status.isInitializing]);
+    play(status.deviceId);
+  }, [roomStatus.currentURI, status.deviceId]);
 
-  // useEffect(() => {
-  //   if (playerStatus.webplayer.isPlaying) {
-  //     resumeSong(token);
-  //   } else {
-  //     pauseSong(token);
-  //   }
-  // }, [playerStatus.webplayer.isPlaying]);
+  useEffect(() => {
+    if (roomStatus.webplayer.isPlaying) {
+      resumeSong(spotifyToken);
+    } else {
+      pauseSong(spotifyToken);
+    }
+  }, [roomStatus.webplayer.isPlaying]);
 
   const initialization = () => {
     // @ts-ignore
     player.current = new Spotify.Player({
       getOAuthToken: (cb) => {
-        cb(token);
+        cb(spotifyToken);
       },
       name: 'SonicBoom',
     });
@@ -121,10 +119,13 @@ export const Webplayer: React.FC<Props> = (props) => {
     player.current.connect();
   };
 
-  // const play = (deviceId: string) =>
-  //   playSong(token, deviceId, {
-  //     uris: roomStatus.currentURI,
-  //   });
+  const play = (deviceId: string) => {
+    if (roomStatus.currentURI) {
+      playSong(spotifyToken, deviceId, {
+        uris: roomStatus.currentURI,
+      });
+    }
+  };
 
   return <WebplayerView status={status} emitPlayState={emitPlayState} />;
 };

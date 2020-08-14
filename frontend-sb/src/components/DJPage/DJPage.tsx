@@ -57,7 +57,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       transports: ['websocket'],
       path: '/v1/webplayer',
       query: {
-        token: `Bearer ${user.accessToken}`,
+        token: `Bearer ${user.spotifyAccessToken}`,
       },
     });
   };
@@ -73,7 +73,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
     try {
       const { data } = await refreshUser(token);
       setToken(data.accessToken);
-      setUser({ ...user, accessToken: data.spotifyAccessToken });
+      setUser({ ...user, spotifyAccessToken: data.spotifyAccessToken });
     } catch (err) {
       console.log(err);
       handleSignOut();
@@ -89,7 +89,8 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
 
   return (
     <DJPageView
-      token={user.accessToken}
+      spotifyToken={user.spotifyAccessToken}
+      token={token}
       handleAuthError={handleAuthError}
       handleSignOut={handleSignOut}
       emitPlayState={emitPlayState}

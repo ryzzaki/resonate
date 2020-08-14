@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { navigate } from '@reach/router';
 import { AuthContext } from './context/AuthContext';
 import { UserContext } from './context/UserContext';
 import { fetchUser } from './utils/api';

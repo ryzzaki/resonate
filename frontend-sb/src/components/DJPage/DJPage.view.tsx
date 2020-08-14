@@ -1,11 +1,13 @@
 import React from 'react';
 import { Search } from '../Search';
 import { Webplayer } from '../Webplayer/Webplayer';
+import roomStatus from '../../types/roomStatus';
 
 const randomUserIcons = ['🎸', '🎹', '🎺', '🎻', '🪕', '🎷', '🥁', '🎤'];
 
 type Props = {
-  roomStatus;
+  roomStatus: roomStatus;
+  spotifyToken: string;
   token: string;
   handleSignOut: () => void;
   handleAuthError: () => void;
@@ -18,6 +20,7 @@ export const DJPageView: React.FC<Props> = (props) => {
     roomStatus,
     handleSignOut,
     handleAuthError,
+    spotifyToken,
     token,
     emitPlayState,
     emitSearchedURIs,
@@ -70,13 +73,15 @@ export const DJPageView: React.FC<Props> = (props) => {
           <Search token={token} emitSearchedURIs={emitSearchedURIs} />
         </div>
         <div className="mt-auto sticky bottom-0 bg-darkblue">
-          {roomStatus.currentURI && (
+          {roomStatus.currentURI ? (
             <Webplayer
               roomStatus={roomStatus}
-              token={token}
+              spotifyToken={spotifyToken}
               handleAuthError={handleAuthError}
               emitPlayState={emitPlayState}
             />
+          ) : (
+            <p>connecting...</p>
           )}
         </div>
       </main>
