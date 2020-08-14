@@ -46,18 +46,18 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
       'tokenVer',
     ]);
 
+    if (!this.session.currentDJ && this.session.connectedUsers.length === 0) {
+      this.session.currentDJ = user;
+      this.session.startsAt = Date.now();
+      this.session.endsAt = Date.now() + 10 * 60 * 1000;
+    }
+
     if (
       !this.session.connectedUsers.find(val => {
         return val.id === user.id;
       })
     ) {
       this.session.connectedUsers.push(user);
-    }
-
-    if (!this.session.currentDJ && this.session.connectedUsers.length === 0) {
-      this.session.currentDJ = user;
-      this.session.startsAt = Date.now();
-      this.session.endsAt = Date.now() + 10 * 60 * 1000;
     }
 
     this.logger.verbose(`A user has connected! Current number of users: ${this.session.connectedUsers.length}`);

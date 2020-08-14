@@ -4,7 +4,7 @@ import { UrlEnums } from '../enums/urls.enum';
 import { RouteComponentProps } from '@reach/router';
 import { AuthContext } from '../context/AuthContext';
 import { UserContext } from '../context/UserContext';
-import { refreshUser, signOutUser } from '../utils/api';
+import { refreshUser, signOutUser, resumeSong, pauseSong } from '../utils/api';
 import { Search } from './Search';
 import { Webplayer } from './Webplayer';
 import playerStatus from '../types/playerStatus';
@@ -40,18 +40,29 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
     });
     socket.current.on('receiveCurrentSession', (session: any) => {
       console.log(session);
-      setPlayerStatus((state) => ({ ...state, uris: session.currentURI }));
+      setPlayerStatus((state) => ({
+        ...state,
+        uris: session.currentURI,
+        play: true,
+      }));
     });
     socket.current.on('receiveCurrentURI', (uris: string[]) => {
       setPlayerStatus((state) => ({ ...state, uris }));
     });
+    socket.current.on('receiveCurrentWebplayerState', (state: boolean) => {
+      if (state) {
+        resumeSong(user.accessToken);
+      } else {
+        pauseSong(user.accessToken);
+      }
+    });
   }, []);
 
-  const emitSearchedURIs = (uris: string[]) => {
-    if (socket) {
-      socket.current.emit('rebroadcastSelectedURI', uris);
-    }
-  };
+  const emitSearchedURIs = (uris: string[]) =>
+    socket.current.emit('rebroadcastSelectedURI', uris);
+
+  const emitPlayState = (state: boolean) =>
+    socket.current.emit('updateWebplayerState', state);
 
   const handleAuthError = async () => {
     try {
@@ -98,6 +109,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
               playerStatus={playerStatus}
               token={user.accessToken}
               handleAuthError={handleAuthError}
+              emitPlayState={emitPlayState}
             />
           )}
         </div>

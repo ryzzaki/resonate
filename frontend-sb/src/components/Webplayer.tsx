@@ -3,16 +3,17 @@ import { ReactComponent as Play } from '../assets/icons/play.svg';
 import { ReactComponent as Pause } from '../assets/icons/pause.svg';
 import loadScript from '../utils/loadScript';
 import playerStatus from '../types/playerStatus';
-import { playSong, pauseSong } from '../utils/api';
+import { playSong } from '../utils/api';
 
 type Props = {
   playerStatus: playerStatus;
   token: string;
   handleAuthError: () => void;
+  emitPlayState: (state: boolean) => void;
 };
 
 export const Webplayer: React.FC<Props> = (props) => {
-  const { playerStatus, token, handleAuthError } = props;
+  const { playerStatus, token, handleAuthError, emitPlayState } = props;
 
   const [status, setStatus] = useState<{
     isInitializing: boolean;
@@ -52,7 +53,7 @@ export const Webplayer: React.FC<Props> = (props) => {
       getOAuthToken: (cb) => {
         cb(token);
       },
-      name: 'Web pleya',
+      name: 'SonicBoom',
     });
 
     // Error handling
@@ -108,8 +109,6 @@ export const Webplayer: React.FC<Props> = (props) => {
       uris: playerStatus.uris,
     });
 
-  const pause = () => pauseSong(token);
-
   return (
     <div>
       <div className="">
@@ -135,11 +134,11 @@ export const Webplayer: React.FC<Props> = (props) => {
         </div>
         <div className="flex justify-center">
           {status.paused ? (
-            <button>
+            <button onClick={() => emitPlayState(true)}>
               <Play className="w-60 h-60 fill-current text-skinpink" />
             </button>
           ) : (
-            <button onClick={pause}>
+            <button onClick={() => emitPlayState(false)}>
               <Pause className="w-60 h-60 fill-current text-skinpink" />
             </button>
           )}
