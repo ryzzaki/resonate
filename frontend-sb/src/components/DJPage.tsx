@@ -39,8 +39,6 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
 
   const socket = useRef<any>(null);
 
-  console.log(playerStatus);
-
   useEffect(() => {
     socket.current = connectSocket(token);
     socket.current.on('connect_error', (err) => {
@@ -75,7 +73,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       setToken(data.accessToken);
       setUser({ ...user, accessToken: data.spotifyAccessToken });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       handleSignOut();
     }
   };
@@ -138,7 +136,8 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
           {socket.current && (
             <Webplayer
               playerStatus={playerStatus}
-              token={user.accessToken}
+              spotifyToken={user.accessToken}
+              token={token}
               handleAuthError={handleAuthError}
               emitPlayState={emitPlayState}
             />

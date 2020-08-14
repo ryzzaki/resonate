@@ -20,7 +20,7 @@ export const RedirectPage: React.FC<RouteComponentProps<Props>> = (props) => {
         setToken(token);
         navigate('/party');
       } catch (err) {
-        console.log(err);
+        console.error(err);
         localStorage.removeItem('access_key');
         setToken('');
         setUser({});

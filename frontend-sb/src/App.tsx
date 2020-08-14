@@ -17,15 +17,13 @@ function App() {
         setUser(data);
         setToken(access_token || '');
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     }
     if (access_token) {
       fetchUserAndRedirect();
     }
   }, []);
-
-  console.log('app');
 
   return (
     <div className="App">

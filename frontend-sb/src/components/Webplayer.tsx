@@ -7,13 +7,20 @@ import { playSong, resumeSong, pauseSong } from '../utils/api';
 
 type Props = {
   playerStatus: playerStatus;
+  spotifyToken: string;
   token: string;
   handleAuthError: () => void;
   emitPlayState: (state: boolean) => void;
 };
 
 export const Webplayer: React.FC<Props> = (props) => {
-  const { playerStatus, token, handleAuthError, emitPlayState } = props;
+  const {
+    playerStatus,
+    spotifyToken,
+    token,
+    handleAuthError,
+    emitPlayState,
+  } = props;
 
   const [status, setStatus] = useState<{
     isInitializing: boolean;
@@ -59,7 +66,7 @@ export const Webplayer: React.FC<Props> = (props) => {
     // @ts-ignore
     player.current = new Spotify.Player({
       getOAuthToken: (cb) => {
-        cb(token);
+        cb(spotifyToken);
       },
       name: 'SonicBoom',
     });
@@ -68,6 +75,8 @@ export const Webplayer: React.FC<Props> = (props) => {
     player.current.addListener('initialization_error', ({ message }) => {
       console.error(message);
       setStatus((state) => ({ ...state, errorType: 'initialization_error' }));
+      // is this a good idea?
+      handleAuthError();
     });
     player.current.addListener('authentication_error', ({ message }) => {
       console.error(message);
@@ -77,15 +86,18 @@ export const Webplayer: React.FC<Props> = (props) => {
     player.current.addListener('account_error', ({ message }) => {
       console.error(message);
       setStatus((state) => ({ ...state, errorType: 'account_error' }));
+      // this can't be a good idea
+      handleAuthError();
     });
     player.current.addListener('playback_error', ({ message }) => {
       console.error(message);
       setStatus((state) => ({ ...state, errorType: 'playback_error' }));
+      // this is a really bad idea
+      handleAuthError();
     });
 
     // Status handling + connection
     player.current.addListener('player_state_changed', (songState) => {
-      console.log(songState);
       if (!songState) {
         setStatus((state) => ({ ...state, paused: true }));
       } else {
@@ -112,10 +124,13 @@ export const Webplayer: React.FC<Props> = (props) => {
     player.current.connect();
   };
 
-  const play = (deviceId: string) =>
-    playSong(token, deviceId, {
-      uris: playerStatus.currentURI,
-    });
+  const play = (deviceId: string) => {
+    if (playerStatus.currentURI) {
+      playSong(token, deviceId, {
+        uris: playerStatus.currentURI,
+      });
+    }
+  };
 
   return (
     <div>
