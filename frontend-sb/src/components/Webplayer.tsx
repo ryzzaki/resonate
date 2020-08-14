@@ -110,8 +110,6 @@ export const Webplayer: React.FC<Props> = (props) => {
 
   const pause = () => pauseSong(token);
 
-  console.log(status);
-
   return (
     <div>
       <div className="">

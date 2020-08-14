@@ -1,6 +1,6 @@
 import { JwtModuleOptions, JwtSecretRequestType } from '@nestjs/jwt';
 import mainConfig from './main.config';
-import { TokenPayloadInterface } from '../auth/interfaces/token-payload.interface';
+import { TokenPayloadInterface } from '../auth/interfaces/tokenPayload.interface';
 import { AuthTypeEnums } from '../auth/interfaces/auth.enum';
 
 export const dynamicJwtConfig: JwtModuleOptions = {

@@ -11,10 +11,10 @@ import playerStatus from '../types/playerStatus';
 
 const connectSocket = (token: string): SocketIOClient.Socket => {
   return io(UrlEnums.BASE_URL.toString(), {
-    transportOptions: {
-      extraHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
+    transports: ['websocket'],
+    path: '/v1/webplayer',
+    query: {
+      token: `Bearer ${token}`,
     },
   });
 };
@@ -38,7 +38,11 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
     socket.current.on('connect_error', (err) => {
       console.error(err);
     });
-    socket.current.on('receiveSelectedURI', (uris: string[]) => {
+    socket.current.on('receiveCurrentSession', (session: any) => {
+      console.log(session);
+      setPlayerStatus((state) => ({ ...state, uris: session.currentURI }));
+    });
+    socket.current.on('receiveCurrentURI', (uris: string[]) => {
       setPlayerStatus((state) => ({ ...state, uris }));
     });
   }, []);
