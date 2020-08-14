@@ -1,7 +1,9 @@
+import sessionUser from './sessionUser';
+
 type playerStatus = {
-  currentURI: string[];
-  currentDJ: any;
-  connectedUsers: any;
+  currentDJ: sessionUser | undefined;
+  currentURI: string[] | undefined;
+  connectedUsers: sessionUser[];
   startsAt: number;
   endsAt: number;
   webplayer: {

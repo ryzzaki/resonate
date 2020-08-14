@@ -119,9 +119,6 @@ export const Webplayer: React.FC<Props> = (props) => {
 
   return (
     <div>
-      <div className="">
-        <div></div>
-      </div>
       <div className="grid grid-cols-3 p-10">
         <div className="flex items-center">
           <div className="flex-shrink-0 mr-10">

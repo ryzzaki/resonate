@@ -24,11 +24,10 @@ type Props = {};
 export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
   const { token, setToken } = useContext(AuthContext);
   const { user, setUser } = useContext(UserContext);
-
   const [playerStatus, setPlayerStatus] = useState<playerStatus>({
-    currentURI: [],
-    currentDJ: {},
-    connectedUsers: {},
+    currentDJ: undefined,
+    connectedUsers: [],
+    currentURI: undefined,
     startsAt: 0,
     endsAt: 0,
     webplayer: {
@@ -36,6 +35,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       positionMs: 0,
     },
   });
+  const randomUserIcons = ['🎸', '🎹', '🎺', '🎻', '🪕', '🎷', '🥁', '🎤'];
 
   const socket = useRef<any>(null);
 
@@ -47,7 +47,6 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       console.error(err);
     });
     socket.current.on('receiveCurrentSession', (session: any) => {
-      console.log(session);
       setPlayerStatus(session);
     });
     socket.current.on('receiveCurrentURI', (currentURI: string[]) => {
@@ -94,6 +93,32 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
         <h1 className="font-bold tracking-tighter text-40 text-darkblue">
           SonicBoom
         </h1>
+        <h2 className="pt-25 p-1 text-darkblue font-bold">
+          Connected Listeners
+        </h2>
+        <div className="p-15 pb-10 border-2 border-darkblue">
+          <ul className="list-disc">
+            {playerStatus?.connectedUsers.map((result: any) => (
+              <li key={result.id} className="group flex mb-10">
+                <div className="pt-5">
+                  <h5 className="font-semibold text-darkblue">
+                    {playerStatus?.currentDJ?.id === result.id ? (
+                      <span className="text-blue">
+                        [DJ] 🎧 {result.displayName}
+                      </span>
+                    ) : (
+                      `${
+                        randomUserIcons[
+                          Math.floor(Math.random() * randomUserIcons.length)
+                        ]
+                      } ${result.displayName}`
+                    )}
+                  </h5>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
         <ul className="mt-auto flex text-darkblue font-medium">
           <li className="mr-20">
             <a className="cursor-pointer">Settings</a>
