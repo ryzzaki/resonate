@@ -19,12 +19,38 @@ export const refreshUser = async (token: string | null) => {
 };
 
 export const signOutUser = async () => {
-  return axios.get(`${UrlEnums.API_URL}/auth/signout`);
+  return axios.get(`${UrlEnums.API_URL}/auth/signout`, {
+    withCredentials: true,
+  });
 };
 
 export const searchSongs = async (token: string, search: string) => {
   return axios.get(
     `${UrlEnums.API_URL}/spotify/search?searchString=${search}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+};
+
+export const playSong = async (token: string, deviceId: string, data: any) => {
+  return axios.put(
+    `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
+    data,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+};
+
+export const pauseSong = async (token: string) => {
+  return axios.put(
+    `https://api.spotify.com/v1/me/player/pause`,
+    {},
     {
       headers: {
         Authorization: `Bearer ${token}`,

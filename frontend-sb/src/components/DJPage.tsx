@@ -1,47 +1,48 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
-import { ICallbackState } from 'react-spotify-web-playback/lib/types/common';
 import { UrlEnums } from '../enums/urls.enum';
 import { RouteComponentProps } from '@reach/router';
 import { AuthContext } from '../context/AuthContext';
 import { UserContext } from '../context/UserContext';
-import { refreshUser, signOutUser } from '../utils/api';
+import { refreshUser, signOutUser, playSong, pauseSong } from '../utils/api';
 import { Search } from './Search';
 import { Webplayer } from './Webplayer';
+import playerStatus from '../types/playerStatus';
+
+const connectSocket = (token: string): SocketIOClient.Socket => {
+  return io(UrlEnums.BASE_URL.toString(), {
+    transportOptions: {
+      extraHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  });
+};
 
 type Props = {};
-
-// const connectSocket = (token: string): SocketIOClient.Socket => {
-//   // socket testing
-//   return io(UrlEnums.BASE_URL.toString(), {
-//     transportOptions: {
-//       extraHeaders: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     },
-//   });
-// };
 
 export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
   const { token, setToken } = useContext(AuthContext);
   const { user, setUser } = useContext(UserContext);
 
-  const [player, setPlayer] = useState({
-    isPlaying: false,
+  const [playerStatus, setPlayerStatus] = useState<playerStatus>({
+    play: false,
     uris: [],
-    socket: null,
   });
 
-  // useEffect(() => {
-  //   setSocket(connectSocket(token));
-  // }, [token]);
+  const socket = useRef<any>(null);
 
-  // if (socket) {
-  //   // enumerate the events later
-  //   socket.on('receiveSelectedURI', (data: string[]) => {
-  //     setURIs(data);
-  //   });
-  // }
+  console.log(playerStatus);
+
+  useEffect(() => {
+    socket.current = connectSocket(token);
+    socket.current.on('connect_error', (err) => {
+      console.error(err);
+    });
+    socket.current.on('receiveSelectedURI', (uris: string[]) => {
+      setPlayerStatus((state) => ({ ...state, uris, play: true }));
+    });
+  }, []);
 
   // const emitSearchedURIs = (uris: string[]) => {
   //   if (socket) {
@@ -49,16 +50,28 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
   //   }
   // };
 
-  const handleCallback = async (res: ICallbackState) => {
-    if (res.errorType === 'authentication_error') {
-      try {
-        const { data } = await refreshUser(token);
-        setToken(data.accessToken);
-        setUser({ ...user, accessToken: data.spotifyAccessToken });
-      } catch (err) {
-        console.log(err);
-        handleSignOut();
-      }
+  // const setIsPlaying = (playState: boolean) => {
+  //   setPlayer((state) => ({ ...state, isPlaying: playState }));
+  // };
+
+  const handlePlay = (deviceId: string) =>
+    playSong(user.accessToken, deviceId, {
+      uris: playerStatus.uris,
+    });
+
+  const handlePause = () => {
+    pauseSong(user.accessToken);
+    setPlayerStatus((state) => ({ ...state, play: false }));
+  };
+
+  const handleAuthError = async () => {
+    try {
+      const { data } = await refreshUser(token);
+      setToken(data.accessToken);
+      setUser({ ...user, accessToken: data.spotifyAccessToken });
+    } catch (err) {
+      console.log(err);
+      handleSignOut();
     }
   };
 
@@ -77,12 +90,12 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
         </h1>
         <ul className="mt-auto flex text-darkblue font-medium">
           <li className="mr-20">
-            <u className="cursor-pointer">Settings</u>
+            <a className="cursor-pointer">Settings</a>
           </li>
           <li className="mr-2 0">
-            <u className="cursor-pointer" onClick={handleSignOut}>
+            <a className="cursor-pointer" onClick={handleSignOut}>
               Sign Out
-            </u>
+            </a>
           </li>
         </ul>
       </aside>
@@ -95,12 +108,15 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
           /> */}
         </div>
         <div className="mt-auto sticky bottom-0">
-          <Webplayer
-            token={user.accessToken}
-            isPlaying={player.isPlaying}
-            uris={player.uris}
-            handleCallback={handleCallback}
-          />
+          {socket.current && playerStatus.uris.length && (
+            <Webplayer
+              token={user.accessToken}
+              playerStatus={playerStatus}
+              handleAuthError={handleAuthError}
+              handlePlay={handlePlay}
+              handlePause={handlePause}
+            />
+          )}
         </div>
       </main>
     </div>
