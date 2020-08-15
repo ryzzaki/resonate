@@ -80,7 +80,7 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     this.session.connectedUsers = this.session.connectedUsers.filter(val => !(val.id === user.id));
     if (user.id === this.session.currentDJ.id) {
       if (this.session.connectedUsers.length !== 0) {
-        this.selectNewDJ(user);
+        await this.selectNewDJ(user);
       }
       this.session.currentDJ = undefined;
     }
@@ -96,17 +96,18 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
   }
 
   @UseGuards(WsAuthGuard)
-  @SubscribeMessage('rebroadcastSelectedURI')
-  async onURIChange(@MessageBody() uris: string[]) {
-    this.session.currentURI = uris;
-    this.logger.verbose(`Newly selected URI: ${this.session.currentURI}`);
-    this.server.emit('receiveCurrentURI', this.session.currentURI);
-  }
-
-  @UseGuards(WsAuthGuard)
   @SubscribeMessage('getUsers')
   async getUsers() {
     this.server.emit('receiveUsers', this.session.connectedUsers);
+  }
+
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage('rebroadcastSelectedURI')
+  async onURIChange(@MessageBody() uris: string[], @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User) {
+    this.isPermittedForUser(user);
+    this.session.currentURI = uris;
+    this.logger.verbose(`Newly selected URI: ${this.session.currentURI}`);
+    this.server.emit('receiveCurrentURI', this.session.currentURI);
   }
 
   @UseGuards(WsAuthGuard)
