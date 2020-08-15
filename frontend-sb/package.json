@@ -42,7 +42,7 @@
     "cross-env": "7.0.2",
     "postcss-cli": "7.1.1",
     "prettier": "2.0.4",
-    "tailwindcss": "1.2.0",
+    "tailwindcss": "1.6.2",
     "tslint": "6.1.1",
     "tslint-config-prettier": "1.18.0",
     "tslint-react": "4.2.0"
