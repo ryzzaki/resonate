@@ -8,16 +8,22 @@ import { WebplayerView } from './Webplayer.view';
 type Props = {
   roomStatus: roomStatus;
   spotifyToken: string;
+  token: string;
   handleAuthError: () => void;
   emitPlayState: (state: boolean) => void;
 };
 
 export const Webplayer: React.FC<Props> = (props) => {
-  const { roomStatus, spotifyToken, handleAuthError, emitPlayState } = props;
+  const {
+    roomStatus,
+    token,
+    spotifyToken,
+    handleAuthError,
+    emitPlayState,
+  } = props;
 
   const [status, setStatus] = useState<playerStatus>({
     isInitializing: false,
-    paused: true,
     errorType: '',
     deviceId: '',
     currentTrack: {},
@@ -36,14 +42,19 @@ export const Webplayer: React.FC<Props> = (props) => {
   }, []);
 
   useEffect(() => {
-    play(status.deviceId);
+    if (status.deviceId) {
+      play(status.deviceId);
+    }
   }, [roomStatus.currentURI, status.deviceId]);
 
   useEffect(() => {
+    // ignore first load
+    if (!status.deviceId) return;
+
     if (roomStatus.webplayer.isPlaying) {
-      resumeSong(spotifyToken);
+      resumeSong(token);
     } else {
-      pauseSong(spotifyToken);
+      pauseSong(token);
     }
   }, [roomStatus.webplayer.isPlaying]);
 
@@ -95,11 +106,10 @@ export const Webplayer: React.FC<Props> = (props) => {
     player.current.addListener('player_state_changed', (songState) => {
       // TODO: Check this logic for disconection from other device
       if (!songState) {
-        setStatus((state) => ({ ...state, paused: true }));
+        setStatus((state) => ({ ...state, isInitializing: true }));
       } else {
         setStatus((state) => ({
           ...state,
-          paused: songState.paused,
           currentTrack: songState.track_window.current_track,
         }));
       }
@@ -121,11 +131,17 @@ export const Webplayer: React.FC<Props> = (props) => {
 
   const play = (deviceId: string) => {
     if (roomStatus.currentURI) {
-      playSong(spotifyToken, deviceId, {
+      playSong(token, deviceId, {
         uris: roomStatus.currentURI,
       });
     }
   };
 
-  return <WebplayerView status={status} emitPlayState={emitPlayState} />;
+  return (
+    <WebplayerView
+      status={status}
+      paused={!roomStatus.webplayer.isPlaying}
+      emitPlayState={emitPlayState}
+    />
+  );
 };

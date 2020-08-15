@@ -76,6 +76,7 @@ export const DJPageView: React.FC<Props> = (props) => {
           {roomStatus.currentURI ? (
             <Webplayer
               roomStatus={roomStatus}
+              token={token}
               spotifyToken={spotifyToken}
               handleAuthError={handleAuthError}
               emitPlayState={emitPlayState}

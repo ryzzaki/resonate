@@ -4,12 +4,13 @@ import { ReactComponent as Play } from '../../assets/icons/play.svg';
 import { ReactComponent as Pause } from '../../assets/icons/pause.svg';
 
 type Props = {
-  emitPlayState: (state: boolean) => void;
+  paused: boolean;
   status: playerStatus;
+  emitPlayState: (state: boolean) => void;
 };
 
 export const WebplayerView: React.FC<Props> = (props) => {
-  const { emitPlayState, status } = props;
+  const { paused, emitPlayState, status } = props;
 
   return (
     <div>
@@ -33,7 +34,7 @@ export const WebplayerView: React.FC<Props> = (props) => {
           </div>
         </div>
         <div className="flex justify-center">
-          {status.paused ? (
+          {paused ? (
             <button onClick={() => emitPlayState(true)}>
               <Play className="w-60 h-60 fill-current text-skinpink" />
             </button>

@@ -2,7 +2,7 @@ import React from 'react';
 
 export const UserContext = React.createContext({
   user: {
-    spotifyAccessToken: '',
+    accessToken: '',
   },
   setUser: (user: any) => {},
 });
