@@ -104,8 +104,7 @@ export class AuthService {
   async updateUserDetails(updateDetailsDto: UpdateUserDto, user: User): Promise<User> {
     const { displayName } = updateDetailsDto;
     await this.userRepository.updateUserDisplayNameById(user.id, displayName);
-
-    return await this.userRepository.getUserById(user.id);
+    return this.userRepository.getUserById(user.id);
   }
 
   async getUserById(id: string): Promise<User> {
@@ -117,15 +116,6 @@ export class AuthService {
     return { id, displayName };
   }
 
-  // async generateInvitationToken(groupId: number): Promise<string> {
-  //   const payload = { groupId };
-  //   const generatedToken = await this.jwtService.signAsync(payload, {
-  //     expiresIn: '60m',
-  //     jwtid: uuid.v4(),
-  //   });
-  //   return generatedToken;
-  // }
-
   private async generateToken(id: string, type: AuthTypeEnums, ver?: number): Promise<string> {
     const payload: TokenPayloadInterface = { id, ver, type };
     const generatedToken = await this.jwtService.signAsync(payload, {
@@ -134,21 +124,6 @@ export class AuthService {
     });
     return generatedToken;
   }
-
-  // private async validateInvitationToken(invitationToken: string): Promise<{ jti: string; groupId: number }> {
-  //   try {
-  //     const { jti, groupId } = await this.jwtService.verifyAsync(invitationToken);
-  //     const client = this.redisService.getClient();
-  //     const token: string = await client.get(String(jti));
-  //     if (token) {
-  //       throw new BadRequestException('Token is invalid');
-  //     }
-  //     return { jti, groupId };
-  //   } catch (err) {
-  //     this.logger.error(`Invitation Token validation has failed on error: ${err}`);
-  //     throw new UnauthorizedException(`Invitation Token validation has failed on error: ${err}`);
-  //   }
-  // }
 
   async getAllUsersCount(): Promise<{ total: number }> {
     return await this.userRepository.getAllUsersCount();
@@ -200,7 +175,6 @@ export class AuthService {
       .post(url, grant, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          // tslint:disable-next-line: object-literal-key-quotes
           Authorization: `Basic ${await this.getBase64AuthHeader()}`,
         },
       })
