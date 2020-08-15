@@ -1,8 +1,11 @@
 type playerStatus = {
+  currentTrack: any;
   isInitializing: boolean;
+  paused: boolean;
   errorType: string;
   deviceId: string;
-  currentTrack: any;
+  position: number;
+  progressMs: number;
 };
 
 export default playerStatus;

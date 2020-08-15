@@ -36,11 +36,10 @@ export const Search: React.FC<Props> = (props) => {
     debounceSearch(e);
   };
 
-  const handleClickURIs = useCallback((e) => {
-    e.preventDefault();
+  const handleClickURIs = (e) => {
     const { uris } = e.currentTarget.dataset;
     emitSearchedURIs(uris.split(','));
-  }, []);
+  };
 
   return (
     <div>

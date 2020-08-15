@@ -7,7 +7,7 @@ type roomStatus = {
   startsAt: number;
   endsAt: number;
   webplayer: {
-    isPlaying: boolean;
+    isPlaying: false;
     positionMs: number;
   };
 };

@@ -7,14 +7,17 @@ type Props = {
   paused: boolean;
   status: playerStatus;
   emitPlayState: (state: boolean) => void;
+  emitSliderPos: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export const WebplayerView: React.FC<Props> = (props) => {
-  const { paused, emitPlayState, status } = props;
+  const { paused, emitPlayState, status, emitSliderPos } = props;
 
   return (
     <div>
-      <div></div>
+      <div>
+        <input type="range" className="w-full bg-skinpink" />
+      </div>
       <div className="grid grid-cols-3 p-10">
         <div className="flex items-center">
           <div className="flex-shrink-0 mr-10">

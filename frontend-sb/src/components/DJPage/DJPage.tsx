@@ -4,7 +4,12 @@ import { UrlEnums } from '../../enums/urls.enum';
 import { RouteComponentProps } from '@reach/router';
 import { AuthContext } from '../../context/AuthContext';
 import { UserContext } from '../../context/UserContext';
-import { refreshUser, signOutUser } from '../../utils/api';
+import {
+  refreshUser,
+  signOutUser,
+  pauseSong,
+  resumeSong,
+} from '../../utils/api';
 import roomStatus from '../../types/roomStatus';
 import { DJPageView } from './DJPage.view';
 
@@ -41,13 +46,11 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       setRoomStatus((state) => ({ ...state, currentURI }));
     });
     socket.current.on('receiveCurrentWebplayerState', (isPlaying: boolean) => {
-      setRoomStatus((state) => ({
-        ...state,
-        webplayer: {
-          ...state.webplayer,
-          isPlaying,
-        },
-      }));
+      if (isPlaying) {
+        resumeSong(token);
+      } else {
+        pauseSong(token);
+      }
     });
     // TODO: socket cleanup function
   }, []);
@@ -67,6 +70,8 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
 
   const emitPlayState = (state: boolean) =>
     socket.current.emit('updateWebplayerState', state);
+
+  const emitSliderPos = (e: any) => {};
 
   const handleAuthError = async () => {
     // Refresh token on error, if fail -> signout
@@ -93,6 +98,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       token={token}
       handleAuthError={handleAuthError}
       handleSignOut={handleSignOut}
+      emitSliderPos={emitSliderPos}
       emitPlayState={emitPlayState}
       emitSearchedURIs={emitSearchedURIs}
       roomStatus={roomStatus}

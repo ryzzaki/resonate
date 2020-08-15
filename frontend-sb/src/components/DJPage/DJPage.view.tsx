@@ -13,6 +13,7 @@ type Props = {
   handleAuthError: () => void;
   emitPlayState: (state: boolean) => void;
   emitSearchedURIs: (uris: string[]) => void;
+  emitSliderPos: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export const DJPageView: React.FC<Props> = (props) => {
@@ -20,13 +21,12 @@ export const DJPageView: React.FC<Props> = (props) => {
     roomStatus,
     handleSignOut,
     handleAuthError,
+    emitSliderPos,
     spotifyToken,
     token,
     emitPlayState,
     emitSearchedURIs,
   } = props;
-
-  console.log(roomStatus);
 
   return (
     <div className="min-h-screen flex">
@@ -80,6 +80,7 @@ export const DJPageView: React.FC<Props> = (props) => {
               spotifyToken={spotifyToken}
               handleAuthError={handleAuthError}
               emitPlayState={emitPlayState}
+              emitSliderPos={emitSliderPos}
             />
           ) : (
             <p>connecting...</p>

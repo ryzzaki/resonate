@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import loadScript from '../../utils/loadScript';
 import roomStatus from '../../types/roomStatus';
 import playerStatus from '../../types/playerStatus';
-import { playSong, resumeSong, pauseSong } from '../../utils/api';
+import { playSong } from '../../utils/api';
 import { WebplayerView } from './Webplayer.view';
 
 type Props = {
@@ -11,6 +11,7 @@ type Props = {
   token: string;
   handleAuthError: () => void;
   emitPlayState: (state: boolean) => void;
+  emitSliderPos: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export const Webplayer: React.FC<Props> = (props) => {
@@ -20,43 +21,37 @@ export const Webplayer: React.FC<Props> = (props) => {
     spotifyToken,
     handleAuthError,
     emitPlayState,
+    emitSliderPos,
   } = props;
 
   const [status, setStatus] = useState<playerStatus>({
-    isInitializing: false,
+    currentTrack: {},
+    isInitializing: true,
+    paused: true,
     errorType: '',
     deviceId: '',
-    currentTrack: {},
+    position: 0,
+    progressMs: 0,
   });
 
   const player = useRef<any>(null);
+  const playerInterval = useRef<any>(null);
 
+  // initializing the spotify SDK
   useEffect(() => {
-    // initializing the spotify SDK
-    setStatus((state) => ({ ...state, isInitializing: true }));
     // @ts-ignore
     window.onSpotifyWebPlaybackSDKReady = initialization;
-
     (async () => await loadScript())();
     // TODO: cleanup function to remove script element
   }, []);
 
+  // on URI change from djroom play the new song
   useEffect(() => {
-    if (status.deviceId) {
-      play(status.deviceId);
+    if (!status.isInitializing) {
+      // play(status.deviceId);
+      console.log('k');
     }
-  }, [roomStatus.currentURI, status.deviceId]);
-
-  useEffect(() => {
-    // ignore first load
-    if (!status.deviceId) return;
-
-    if (roomStatus.webplayer.isPlaying) {
-      resumeSong(token);
-    } else {
-      pauseSong(token);
-    }
-  }, [roomStatus.webplayer.isPlaying]);
+  }, [roomStatus.currentURI]);
 
   const initialization = () => {
     // @ts-ignore
@@ -68,60 +63,14 @@ export const Webplayer: React.FC<Props> = (props) => {
     });
 
     // Error handling
-    player.current.addListener('initialization_error', ({ message }) => {
-      console.error(message);
-      setStatus((state) => ({
-        ...state,
-        errorType: 'initialization_error',
-        isInitializing: false,
-      }));
-    });
-    player.current.addListener('authentication_error', ({ message }) => {
-      console.error(message);
-      setStatus((state) => ({
-        ...state,
-        errorType: 'authentication_error',
-        isInitializing: false,
-      }));
-      handleAuthError();
-    });
-    player.current.addListener('account_error', ({ message }) => {
-      console.error(message);
-      setStatus((state) => ({
-        ...state,
-        errorType: 'account_error',
-        isInitializing: false,
-      }));
-    });
-    player.current.addListener('playback_error', ({ message }) => {
-      console.error(message);
-      setStatus((state) => ({
-        ...state,
-        errorType: 'playback_error',
-        isInitializing: false,
-      }));
-    });
+    player.current.addListener('initialization_error', handlePlayerError);
+    player.current.addListener('authentication_error', handlePlayerError);
+    player.current.addListener('account_error', handlePlayerError);
+    player.current.addListener('playback_error', handlePlayerError);
 
     // Status handling + connection
-    player.current.addListener('player_state_changed', (songState) => {
-      // TODO: Check this logic for disconection from other device
-      if (!songState) {
-        setStatus((state) => ({ ...state, isInitializing: true }));
-      } else {
-        setStatus((state) => ({
-          ...state,
-          currentTrack: songState.track_window.current_track,
-        }));
-      }
-    });
-    player.current.addListener('ready', ({ device_id }) => {
-      console.log('Ready with Device ID', device_id);
-      setStatus((state) => ({
-        ...state,
-        deviceId: device_id,
-        isInitializing: false,
-      }));
-    });
+    player.current.addListener('player_state_changed', handlePlayerStateChange);
+    player.current.addListener('ready', handlePlayerReady);
     player.current.addListener('not_ready', ({ device_id }) => {
       console.log('Device ID has gone offline', device_id);
     });
@@ -129,7 +78,58 @@ export const Webplayer: React.FC<Props> = (props) => {
     player.current.connect();
   };
 
-  const play = (deviceId: string) => {
+  const handlePlayerError = ({ message }) => {
+    console.error(message);
+    if (message === 'Authentication failed') {
+      handleAuthError();
+    }
+
+    setStatus((state) => ({
+      ...state,
+      errorType: message,
+      isInitializing: false,
+    }));
+  };
+
+  const handlePlayerReady = ({ device_id }) => {
+    console.log('Ready with Device ID', device_id);
+    if (roomStatus.webplayer.isPlaying) {
+      play(device_id);
+    }
+    setStatus((state) => ({
+      ...state,
+      deviceId: device_id,
+      isInitializing: false,
+    }));
+  };
+
+  const handlePlayerStateChange = (songState: any) => {
+    // TODO: Check this logic for disconection from other device
+    if (!songState) {
+      setStatus((state) => ({ ...state, isInitializing: true }));
+    } else {
+      console.log(songState);
+      setStatus((state) => ({
+        ...state,
+        currentTrack: songState.track_window.current_track,
+        paused: songState.paused,
+      }));
+    }
+  };
+
+  const handleIntervalUpdate = (e: number | undefined) => {
+    console.log(status);
+  };
+
+  const handlePlayState = (state: boolean) => {
+    if (!status.currentTrack.id) {
+      play(status.deviceId);
+    } else {
+      emitPlayState(state);
+    }
+  };
+
+  const play = async (deviceId: string) => {
     if (roomStatus.currentURI) {
       playSong(token, deviceId, {
         uris: roomStatus.currentURI,
@@ -137,11 +137,26 @@ export const Webplayer: React.FC<Props> = (props) => {
     }
   };
 
+  if (status.isInitializing)
+    return (
+      <div className="text-center text-pink p-20">
+        <p>LOADING...</p>
+      </div>
+    );
+
+  if (status.errorType)
+    return (
+      <div className="text-center text-pink p-20">
+        <p>{status.errorType}</p>
+      </div>
+    );
+
   return (
     <WebplayerView
       status={status}
-      paused={!roomStatus.webplayer.isPlaying}
-      emitPlayState={emitPlayState}
+      paused={status.paused}
+      emitPlayState={handlePlayState}
+      emitSliderPos={emitSliderPos}
     />
   );
 };
