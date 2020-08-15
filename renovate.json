@@ -1,3 +1,9 @@
 {
-  "extends": ["config:base"]
+  "extends": ["config:js-app", ":rebaseStalePrs", "docker:disable", "group:allNonMajor", "schedule:earlyMondays"],
+  "automergeType": "branch",
+  "automerge": true,
+  "major": {
+    "automerge": false,
+    "ignoreDeps": ["@types/node"]
+  }
 }
