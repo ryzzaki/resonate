@@ -43,7 +43,8 @@ export const Webplayer: React.FC<Props> = (props) => {
     // @ts-ignore
     window.onSpotifyWebPlaybackSDKReady = initialization;
     (async () => await loadScript())();
-    // TODO: cleanup function to remove script element
+
+    return () => player.current.disconnect();
   }, []);
 
   // on URI change from djroom play the new song
@@ -63,11 +64,6 @@ export const Webplayer: React.FC<Props> = (props) => {
       playerInterval.current = window.setInterval(handleIntervalUpdate, 100);
     }
   }, [status.paused]);
-
-  // on change track restarts progressMs for player slider
-  useEffect(() => {
-    setStatus((state) => ({ ...state, progressMs: 0 }));
-  }, [status.currentTrack.id]);
 
   const initialization = () => {
     // @ts-ignore
@@ -126,6 +122,7 @@ export const Webplayer: React.FC<Props> = (props) => {
     } else {
       setStatus((state) => ({
         ...state,
+        progressMs: !songState.position ? 0 : state.progressMs,
         currentTrack: songState.track_window.current_track,
         paused: songState.paused,
       }));
