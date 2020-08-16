@@ -105,6 +105,18 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
   }
 
   @UseGuards(WsAuthGuard)
+  @SubscribeMessage('getSongStart')
+  async getSongStart() {
+    this.server.emit('receiveCurrentSongStart', this.session.webplayer.songStartedAt);
+  }
+
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage('getSongPause')
+  async getSongPause() {
+    this.server.emit('receiveCurrentSongPause', this.session.webplayer.songPausedAt);
+  }
+
+  @UseGuards(WsAuthGuard)
   @SubscribeMessage('rebroadcastSelectedURI')
   async onURIChange(@MessageBody() uris: string[], @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User) {
     this.isPermittedForUser(user);
