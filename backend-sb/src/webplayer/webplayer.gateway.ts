@@ -83,6 +83,7 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
         await this.selectNewDJ(user);
       }
       this.session.currentDJ = undefined;
+      this.server.emit('receiveNewDJ', this.session.currentDJ);
     }
     this.logger.verbose(`A user has disconnected! Current number of users: ${this.session.connectedUsers.length}`);
     this.server.emit('receiveCurrentSession', this.session);
