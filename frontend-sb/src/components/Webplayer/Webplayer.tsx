@@ -4,6 +4,7 @@ import roomStatus from '../../types/roomStatus';
 import playerStatus from '../../types/playerStatus';
 import { playSong } from '../../utils/api';
 import { WebplayerView } from './Webplayer.view';
+import { stat } from 'fs';
 
 type Props = {
   roomStatus: roomStatus;
@@ -47,11 +48,26 @@ export const Webplayer: React.FC<Props> = (props) => {
 
   // on URI change from djroom play the new song
   useEffect(() => {
-    if (!status.isInitializing) {
-      // play(status.deviceId);
-      console.log('k');
-    }
+    if (status.isInitializing) return;
+
+    play(status.deviceId);
   }, [roomStatus.currentURI]);
+
+  // player slider logic, setInterval on play / clearInterval of pause
+  useEffect(() => {
+    if (status.isInitializing) return;
+
+    if (status.paused) {
+      window.clearInterval(playerInterval.current);
+    } else {
+      playerInterval.current = window.setInterval(handleIntervalUpdate, 100);
+    }
+  }, [status.paused]);
+
+  // on change track restarts progressMs for player slider
+  useEffect(() => {
+    setStatus((state) => ({ ...state, progressMs: 0 }));
+  }, [status.currentTrack.id]);
 
   const initialization = () => {
     // @ts-ignore
@@ -108,7 +124,6 @@ export const Webplayer: React.FC<Props> = (props) => {
     if (!songState) {
       setStatus((state) => ({ ...state, isInitializing: true }));
     } else {
-      console.log(songState);
       setStatus((state) => ({
         ...state,
         currentTrack: songState.track_window.current_track,
@@ -118,7 +133,18 @@ export const Webplayer: React.FC<Props> = (props) => {
   };
 
   const handleIntervalUpdate = (e: number | undefined) => {
-    console.log(status);
+    setStatus((state) => {
+      const progressMs = state.progressMs + 100;
+      const progressInDuration =
+        state.progressMs / state.currentTrack.duration_ms;
+
+      // max length = 100 slider input value -> find the (current ms / the track length) * 100
+      return {
+        ...state,
+        progressMs,
+        position: progressInDuration > 100 ? 1000 : progressInDuration * 100,
+      };
+    });
   };
 
   const handlePlayState = (state: boolean) => {
@@ -136,20 +162,6 @@ export const Webplayer: React.FC<Props> = (props) => {
       });
     }
   };
-
-  if (status.isInitializing)
-    return (
-      <div className="text-center text-pink p-20">
-        <p>LOADING...</p>
-      </div>
-    );
-
-  if (status.errorType)
-    return (
-      <div className="text-center text-pink p-20">
-        <p>{status.errorType}</p>
-      </div>
-    );
 
   return (
     <WebplayerView

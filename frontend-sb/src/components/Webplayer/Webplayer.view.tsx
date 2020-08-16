@@ -13,10 +13,29 @@ type Props = {
 export const WebplayerView: React.FC<Props> = (props) => {
   const { paused, emitPlayState, status, emitSliderPos } = props;
 
+  if (status.isInitializing)
+    return (
+      <div className="text-center text-pink p-20">
+        <p>LOADING...</p>
+      </div>
+    );
+
+  if (status.errorType)
+    return (
+      <div className="text-center text-pink p-20">
+        <p>{status.errorType}</p>
+      </div>
+    );
+
   return (
     <div>
       <div>
-        <input type="range" className="w-full bg-skinpink" />
+        <input
+          type="range"
+          className="w-full block"
+          value={status.position}
+          onChange={() => {}}
+        />
       </div>
       <div className="grid grid-cols-3 p-10">
         <div className="flex items-center">
