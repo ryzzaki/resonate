@@ -120,6 +120,7 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
   async selectNewDJ(@GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User) {
     this.isPermittedForUser(user);
     this.session.currentDJ = _.sample(this.session.connectedUsers);
+    this.session.startsAt = Date.now();
     this.server.emit('receiveNewDJ', this.session.currentDJ);
   }
 
