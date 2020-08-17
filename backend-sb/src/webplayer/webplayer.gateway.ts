@@ -53,11 +53,11 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
       this.session.endsAt = Date.now() + 10 * 60 * 1000;
     }
 
-    if (
-      !this.session.connectedUsers.find(val => {
-        return val.id === user.id;
-      })
-    ) {
+    const isNewUser = !this.session.connectedUsers.find(val => {
+      return val.id === user.id;
+    });
+
+    if (isNewUser) {
       this.session.connectedUsers.push(user);
     }
 
@@ -72,7 +72,11 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
       this.session.currentURI = ['spotify:track:4Uy3kNxW2kB8AEoXljEcth'];
     }
 
-    this.server.emit('receiveCurrentSession', this.session);
+    if (isNewUser) {
+      this.server.emit('receiveCurrentSession', this.session);
+    } else {
+      this.server.emit('receiveUsers', this.session.connectedUsers);
+    }
 
     // Set the song start after the broadcast, because DJ doesnt need to know when the song starts
     this.session.webplayer.songStartedAt = Date.now();
@@ -83,14 +87,11 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     const user = await this.webplayerService.getUserUsingJwtToken(jwtToken);
     this.session.connectedUsers = this.session.connectedUsers.filter(val => !(val.id === user.id));
     if (user.id === this.session.currentDJ.id) {
-      if (this.session.connectedUsers.length !== 0) {
-        await this.selectNewDJ(user);
-      }
-      this.session.currentDJ = undefined;
+      this.session.connectedUsers.length !== 0 ? await this.selectNewDJ(user) : (this.session.currentDJ = undefined);
       this.server.emit('receiveNewDJ', this.session.currentDJ);
     }
     this.logger.verbose(`A user has disconnected! Current number of users: ${this.session.connectedUsers.length}`);
-    this.server.emit('receiveCurrentSession', this.session);
+    this.server.emit('receiveUsers', this.session.connectedUsers);
     return socket.disconnect();
   }
 
