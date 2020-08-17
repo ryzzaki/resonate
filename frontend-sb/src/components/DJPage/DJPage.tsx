@@ -58,6 +58,9 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
     socket.current.on('receiveNewDJ', (currentDJ: any) => {
       setRoomStatus((state) => ({ ...state, currentDJ }));
     });
+    socket.current.on('receiveUsers', (connectedUsers: any) => {
+      setRoomStatus((state) => ({ ...state, connectedUsers }));
+    });
     // TODO: socket cleanup function
   }, []);
 
