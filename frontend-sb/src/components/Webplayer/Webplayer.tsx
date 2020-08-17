@@ -44,7 +44,7 @@ export const Webplayer: React.FC<Props> = (props) => {
     (async () => await loadScript())();
 
     return () => player.current.disconnect();
-  }, []);
+  }, [spotifyToken]);
 
   // on URI change from djroom play the new song
   useEffect(() => {
@@ -93,6 +93,7 @@ export const Webplayer: React.FC<Props> = (props) => {
     console.error(message);
     if (message === 'Authentication failed') {
       handleAuthError();
+      return;
     }
 
     setStatus((state) => ({

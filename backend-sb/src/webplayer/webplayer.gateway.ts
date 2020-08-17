@@ -146,8 +146,8 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
       // TODO: there might be a big timing gap between the pause and spotify pausing the song, we need to check if the UX fits well enougth for the technical problem
       this.session.webplayer.songPausedAt = Date.now();
     } else {
-      this.session.webplayer.songPausedAt = undefined;
       this.session.webplayer.songStartedAt = this.session.webplayer.songStartedAt + (Date.now() - this.session.webplayer.songPausedAt);
+      this.session.webplayer.songPausedAt = undefined;
     }
     this.session.webplayer.isPlaying = state;
     this.server.emit('receiveCurrentWebplayerState', this.session.webplayer.isPlaying);
