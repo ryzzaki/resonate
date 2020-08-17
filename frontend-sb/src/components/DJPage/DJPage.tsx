@@ -34,6 +34,8 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
     },
   });
 
+  const isDJ = roomStatus.currentDJ?.id === user.id;
+
   useEffect(() => {
     // initializing socket connection
     socket.current = connectSocket();
@@ -53,6 +55,9 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
         pauseSong(token);
       }
     });
+    socket.current.on('receiveNewDJ', (currentDJ: any) => {
+      setRoomStatus((state) => ({ ...state, currentDJ }));
+    });
     // TODO: socket cleanup function
   }, []);
 
@@ -69,10 +74,15 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
   const emitSearchedURIs = (uris: string[]) =>
     socket.current.emit('rebroadcastSelectedURI', uris);
 
-  const emitPlayState = (state: boolean) =>
-    socket.current.emit('updateWebplayerState', state);
+  const emitPlayState = (state: boolean) => {
+    if (isDJ) {
+      socket.current.emit('updateWebplayerState', state);
+    }
+  };
 
   const emitSliderPos = (e: any) => {};
+
+  const emitSelectNewDJ = () => socket.current.emit('selectNewDJ');
 
   const handleAuthError = async () => {
     // Refresh token on error, if fail -> signout
@@ -98,10 +108,12 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
     <DJPageView
       spotifyToken={user.accessToken}
       token={token}
+      isDJ={isDJ}
       handleAuthError={handleAuthError}
       handleSignOut={handleSignOut}
       emitSliderPos={emitSliderPos}
       emitPlayState={emitPlayState}
+      emitSelectNewDJ={emitSelectNewDJ}
       emitSearchedURIs={emitSearchedURIs}
       roomStatus={roomStatus}
     />

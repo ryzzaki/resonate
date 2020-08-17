@@ -9,7 +9,6 @@ function App() {
   const [user, setUser] = useState<any>({});
 
   useEffect(() => {
-    console.log('app');
     const access_token = localStorage.getItem('access_key');
     async function fetchUserAndRedirect() {
       try {
@@ -21,7 +20,7 @@ function App() {
         console.error(err);
       }
     }
-    if (access_token) {
+    if (access_token && window.location.pathname !== '/auth/') {
       fetchUserAndRedirect();
     }
   }, []);

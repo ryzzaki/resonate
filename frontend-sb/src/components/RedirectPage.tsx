@@ -13,10 +13,8 @@ export const RedirectPage: React.FC<RouteComponentProps<Props>> = (props) => {
   const { setUser } = useContext(UserContext);
 
   useEffect(() => {
-    console.log('redirect');
     async function fetchUserAndRedirect(token: string) {
       try {
-        console.log('userfetching');
         const { data } = await fetchUser(token);
         setUser(data);
         setToken(token);

@@ -9,8 +9,10 @@ type Props = {
   roomStatus: roomStatus;
   spotifyToken: string;
   token: string;
+  isDJ: boolean;
   handleSignOut: () => void;
   handleAuthError: () => void;
+  emitSelectNewDJ: () => void;
   emitPlayState: (state: boolean) => void;
   emitSearchedURIs: (uris: string[]) => void;
   emitSliderPos: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -19,14 +21,18 @@ type Props = {
 export const DJPageView: React.FC<Props> = (props) => {
   const {
     roomStatus,
+    isDJ,
     handleSignOut,
     handleAuthError,
-    emitSliderPos,
     spotifyToken,
     token,
+    emitSliderPos,
     emitPlayState,
     emitSearchedURIs,
+    emitSelectNewDJ,
   } = props;
+
+  const showDJChangeOption = isDJ && roomStatus.connectedUsers.length > 1;
 
   return (
     <div className="min-h-screen flex">
@@ -57,14 +63,34 @@ export const DJPageView: React.FC<Props> = (props) => {
             ))}
           </ul>
         </div>
-        <ul className="mt-auto flex text-darkblue font-medium px-20">
+        {showDJChangeOption && (
+          <div className="flex pt-10">
+            <button
+              className="mx-auto bg-pink text-white font-bold text-14
+                px-20 py-5 rounded-full uppercase"
+              onClick={emitSelectNewDJ}
+            >
+              shuffle DJ
+            </button>
+          </div>
+        )}
+        <ul className="mt-auto flex text-darkblue font-medium px-20 text-14">
           <li className="mr-20">
-            <a className="cursor-pointer">Settings</a>
+            <div className="cursor-pointer">Settings</div>
           </li>
-          <li className="mr-2 0">
-            <a className="cursor-pointer" onClick={handleSignOut}>
-              Sign Out
+          <li className="mr-20">
+            <a
+              className="cursor-pointer"
+              target="_blank"
+              href="https://github.com/ryzzaki/SonicBoom/issues"
+            >
+              Report a bug
             </a>
+          </li>
+          <li>
+            <div className="cursor-pointer" onClick={handleSignOut}>
+              Sign Out
+            </div>
           </li>
         </ul>
       </aside>
