@@ -43,25 +43,37 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       console.error(err);
     });
     socket.current.on('receiveCurrentSession', (session: any) => {
+      console.log('session');
       setRoomStatus(session);
     });
     socket.current.on('receiveCurrentURI', (currentURI: string[]) => {
+      console.log('uri');
       setRoomStatus((state) => ({ ...state, currentURI }));
     });
     socket.current.on('receiveCurrentWebplayerState', (isPlaying: boolean) => {
-      if (isPlaying) {
-        resumeSong(token);
-      } else {
-        pauseSong(token);
+      console.log('webplayerstate');
+      try {
+        if (isPlaying) {
+          resumeSong(token);
+        } else {
+          pauseSong(token);
+        }
+      } catch (err) {
+        console.log(err);
+        handleAuthError();
       }
     });
     socket.current.on('receiveNewDJ', (currentDJ: any) => {
+      console.log('receiveNewDJ');
       setRoomStatus((state) => ({ ...state, currentDJ }));
     });
     socket.current.on('receiveUsers', (connectedUsers: any) => {
+      console.log('recieveUsers');
       setRoomStatus((state) => ({ ...state, connectedUsers }));
     });
+
     // TODO: socket cleanup function
+    return () => socket.current.disconnect();
   }, []);
 
   const connectSocket = (): SocketIOClient.Socket => {
