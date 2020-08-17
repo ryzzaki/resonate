@@ -70,10 +70,12 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
 
     if (!this.session.currentURI) {
       this.session.currentURI = ['spotify:track:4Uy3kNxW2kB8AEoXljEcth'];
-      this.session.webplayer.songStartedAt = Date.now();
     }
 
     this.server.emit('receiveCurrentSession', this.session);
+
+    // Set the song start after the broadcast, because DJ doesnt need to know when the song starts
+    this.session.webplayer.songStartedAt = Date.now();
   }
 
   async handleDisconnect(socket: Socket) {
@@ -121,10 +123,10 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
   async onURIChange(@MessageBody() uris: string[], @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User) {
     this.isPermittedForUser(user);
     this.session.currentURI = uris;
-    this.session.webplayer.songStartedAt = Date.now();
     this.logger.verbose(`Newly selected URI: ${this.session.currentURI}`);
     this.server.emit('receiveCurrentURI', this.session.currentURI);
     this.server.emit('receiveCurrentSongStart', this.session.webplayer.songStartedAt);
+    this.session.webplayer.songStartedAt = Date.now();
   }
 
   @UseGuards(WsAuthGuard)
@@ -141,7 +143,11 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
   async setWebplayerState(@MessageBody() state: boolean, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User) {
     this.isPermittedForUser(user);
     if (!state) {
+      // TODO: there might be a big timing gap between the pause and spotify pausing the song, we need to check if the UX fits well enougth for the technical problem
       this.session.webplayer.songPausedAt = Date.now();
+    } else {
+      this.session.webplayer.songPausedAt = undefined;
+      this.session.webplayer.songStartedAt = this.session.webplayer.songStartedAt + (Date.now() - this.session.webplayer.songPausedAt);
     }
     this.session.webplayer.isPlaying = state;
     this.server.emit('receiveCurrentWebplayerState', this.session.webplayer.isPlaying);

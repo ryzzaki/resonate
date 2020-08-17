@@ -19,7 +19,7 @@ export class SpotifyController {
 
   @Put('/play')
   @UseGuards(AuthGuard())
-  playSongForDeviceId(@Query('deviceId') deviceId: string, @Body() data: { uris: string[] }, @GetUser() user: User) {
+  playSongForDeviceId(@Query('deviceId') deviceId: string, @Body() data: { uris: string[]; position_ms?: number }, @GetUser() user: User) {
     return this.spotifyService.playSongForDeviceId(deviceId, data, user);
   }
 

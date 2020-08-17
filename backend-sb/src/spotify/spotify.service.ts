@@ -44,7 +44,8 @@ export class SpotifyService {
   }
 
   async updatePlayerState(user: User, playerState: WebplayerStateEnum): Promise<void> {
-    const url = `https://api.spotify.com/v1/me/player/${playerState === WebplayerStateEnum.PAUSE ? 'pause' : 'play'}`;
+    const isPause = playerState === WebplayerStateEnum.PAUSE;
+    const url = `https://api.spotify.com/v1/me/player/${isPause ? 'pause' : 'play'}`;
     await axios
       .put(
         url,

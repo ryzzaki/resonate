@@ -105,7 +105,10 @@ export const Webplayer: React.FC<Props> = (props) => {
   const handlePlayerReady = ({ device_id }) => {
     console.log('Ready with Device ID', device_id);
     if (roomStatus.webplayer.isPlaying) {
-      play(device_id);
+      const songStart = roomStatus.webplayer.songStartedAt
+        ? Date.now() - roomStatus.webplayer.songStartedAt
+        : 0;
+      play(device_id, songStart);
     }
     setStatus((state) => ({
       ...state,
@@ -116,12 +119,17 @@ export const Webplayer: React.FC<Props> = (props) => {
 
   const handlePlayerStateChange = (songState: any) => {
     // TODO: Check this logic for disconection from other devices
+    console.log(songState);
     if (!songState) {
       setStatus((state) => ({ ...state, isInitializing: true }));
     } else {
       setStatus((state) => ({
         ...state,
-        progressMs: !songState.position ? 0 : state.progressMs,
+        progressMs: roomStatus.webplayer.songStartedAt
+          ? songState.position
+          : !songState.position
+          ? 0
+          : state.progressMs,
         currentTrack: songState.track_window.current_track,
         paused: songState.paused,
       }));
@@ -151,10 +159,11 @@ export const Webplayer: React.FC<Props> = (props) => {
     }
   };
 
-  const play = async (deviceId: string) => {
+  const play = async (deviceId: string, position_ms?: number) => {
     if (roomStatus.currentURI) {
       playSong(token, deviceId, {
         uris: roomStatus.currentURI,
+        position_ms,
       });
     }
   };

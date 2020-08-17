@@ -8,7 +8,8 @@ type roomStatus = {
   endsAt: number;
   webplayer: {
     isPlaying: boolean;
-    positionMs: number;
+    songPausedAt: number;
+    songStartedAt: number;
   };
 };
 

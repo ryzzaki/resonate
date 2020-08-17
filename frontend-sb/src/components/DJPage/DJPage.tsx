@@ -29,7 +29,8 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
     endsAt: 0,
     webplayer: {
       isPlaying: false,
-      positionMs: 0,
+      songStartedAt: 0,
+      songPausedAt: 0,
     },
   });
 

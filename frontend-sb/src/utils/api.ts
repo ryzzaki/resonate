@@ -38,7 +38,7 @@ export const searchSongs = async (token: string, search: string) => {
 export const playSong = async (
   token: string,
   deviceId: string,
-  data: { uris: string[] }
+  data: { uris: string[]; position_ms?: number }
 ) => {
   return axios.put(
     `${UrlEnums.API_URL}/spotify/play?deviceId=${deviceId}`,
