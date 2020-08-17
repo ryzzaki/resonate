@@ -79,6 +79,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       const { data } = await refreshUser(token);
       setToken(data.accessToken);
       setUser({ ...user, accessToken: data.spotifyAccessToken });
+      // TODO: missing something here, a trigger to reinitialize the player
     } catch (err) {
       console.log(err);
       handleSignOut();

@@ -4,7 +4,6 @@ import roomStatus from '../../types/roomStatus';
 import playerStatus from '../../types/playerStatus';
 import { playSong } from '../../utils/api';
 import { WebplayerView } from './Webplayer.view';
-import { stat } from 'fs';
 
 type Props = {
   roomStatus: roomStatus;
@@ -116,7 +115,7 @@ export const Webplayer: React.FC<Props> = (props) => {
   };
 
   const handlePlayerStateChange = (songState: any) => {
-    // TODO: Check this logic for disconection from other device
+    // TODO: Check this logic for disconection from other devices
     if (!songState) {
       setStatus((state) => ({ ...state, isInitializing: true }));
     } else {
@@ -139,7 +138,7 @@ export const Webplayer: React.FC<Props> = (props) => {
       return {
         ...state,
         progressMs,
-        position: progressInDuration > 100 ? 1000 : progressInDuration * 100,
+        position: progressInDuration > 100 ? 100 : progressInDuration * 100,
       };
     });
   };
