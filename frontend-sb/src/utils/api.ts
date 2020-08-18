@@ -35,9 +35,13 @@ export const searchSongs = async (token: string, search: string) => {
   );
 };
 
-export const playSong = async (token: string, deviceId: string, data: any) => {
+export const playSong = async (
+  token: string,
+  deviceId: string,
+  data: { uris: string[]; position_ms?: number }
+) => {
   return axios.put(
-    `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
+    `${UrlEnums.API_URL}/spotify/play?deviceId=${deviceId}`,
     data,
     {
       headers: {
@@ -49,7 +53,7 @@ export const playSong = async (token: string, deviceId: string, data: any) => {
 
 export const pauseSong = async (token: string) => {
   return axios.put(
-    `https://api.spotify.com/v1/me/player/pause`,
+    `${UrlEnums.API_URL}/spotify/pause`,
     {},
     {
       headers: {
@@ -61,7 +65,7 @@ export const pauseSong = async (token: string) => {
 
 export const resumeSong = async (token: string) => {
   return axios.put(
-    `https://api.spotify.com/v1/me/player/play`,
+    `${UrlEnums.API_URL}/spotify/resume`,
     {},
     {
       headers: {

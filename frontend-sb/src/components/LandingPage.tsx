@@ -22,7 +22,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => (
               </span>
             </h1>
             <p className="text-16 p-10 m-10">
-              Sonic Boom allows you to stream songs from your Spotify account to
+              SonicBoom allows you to stream songs from your Spotify account to
               anyone who is connected. Everyone listens to the same song.{' '}
               <span className="font-heading">Maximum.</span>{' '}
               <span className="font-heading text-green">Synergy.</span>
@@ -42,7 +42,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => (
               <span className="text-green">1.</span> Spotify Premium
             </h1>
             <p className="text-16 p-10 m-10">
-              To use Sonic Boom, you must be subscribed to Spotify Premium.
+              To use SonicBoom, you must be subscribed to Spotify Premium.
             </p>
           </div>
           <div className="flex-auto w-full md:w-1/3">
@@ -61,7 +61,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => (
               </span>
             </h1>
             <p className="text-16 p-10 m-10">
-              Login to Sonic Boom with your Spotify account & consent to share
+              Login to SonicBoom with your Spotify account & consent to share
               basic information.
             </p>
           </div>
@@ -85,7 +85,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => (
               </span>
             </h1>
             <p className="text-16 p-10 m-10">
-              <span className="font-heading">Nope!</span> Sonic Boom is{' '}
+              <span className="font-heading">Nope!</span> SonicBoom is{' '}
               <span className="font-heading text-green">completely free</span>{' '}
               to use! It is also{' '}
               <a

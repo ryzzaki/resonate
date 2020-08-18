@@ -32,7 +32,8 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     connectedUsers: [],
     webplayer: {
       isPlaying: true,
-      positionMs: 0,
+      songStartedAt: undefined,
+      songPausedAt: undefined,
     },
   };
 
@@ -45,47 +46,36 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
       'subscription',
       'tokenVer',
     ]);
-
     if (!this.session.currentDJ && this.session.connectedUsers.length === 0) {
       this.session.currentDJ = user;
       this.session.startsAt = Date.now();
       this.session.endsAt = Date.now() + 10 * 60 * 1000;
     }
-
-    if (
-      !this.session.connectedUsers.find(val => {
-        return val.id === user.id;
-      })
-    ) {
-      this.session.connectedUsers.push(user);
-    }
-
+    this.session.connectedUsers.push(user);
     this.logger.verbose(`A user has connected! Current number of users: ${this.session.connectedUsers.length}`);
-
     // Play a default song if the state is fresh
     this.logger.verbose(
       `${this.session.currentURI ? `Initiating with current URI: ${this.session.currentURI}` : `No current URI found... playing default`}`
     );
-
     if (!this.session.currentURI) {
-      this.session.currentURI = ['spotify:track:4Uy3kNxW2kB8AEoXljEcth'];
+      this.session.currentURI = ['spotify:track:7qEKqBCD2vE5vIBsrUitpD'];
     }
-
-    this.server.emit('receiveCurrentSession', this.session);
+    this.server.to(socket.id).emit('receiveCurrentSession', this.session);
+    this.server.emit('receiveUsers', this.session.connectedUsers);
+    // Set the song start after the broadcast, because DJ doesnt need to know when the song starts
+    this.session.webplayer.songStartedAt = Date.now();
   }
 
   async handleDisconnect(socket: Socket) {
     const jwtToken = <string>socket.handshake.query.token.replace('Bearer ', '');
     const user = await this.webplayerService.getUserUsingJwtToken(jwtToken);
-    this.session.connectedUsers = this.session.connectedUsers.filter(val => !(val.id === user.id));
+    this.session.connectedUsers = this.session.connectedUsers.filter(val => val.id !== user.id);
     if (user.id === this.session.currentDJ.id) {
-      if (this.session.connectedUsers.length !== 0) {
-        this.selectNewDJ(user);
-      }
-      this.session.currentDJ = undefined;
+      this.session.connectedUsers.length > 0 ? await this.selectNewDJ(user) : (this.session.currentDJ = undefined);
+      this.server.emit('receiveNewDJ', this.session.currentDJ);
     }
     this.logger.verbose(`A user has disconnected! Current number of users: ${this.session.connectedUsers.length}`);
-    this.server.emit('receiveCurrentSession', this.session);
+    this.server.emit('receiveUsers', this.session.connectedUsers);
     return socket.disconnect();
   }
 
@@ -96,39 +86,55 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
   }
 
   @UseGuards(WsAuthGuard)
-  @SubscribeMessage('rebroadcastSelectedURI')
-  async onURIChange(@MessageBody() uris: string[]) {
-    this.session.currentURI = uris;
-    this.logger.verbose(`Newly selected URI: ${this.session.currentURI}`);
-    this.server.emit('receiveCurrentURI', this.session.currentURI);
-  }
-
-  @UseGuards(WsAuthGuard)
   @SubscribeMessage('getUsers')
   async getUsers() {
     this.server.emit('receiveUsers', this.session.connectedUsers);
   }
 
   @UseGuards(WsAuthGuard)
-  @SubscribeMessage('selectNewDJ')
-  async selectNewDJ(@GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User) {
-    this.isPermittedForUser(user);
-    this.session.currentDJ = _.sample(this.session.connectedUsers);
-    this.server.emit('receiveNewDJ', this.session.currentDJ);
+  @SubscribeMessage('getSongStart')
+  async getSongStart() {
+    this.server.emit('receiveCurrentSongStart', this.session.webplayer.songStartedAt);
   }
 
   @UseGuards(WsAuthGuard)
-  @SubscribeMessage('updatePositionMs')
-  async updatePositionMs(@MessageBody() positionMs: number, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User) {
+  @SubscribeMessage('getSongPause')
+  async getSongPause() {
+    this.server.emit('receiveCurrentSongPause', this.session.webplayer.songPausedAt);
+  }
+
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage('rebroadcastSelectedURI')
+  async onURIChange(@MessageBody() uris: string[], @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User) {
     this.isPermittedForUser(user);
-    this.session.webplayer.positionMs = positionMs;
-    this.server.emit('receiveCurrentPositionMs', this.session.webplayer.positionMs);
+    this.session.currentURI = uris;
+    this.logger.verbose(`Newly selected URI: ${this.session.currentURI}`);
+    this.server.emit('receiveCurrentURI', this.session.currentURI);
+    this.server.emit('receiveCurrentSongStart', this.session.webplayer.songStartedAt);
+    this.session.webplayer.songStartedAt = Date.now();
+  }
+
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage('selectNewDJ')
+  async selectNewDJ(@GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User) {
+    this.isPermittedForUser(user);
+    const connectedUsersWithoutDJ = this.session.connectedUsers.filter(val => val.id !== user.id);
+    this.session.currentDJ = _.sample(connectedUsersWithoutDJ);
+    this.session.startsAt = Date.now();
+    this.server.emit('receiveNewDJ', this.session.currentDJ);
   }
 
   @UseGuards(WsAuthGuard)
   @SubscribeMessage('updateWebplayerState')
   async setWebplayerState(@MessageBody() state: boolean, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User) {
     this.isPermittedForUser(user);
+    if (!state) {
+      // TODO: there might be a big timing gap between the pause and spotify pausing the song, we need to check if the UX fits well enougth for the technical problem
+      this.session.webplayer.songPausedAt = Date.now();
+    } else {
+      this.session.webplayer.songStartedAt = this.session.webplayer.songStartedAt + (Date.now() - this.session.webplayer.songPausedAt);
+      this.session.webplayer.songPausedAt = undefined;
+    }
     this.session.webplayer.isPlaying = state;
     this.server.emit('receiveCurrentWebplayerState', this.session.webplayer.isPlaying);
   }
@@ -148,6 +154,7 @@ interface Session {
   endsAt?: number;
   webplayer: {
     isPlaying: boolean;
-    positionMs: number;
+    songStartedAt: number | undefined;
+    songPausedAt: number | undefined;
   };
 }

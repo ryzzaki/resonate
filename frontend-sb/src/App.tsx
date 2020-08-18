@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { navigate } from '@reach/router';
 import { AuthContext } from './context/AuthContext';
-import { UserContext } from './context/UserContext';
 import { fetchUser } from './utils/api';
 import { Routes } from './routes';
 
@@ -17,22 +15,18 @@ function App() {
         setUser(data);
         setToken(access_token || '');
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     }
-    if (access_token) {
+    if (access_token && window.location.pathname !== '/auth/') {
       fetchUserAndRedirect();
     }
   }, []);
 
-  console.log('app');
-
   return (
     <div className="App">
-      <AuthContext.Provider value={{ token, setToken }}>
-        <UserContext.Provider value={{ user, setUser }}>
-          <Routes token={token} />
-        </UserContext.Provider>
+      <AuthContext.Provider value={{ token, setToken, user, setUser }}>
+        <Routes token={token} />
       </AuthContext.Provider>
     </div>
   );

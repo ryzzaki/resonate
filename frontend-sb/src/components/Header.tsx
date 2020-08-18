@@ -12,8 +12,7 @@ const Header: React.FC<HeaderProps> = (props) => {
       <div className="flex flex-no-wrap justify-between">
         <div className="flex-auto w-auto md:w-1/2 text-center md:text-left">
           <h1 className="font-logoHeading text-34 text-white px-25 py-15">
-            Sonic Boom{' '}
-            <span className="font-body text-14 md:text-18">v1.0</span>
+            SonicBoom <span className="font-body text-14 md:text-18">v1.0</span>
           </h1>
         </div>
         <div className="flex hidden md:visible md:flex w-1/2 justify-end m-10 mr-25">

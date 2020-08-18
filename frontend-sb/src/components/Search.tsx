@@ -11,7 +11,7 @@ function debouncer(func: (...params: any[]) => any, delay: number) {
 
 type Props = {
   token: string;
-  emitSearchedURIs: (state: string[]) => void;
+  emitSearchedURIs: (uris: string[]) => void;
 };
 
 export const Search: React.FC<Props> = (props) => {
@@ -36,11 +36,10 @@ export const Search: React.FC<Props> = (props) => {
     debounceSearch(e);
   };
 
-  const handleClickURIs = useCallback((e) => {
-    e.preventDefault();
+  const handleClickURIs = (e) => {
     const { uris } = e.currentTarget.dataset;
     emitSearchedURIs(uris.split(','));
-  }, []);
+  };
 
   return (
     <div>
@@ -52,6 +51,11 @@ export const Search: React.FC<Props> = (props) => {
         />
       </div>
       <ul className="px-20">
+        {results && !results?.tracks.items.length && (
+          <h4 className="text-skinpink font-semibold">
+            No results (╯°□°)╯︵ ┻━┻
+          </h4>
+        )}
         {results?.tracks.items.map((result: any) => (
           <li
             data-uris={result.uri}
@@ -61,7 +65,7 @@ export const Search: React.FC<Props> = (props) => {
           >
             <img
               className="h-60 w-60 object-cover mr-10"
-              src={result.album?.images[2].url}
+              src={result.album?.images[2]?.url}
               alt="track cover"
             />
             <div className="pt-5">

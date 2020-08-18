@@ -1,6 +1,7 @@
 export default () =>
   new Promise((resolve, reject) => {
     if (!document.getElementById('spotify-player')) {
+      console.log('added script');
       const script = document.createElement('script');
 
       script.id = 'spotify-player';

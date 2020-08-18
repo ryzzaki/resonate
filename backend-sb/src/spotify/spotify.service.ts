@@ -1,7 +1,8 @@
 import { User } from '../auth/entities/user.entity';
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { SpotifyUrlEnums } from 'src/auth/interfaces/urls.enum';
 import { SearchQueryDto } from './dto/search-query.dto';
+import { WebplayerStateEnum } from './interface/webplayerState.enum';
 import axios from 'axios';
 import * as qs from 'qs';
 
@@ -19,10 +20,45 @@ export class SpotifyService {
       .get(url, {
         headers: { Authorization: `Bearer ${user.accessToken}` },
       })
-      .catch(async e => {
-        this.logger.error(`Unable to authorize Spotify client on ${e} using the current refresh token!`);
-        throw new UnauthorizedException(`Unable to authorize Spotify client using the current refresh token!`);
+      .catch(e => {
+        this.logger.error(`Unable to authorize Spotify client on ${e} using the current access token!`);
+        throw new BadRequestException(`Unable to authorize Spotify client using the current access token!`);
       });
     return response.data;
+  }
+
+  async playSongForDeviceId(deviceId: string, data: { uris: string[] }, user: User): Promise<void> {
+    const url = `${SpotifyUrlEnums.SPOTIFY_API}/me/player/play?${qs.stringify({
+      device_id: deviceId,
+    })}`;
+    await axios
+      .put(url, data, {
+        headers: {
+          Authorization: `Bearer ${user.accessToken}`,
+        },
+      })
+      .catch(e => {
+        this.logger.error(`Unable to authorize Spotify client on ${e} using the current access token!`);
+        throw new BadRequestException(`Unable to authorize Spotify client using the current access token!`);
+      });
+  }
+
+  async updatePlayerState(user: User, playerState: WebplayerStateEnum): Promise<void> {
+    const isPause = playerState === WebplayerStateEnum.PAUSE;
+    const url = `https://api.spotify.com/v1/me/player/${isPause ? 'pause' : 'play'}`;
+    await axios
+      .put(
+        url,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${user.accessToken}`,
+          },
+        }
+      )
+      .catch(e => {
+        this.logger.error(`Unable to authorize Spotify client on ${e} using the current access token!`);
+        throw new BadRequestException(`Unable to authorize Spotify client using the current access token!`);
+      });
   }
 }

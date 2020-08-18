@@ -1,7 +1,6 @@
 import React, { useEffect, useContext } from 'react';
 import { RouteComponentProps, navigate } from '@reach/router';
 import { AuthContext } from '../context/AuthContext';
-import { UserContext } from '../context/UserContext';
 import { fetchUser, signOutUser } from '../utils/api';
 
 type Props = {};
@@ -9,8 +8,7 @@ type Props = {};
 export const RedirectPage: React.FC<RouteComponentProps<Props>> = (props) => {
   const { location } = props;
 
-  const { setToken } = useContext(AuthContext);
-  const { setUser } = useContext(UserContext);
+  const { setToken, setUser } = useContext(AuthContext);
 
   useEffect(() => {
     async function fetchUserAndRedirect(token: string) {
@@ -20,7 +18,7 @@ export const RedirectPage: React.FC<RouteComponentProps<Props>> = (props) => {
         setToken(token);
         navigate('/party');
       } catch (err) {
-        console.log(err);
+        console.error(err);
         localStorage.removeItem('access_key');
         setToken('');
         setUser({});
