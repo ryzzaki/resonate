@@ -2,7 +2,7 @@ import sessionUser from './sessionUser';
 
 type roomStatus = {
   currentDJ: sessionUser | undefined;
-  currentURI: string[] | undefined;
+  currentURI: string[];
   connectedUsers: sessionUser[];
   startsAt: number;
   endsAt: number;

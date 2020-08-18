@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { AuthContext } from './context/AuthContext';
-import { UserContext } from './context/UserContext';
 import { fetchUser } from './utils/api';
 import { Routes } from './routes';
 
@@ -12,7 +11,6 @@ function App() {
     const access_token = localStorage.getItem('access_key');
     async function fetchUserAndRedirect() {
       try {
-        console.log('userfetching');
         const { data } = await fetchUser(access_token);
         setUser(data);
         setToken(access_token || '');
@@ -27,10 +25,8 @@ function App() {
 
   return (
     <div className="App">
-      <AuthContext.Provider value={{ token, setToken }}>
-        <UserContext.Provider value={{ user, setUser }}>
-          <Routes token={token} />
-        </UserContext.Provider>
+      <AuthContext.Provider value={{ token, setToken, user, setUser }}>
+        <Routes token={token} />
       </AuthContext.Provider>
     </div>
   );

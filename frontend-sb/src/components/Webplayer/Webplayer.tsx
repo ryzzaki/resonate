@@ -39,8 +39,13 @@ export const Webplayer: React.FC<Props> = (props) => {
 
   // initializing the spotify SDK
   useEffect(() => {
-    // @ts-ignore
-    window.onSpotifyWebPlaybackSDKReady = initialization;
+    if (player.current) {
+      initialization();
+    } else {
+      // @ts-ignore
+      window.onSpotifyWebPlaybackSDKReady = initialization;
+    }
+
     (async () => await loadScript())();
 
     return () => player.current.disconnect();
@@ -64,7 +69,19 @@ export const Webplayer: React.FC<Props> = (props) => {
     }
   }, [status.paused]);
 
+  useEffect(() => {
+    setStatus((state) => ({
+      ...state,
+      errorType:
+        status.currentTrack.uri &&
+        roomStatus.currentURI[0] !== status.currentTrack.uri
+          ? 'Player out of sync, please reload'
+          : '',
+    }));
+  }, [status.currentTrack.uri]);
+
   const initialization = () => {
+    console.log('initializing with: ' + spotifyToken);
     // @ts-ignore
     player.current = new Spotify.Player({
       getOAuthToken: (cb) => {
@@ -119,8 +136,8 @@ export const Webplayer: React.FC<Props> = (props) => {
   };
 
   const handlePlayerStateChange = (songState: any) => {
-    // TODO: Check this logic for disconection from other devices
     console.log(songState);
+
     if (!songState) {
       setStatus((state) => ({ ...state, isInitializing: true }));
     } else {
@@ -154,7 +171,7 @@ export const Webplayer: React.FC<Props> = (props) => {
 
   const handlePlayState = (state: boolean) => {
     if (!status.currentTrack.id) {
-      play(status.deviceId);
+      play(status.deviceId, Date.now() - roomStatus.webplayer.songStartedAt);
     } else {
       emitPlayState(state);
     }

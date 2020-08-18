@@ -99,7 +99,7 @@ export const DJPageView: React.FC<Props> = (props) => {
           <Search token={token} emitSearchedURIs={emitSearchedURIs} />
         </div>
         <div className="mt-auto sticky bottom-0 bg-darkblue">
-          {roomStatus.currentURI ? (
+          {roomStatus.currentURI.length ? (
             <Webplayer
               roomStatus={roomStatus}
               token={token}
