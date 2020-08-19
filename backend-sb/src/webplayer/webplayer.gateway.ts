@@ -69,7 +69,7 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
   async handleDisconnect(socket: Socket) {
     const jwtToken = <string>socket.handshake.query.token.replace('Bearer ', '');
     const user = await this.webplayerService.getUserUsingJwtToken(jwtToken);
-    this.session.connectedUsers = this.session.connectedUsers.filter(val => val.id !== user.id);
+    this.session.connectedUsers = this.session.connectedUsers.filter((val) => val.id !== user.id);
     if (user.id === this.session.currentDJ.id) {
       this.session.connectedUsers.length > 0 ? await this.selectNewDJ(user) : (this.session.currentDJ = undefined);
       this.server.emit('receiveNewDJ', this.session.currentDJ);
@@ -108,6 +108,7 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
   async onURIChange(@MessageBody() uris: string[], @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User) {
     this.isPermittedForUser(user);
     this.session.currentURI = uris;
+    this.session.webplayer.songStartedAt = 0;
     this.logger.verbose(`Newly selected URI: ${this.session.currentURI}`);
     this.server.emit('receiveCurrentURI', this.session.currentURI);
     this.server.emit('receiveCurrentSongStart', this.session.webplayer.songStartedAt);
@@ -118,7 +119,7 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
   @SubscribeMessage('selectNewDJ')
   async selectNewDJ(@GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User) {
     this.isPermittedForUser(user);
-    const connectedUsersWithoutDJ = this.session.connectedUsers.filter(val => val.id !== user.id);
+    const connectedUsersWithoutDJ = this.session.connectedUsers.filter((val) => val.id !== user.id);
     this.session.currentDJ = _.sample(connectedUsersWithoutDJ);
     this.session.startsAt = Date.now();
     this.server.emit('receiveNewDJ', this.session.currentDJ);

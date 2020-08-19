@@ -3,12 +3,7 @@ import io from 'socket.io-client';
 import { UrlEnums } from '../../enums/urls.enum';
 import { RouteComponentProps } from '@reach/router';
 import { AuthContext } from '../../context/AuthContext';
-import {
-  refreshUser,
-  signOutUser,
-  pauseSong,
-  resumeSong,
-} from '../../utils/api';
+import { refreshUser, signOutUser } from '../../utils/api';
 import roomStatus from '../../types/roomStatus';
 import { DJPageView } from './DJPage.view';
 
@@ -26,7 +21,6 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
     startsAt: 0,
     endsAt: 0,
     webplayer: {
-      isPlaying: false,
       songStartedAt: 0,
       songPausedAt: 0,
     },
@@ -34,36 +28,22 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
 
   const isDJ = roomStatus.currentDJ?.id === user.id;
 
+  // initializing socket connection
   useEffect(() => {
-    // initializing socket connection
     socket.current = connectSocket();
-    socket.current.on('connect_error', (err) => {
-      console.error(err);
-    });
-    socket.current.on('receiveCurrentSession', (session: any) => {
-      setRoomStatus(session);
-    });
-    socket.current.on('receiveCurrentURI', (currentURI: string[]) => {
-      setRoomStatus((state) => ({ ...state, currentURI }));
-    });
-    socket.current.on('receiveCurrentWebplayerState', (isPlaying: boolean) => {
-      try {
-        if (isPlaying) {
-          resumeSong(token);
-        } else {
-          pauseSong(token);
-        }
-      } catch (err) {
-        console.log(err);
-        handleAuthError();
-      }
-    });
-    socket.current.on('receiveNewDJ', (currentDJ: any) => {
-      setRoomStatus((state) => ({ ...state, currentDJ }));
-    });
-    socket.current.on('receiveUsers', (connectedUsers: any) => {
-      setRoomStatus((state) => ({ ...state, connectedUsers }));
-    });
+    socket.current.on('connect_error', (err) => console.error(err));
+    socket.current.on('receiveCurrentSession', (session: any) =>
+      setRoomStatus(session)
+    );
+    socket.current.on('receiveCurrentURI', (currentURI: string[]) =>
+      setRoomStatus((state) => ({ ...state, currentURI }))
+    );
+    socket.current.on('receiveNewDJ', (currentDJ: any) =>
+      setRoomStatus((state) => ({ ...state, currentDJ }))
+    );
+    socket.current.on('receiveUsers', (connectedUsers: any) =>
+      setRoomStatus((state) => ({ ...state, connectedUsers }))
+    );
 
     return () => socket.current.disconnect();
   }, []);
@@ -81,18 +61,12 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
   const emitSearchedURIs = (uris: string[]) =>
     socket.current.emit('rebroadcastSelectedURI', uris);
 
-  const emitPlayState = (state: boolean) => {
-    if (isDJ) {
-      socket.current.emit('updateWebplayerState', state);
-    }
-  };
-
   const emitSliderPos = (e: any) => {};
 
   const emitSelectNewDJ = () => socket.current.emit('selectNewDJ');
 
+  // Refresh token on error, if fail -> signout
   const handleAuthError = async () => {
-    // Refresh token on error, if fail -> signout
     try {
       const { data } = await refreshUser(token);
       setToken(data.accessToken);
@@ -119,7 +93,6 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       handleAuthError={handleAuthError}
       handleSignOut={handleSignOut}
       emitSliderPos={emitSliderPos}
-      emitPlayState={emitPlayState}
       emitSelectNewDJ={emitSelectNewDJ}
       emitSearchedURIs={emitSearchedURIs}
       roomStatus={roomStatus}

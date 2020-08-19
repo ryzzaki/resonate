@@ -4,14 +4,15 @@ import { ReactComponent as Play } from '../../assets/icons/play.svg';
 import { ReactComponent as Pause } from '../../assets/icons/pause.svg';
 
 type Props = {
-  paused: boolean;
+  isDJ: boolean;
   status: playerStatus;
-  emitPlayState: (state: boolean) => void;
+  handleResync: () => void;
+  handlePlayState: () => void;
   emitSliderPos: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export const WebplayerView: React.FC<Props> = (props) => {
-  const { paused, emitPlayState, status, emitSliderPos } = props;
+  const { isDJ, handleResync, handlePlayState, status, emitSliderPos } = props;
 
   if (status.isInitializing)
     return (
@@ -28,7 +29,23 @@ export const WebplayerView: React.FC<Props> = (props) => {
     );
 
   return (
-    <div>
+    <div className="relative">
+      {status.unsync && (
+        <button
+          onClick={handleResync}
+          className="absolute left-1/2 -top-3 transform -translate-x-1/2 z-10 mx-auto bg-pink text-white font-bold text-14
+                px-20 py-5 rounded-full uppercase"
+        >
+          Player out of sync, resync with dj room
+        </button>
+      )}
+      {!isDJ && (
+        <div className="group bg-darkblue bg-opacity-0 hover:bg-opacity-75 flex cursor-not-allowed absolute z-10 w-full h-full">
+          <span className="opacity-0 group-hover:opacity-100 m-auto text-pink font-semibold">
+            Allowed for DJ only
+          </span>
+        </div>
+      )}
       <div>
         <input
           type="range"
@@ -56,12 +73,12 @@ export const WebplayerView: React.FC<Props> = (props) => {
           </div>
         </div>
         <div className="flex justify-center">
-          {paused ? (
-            <button onClick={() => emitPlayState(true)}>
+          {status.paused ? (
+            <button onClick={handlePlayState}>
               <Play className="w-60 h-60 fill-current text-skinpink" />
             </button>
           ) : (
-            <button onClick={() => emitPlayState(false)}>
+            <button onClick={handlePlayState}>
               <Pause className="w-60 h-60 fill-current text-skinpink" />
             </button>
           )}
