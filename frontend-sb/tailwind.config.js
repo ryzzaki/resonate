@@ -37,10 +37,13 @@ const sizes = {
 };
 
 const insets = {
-  '0': '0',
   '1/2': '50%',
+  '0': '0',
   '-2': '-2rem',
   '-3': '-3rem',
+  '3': '3rem',
+  '4': '4rem',
+  '5': '5rem',
 };
 
 module.exports = {

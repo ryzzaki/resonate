@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search } from '../Search';
+import { Search } from '../Search/Search';
 import { Webplayer } from '../Webplayer/Webplayer';
 import roomStatus from '../../types/roomStatus';
 
