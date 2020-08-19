@@ -43,15 +43,12 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       console.error(err);
     });
     socket.current.on('receiveCurrentSession', (session: any) => {
-      console.log('session');
       setRoomStatus(session);
     });
     socket.current.on('receiveCurrentURI', (currentURI: string[]) => {
-      console.log('uri');
       setRoomStatus((state) => ({ ...state, currentURI }));
     });
     socket.current.on('receiveCurrentWebplayerState', (isPlaying: boolean) => {
-      console.log('webplayerstate');
       try {
         if (isPlaying) {
           resumeSong(token);
@@ -64,11 +61,9 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       }
     });
     socket.current.on('receiveNewDJ', (currentDJ: any) => {
-      console.log('receiveNewDJ');
       setRoomStatus((state) => ({ ...state, currentDJ }));
     });
     socket.current.on('receiveUsers', (connectedUsers: any) => {
-      console.log('recieveUsers');
       setRoomStatus((state) => ({ ...state, connectedUsers }));
     });
 

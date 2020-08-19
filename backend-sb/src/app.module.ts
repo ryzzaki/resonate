@@ -9,6 +9,7 @@ import { SpotifyModule } from './spotify/spotify.module';
 import { WebplayerModule } from './webplayer/webplayer.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { SessionModule } from './session/session.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { join } from 'path';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', '..', './frontend-sb/build'),
     }),
+    SessionModule,
   ],
   controllers: [AppController],
 })

@@ -17,10 +17,7 @@ export interface MainConfigInterface {
     ca: string;
   };
   redisModuleSettings: {
-    host: string;
-    port: number;
-    db: number;
-    password: string;
+    url: string;
   };
   jwtSettings: {
     accessPublicKey: string;

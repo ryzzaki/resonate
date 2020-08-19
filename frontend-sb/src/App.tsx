@@ -12,7 +12,6 @@ function App() {
     const access_token = localStorage.getItem('access_key');
     async function fetchUserAndRedirect() {
       try {
-        console.log('userfetching');
         const { data } = await fetchUser(access_token);
         setUser(data);
         setToken(access_token || '');

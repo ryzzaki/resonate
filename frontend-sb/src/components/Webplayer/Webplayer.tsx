@@ -120,7 +120,6 @@ export const Webplayer: React.FC<Props> = (props) => {
 
   const handlePlayerStateChange = (songState: any) => {
     // TODO: Check this logic for disconection from other devices
-    console.log(songState);
     if (!songState) {
       setStatus((state) => ({ ...state, isInitializing: true }));
     } else {
