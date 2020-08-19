@@ -41,9 +41,13 @@ export class AuthController {
 
   @Put('/user/update')
   @UseGuards(AuthGuard())
-  updateUserDetails(@Body(ValidationPipe) updateDetailsDto: UpdateUserDto, @GetUser() user: User): Promise<_.Omit<User, 'refreshToken'>> {
+  async updateUserDetails(
+    @Body(ValidationPipe) updateDetailsDto: UpdateUserDto,
+    @GetUser() user: User
+  ): Promise<_.Omit<User, 'refreshToken' | 'email' | 'tokenVer'>> {
     this.logger.verbose('GET on /user/total/detail called');
-    return this.authService.updateUserDetails(updateDetailsDto, user);
+    const fetchedUser = await this.authService.updateUserDetails(updateDetailsDto, user);
+    return _.omit(fetchedUser, ['refreshToken', 'email', 'tokenVer']);
   }
 
   @Get('/public/user/:userId')
@@ -54,9 +58,9 @@ export class AuthController {
 
   @Get('/private/user/')
   @UseGuards(AuthGuard())
-  async getPrivateUserById(@GetUser() user: User): Promise<_.Omit<User, 'refreshToken'>> {
+  async getPrivateUserById(@GetUser() user: User): Promise<_.Omit<User, 'refreshToken' | 'email' | 'tokenVer'>> {
     this.logger.verbose(`GET on /private/user called`);
     const fetchedUser = await this.authService.getUserById(user.id);
-    return _.omit(fetchedUser, ['refreshToken']);
+    return _.omit(fetchedUser, ['refreshToken', 'email', 'tokenVer']);
   }
 }

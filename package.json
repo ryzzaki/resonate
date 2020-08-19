@@ -1,7 +1,7 @@
 {
   "name": "sonicboom",
   "version": "0.0.1",
-  "description": "A Spotify Web Player which lets your friends DJ the playlist for a specific amount of time before randomly selecting someone else.",
+  "description": "A Spotify Web Player which lets your friends & strangers DJ the playlist for a specific amount of time before randomly selecting someone else.",
   "author": "Cuong Nguyen <cuong.nugi@gmail.com>",
   "license": "MIT",
   "scripts": {

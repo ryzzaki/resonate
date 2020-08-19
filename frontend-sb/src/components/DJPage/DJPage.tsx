@@ -3,7 +3,6 @@ import io from 'socket.io-client';
 import { UrlEnums } from '../../enums/urls.enum';
 import { RouteComponentProps } from '@reach/router';
 import { AuthContext } from '../../context/AuthContext';
-import { UserContext } from '../../context/UserContext';
 import {
   refreshUser,
   signOutUser,
@@ -16,15 +15,14 @@ import { DJPageView } from './DJPage.view';
 type Props = {};
 
 export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
-  const { token, setToken } = useContext(AuthContext);
-  const { user, setUser } = useContext(UserContext);
+  const { token, setToken, user, setUser } = useContext(AuthContext);
 
-  const socket = useRef<any>(null);
+  const socket = useRef<any>({ current: null });
 
   const [roomStatus, setRoomStatus] = useState<roomStatus>({
     currentDJ: undefined,
     connectedUsers: [],
-    currentURI: undefined,
+    currentURI: [],
     startsAt: 0,
     endsAt: 0,
     webplayer: {
@@ -67,7 +65,6 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       setRoomStatus((state) => ({ ...state, connectedUsers }));
     });
 
-    // TODO: socket cleanup function
     return () => socket.current.disconnect();
   }, []);
 

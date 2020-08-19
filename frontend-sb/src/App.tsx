@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { AuthContext } from './context/AuthContext';
-import { UserContext } from './context/UserContext';
 import { fetchUser } from './utils/api';
 import { Routes } from './routes';
 
@@ -26,10 +25,8 @@ function App() {
 
   return (
     <div className="App">
-      <AuthContext.Provider value={{ token, setToken }}>
-        <UserContext.Provider value={{ user, setUser }}>
-          <Routes token={token} />
-        </UserContext.Provider>
+      <AuthContext.Provider value={{ token, setToken, user, setUser }}>
+        <Routes token={token} />
       </AuthContext.Provider>
     </div>
   );
