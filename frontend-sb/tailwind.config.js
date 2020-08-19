@@ -36,6 +36,13 @@ const sizes = {
   '30rem': '30rem',
 };
 
+const insets = {
+  '0': '0',
+  '1/2': '50%',
+  '-2': '-2rem',
+  '-3': '-3rem',
+};
+
 module.exports = {
   prefix: '',
   important: false,
@@ -77,9 +84,11 @@ module.exports = {
       spacing: sizes,
       maxWidth: sizes,
     },
+    inset: insets,
   },
   variants: {
     textColor: ['group-hover'],
+    opacity: ['group-hover'],
   },
   plugins: [],
 };

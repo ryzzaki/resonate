@@ -9,8 +9,8 @@ type Props = {
   roomStatus: roomStatus;
   spotifyToken: string;
   token: string;
+  isDJ: boolean;
   handleAuthError: () => void;
-  emitPlayState: (state: boolean) => void;
   emitSliderPos: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
@@ -18,9 +18,9 @@ export const Webplayer: React.FC<Props> = (props) => {
   const {
     roomStatus,
     token,
+    isDJ,
     spotifyToken,
     handleAuthError,
-    emitPlayState,
     emitSliderPos,
   } = props;
 
@@ -28,6 +28,7 @@ export const Webplayer: React.FC<Props> = (props) => {
     currentTrack: {},
     isInitializing: true,
     paused: true,
+    unsync: false,
     errorType: '',
     deviceId: '',
     position: 0,
@@ -40,6 +41,7 @@ export const Webplayer: React.FC<Props> = (props) => {
   // initializing the spotify SDK
   useEffect(() => {
     if (player.current) {
+      // reiniatizale on spotify token refresh
       initialization();
     } else {
       // @ts-ignore
@@ -64,24 +66,23 @@ export const Webplayer: React.FC<Props> = (props) => {
 
     if (status.paused) {
       window.clearInterval(playerInterval.current);
+      setStatus((state) => ({ ...state, unsync: true }));
     } else {
       playerInterval.current = window.setInterval(handleIntervalUpdate, 100);
     }
   }, [status.paused]);
 
   useEffect(() => {
+    // on track change, check if its not from spotify player
     setStatus((state) => ({
       ...state,
-      errorType:
+      unsync:
         status.currentTrack.uri &&
-        roomStatus.currentURI[0] !== status.currentTrack.uri
-          ? 'Player out of sync, please reload'
-          : '',
+        roomStatus.currentURI[0] !== status.currentTrack.uri,
     }));
   }, [status.currentTrack.uri]);
 
   const initialization = () => {
-    console.log('initializing with: ' + spotifyToken);
     // @ts-ignore
     player.current = new Spotify.Player({
       getOAuthToken: (cb) => {
@@ -122,12 +123,11 @@ export const Webplayer: React.FC<Props> = (props) => {
 
   const handlePlayerReady = ({ device_id }) => {
     console.log('Ready with Device ID', device_id);
-    if (roomStatus.webplayer.isPlaying) {
-      const songStart = roomStatus.webplayer.songStartedAt
-        ? Date.now() - roomStatus.webplayer.songStartedAt
-        : 0;
-      play(device_id, songStart);
-    }
+    // Play the song at the right start
+    const songStart = roomStatus.webplayer.songStartedAt
+      ? Date.now() - roomStatus.webplayer.songStartedAt
+      : 0;
+    play(device_id, songStart);
     setStatus((state) => ({
       ...state,
       deviceId: device_id,
@@ -137,7 +137,6 @@ export const Webplayer: React.FC<Props> = (props) => {
 
   const handlePlayerStateChange = (songState: any) => {
     console.log(songState);
-
     if (!songState) {
       setStatus((state) => ({ ...state, isInitializing: true }));
     } else {
@@ -159,7 +158,6 @@ export const Webplayer: React.FC<Props> = (props) => {
       const progressMs = state.progressMs + 100;
       const progressInDuration =
         state.progressMs / state.currentTrack.duration_ms;
-
       // max length = 100 slider input value -> find the (current ms / the track length) * 100
       return {
         ...state,
@@ -169,28 +167,32 @@ export const Webplayer: React.FC<Props> = (props) => {
     });
   };
 
-  const handlePlayState = (state: boolean) => {
-    if (!status.currentTrack.id) {
-      play(status.deviceId, Date.now() - roomStatus.webplayer.songStartedAt);
+  const handlePlayState = () => {
+    if (status.paused) {
+      player.current.resume();
     } else {
-      emitPlayState(state);
+      player.current.pause();
     }
   };
 
+  const handleResync = () => {
+    play(status.deviceId, Date.now() - roomStatus.webplayer.songStartedAt);
+    setStatus((state) => ({ ...state, unsync: false }));
+  };
+
   const play = async (deviceId: string, position_ms?: number) => {
-    if (roomStatus.currentURI) {
-      playSong(token, deviceId, {
-        uris: roomStatus.currentURI,
-        position_ms,
-      });
-    }
+    playSong(token, deviceId, {
+      uris: roomStatus.currentURI,
+      position_ms,
+    });
   };
 
   return (
     <WebplayerView
       status={status}
-      paused={status.paused}
-      emitPlayState={handlePlayState}
+      isDJ={isDJ}
+      handleResync={handleResync}
+      handlePlayState={handlePlayState}
       emitSliderPos={emitSliderPos}
     />
   );
