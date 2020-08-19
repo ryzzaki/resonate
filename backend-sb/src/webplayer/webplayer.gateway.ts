@@ -61,7 +61,7 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     const user = await this.webplayerService.getUserUsingJwtToken(jwtToken);
     session.connectedUsers = session.connectedUsers.filter((val) => val.id !== user.id);
     if (user.id === session.currentDJ.id) {
-      session.connectedUsers.length > 0 ? await this.selectNewDJ(user, socket) : (session.currentDJ = undefined);
+      session.connectedUsers.length > 0 ? await this.selectNewDJ(user, socket) : (session.currentDJ = null);
       this.server.to(session.id).emit('receiveNewDJ', session.currentDJ);
     }
     this.logger.verbose(`A user has disconnected! Current number of users: ${session.connectedUsers.length}`);

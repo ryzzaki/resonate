@@ -6,7 +6,7 @@ export interface Session {
   name: string;
   roomAccess: RoomAccess;
   description: string | undefined;
-  currentDJ: Omit<User, 'email' | 'accessToken' | 'refreshToken' | 'subscription' | 'tokenVer'> | undefined;
+  currentDJ: Omit<User, 'email' | 'accessToken' | 'refreshToken' | 'subscription' | 'tokenVer'> | null;
   currentURI: string[] | undefined;
   connectedUsers: Omit<User, 'email' | 'accessToken' | 'refreshToken' | 'subscription' | 'tokenVer'>[];
   startsAt: number;
