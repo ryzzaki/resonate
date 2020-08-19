@@ -22,10 +22,7 @@ const mainConfig: MainConfigInterface = {
     ca: String(process.env.SSL_CA),
   },
   redisModuleSettings: {
-    host: String(process.env.RDS_HOST),
-    port: Number(process.env.RDS_PORT),
-    db: Number(process.env.RDS_DB),
-    password: String(process.env.RDS_PASSWORD),
+    url: String(process.env.REDIS_URL),
   },
   jwtSettings: {
     accessPublicKey: String(process.env.ACCESS_JWT_PUBLIC),
