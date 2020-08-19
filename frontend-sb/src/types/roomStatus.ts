@@ -1,6 +1,9 @@
 import sessionUser from './sessionUser';
 
 type roomStatus = {
+  name: string;
+  description: string | undefined;
+  sessionId: string;
   currentDJ: sessionUser | undefined;
   currentURI: string[];
   connectedUsers: sessionUser[];

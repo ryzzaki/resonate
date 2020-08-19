@@ -2,6 +2,7 @@ import React from 'react';
 import { Search } from '../Search/Search';
 import { Webplayer } from '../Webplayer/Webplayer';
 import roomStatus from '../../types/roomStatus';
+import { Link } from '@reach/router';
 
 const randomUserIcons = ['🎸', '🎹', '🎺', '🎻', '🪕', '🎷', '🥁', '🎤'];
 
@@ -74,6 +75,11 @@ export const DJPageView: React.FC<Props> = (props) => {
         )}
         <ul className="mt-auto flex text-darkblue font-medium px-20 text-14">
           <li className="mr-20">
+            <div className="cursor-pointer">
+              <Link to="/rooms">Rooms</Link>
+            </div>
+          </li>
+          <li className="mr-20">
             <div className="cursor-pointer">Settings</div>
           </li>
           <li className="mr-20">
@@ -107,7 +113,7 @@ export const DJPageView: React.FC<Props> = (props) => {
               emitSliderPos={emitSliderPos}
             />
           ) : (
-            <p>connecting...</p>
+            <p className="text-center text-pink p-20">Connecting...</p>
           )}
         </div>
       </main>

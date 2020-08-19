@@ -46,20 +46,22 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
       session.startsAt = Date.now();
       session.endsAt = Date.now() + 10 * 60 * 1000;
     }
+    console.log(session);
     session.connectedUsers.push(user);
     this.logger.verbose(`A user has connected! Current number of users: ${session.connectedUsers.length}`);
-    socket.broadcast.to(socket.id).emit('receiveCurrentSession', session);
+    this.server.to(socket.id).emit('receiveCurrentSession', session);
     this.server.to(session.id).emit('receiveUsers', session.connectedUsers);
     // Set the song start after the broadcast, because DJ doesnt need to know when the song starts
     session.webplayer.songStartedAt = Date.now();
     await this.sessionService.updateSession(session);
+    console.log(session);
   }
 
   async handleDisconnect(socket: Socket) {
     const jwtToken = <string>socket.handshake.query.token.replace('Bearer ', '');
     const session = await this.getSessionFromSocketQueryId(socket);
     const user = await this.webplayerService.getUserUsingJwtToken(jwtToken);
-    session.connectedUsers = session.connectedUsers.filter(val => val.id !== user.id);
+    session.connectedUsers = session.connectedUsers.filter((val) => val.id !== user.id);
     if (user.id === session.currentDJ.id) {
       session.connectedUsers.length > 0 ? await this.selectNewDJ(user, socket) : (session.currentDJ = undefined);
       this.server.to(session.id).emit('receiveNewDJ', session.currentDJ);
@@ -122,7 +124,7 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
   async selectNewDJ(@GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
     const session = await this.getSessionFromSocketQueryId(socket);
     this.isPermittedForUser(user, session);
-    const connectedUsersWithoutDJ = session.connectedUsers.filter(val => val.id !== user.id);
+    const connectedUsersWithoutDJ = session.connectedUsers.filter((val) => val.id !== user.id);
     session.currentDJ = _.sample(connectedUsersWithoutDJ);
     session.startsAt = Date.now();
     this.server.to(session.id).emit('receiveNewDJ', session.currentDJ);

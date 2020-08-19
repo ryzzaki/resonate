@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import { UrlEnums } from '../../enums/urls.enum';
-import { RouteComponentProps } from '@reach/router';
+import { RouteComponentProps, navigate } from '@reach/router';
 import { AuthContext } from '../../context/AuthContext';
 import { refreshUser, signOutUser } from '../../utils/api';
 import roomStatus from '../../types/roomStatus';
@@ -15,6 +15,9 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
   const socket = useRef<any>({ current: null });
 
   const [roomStatus, setRoomStatus] = useState<roomStatus>({
+    sessionId: window.location?.search?.replace('?sessionId=', ''),
+    name: '',
+    description: '',
     currentDJ: undefined,
     connectedUsers: [],
     currentURI: [],
@@ -30,10 +33,14 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
 
   // initializing socket connection
   useEffect(() => {
+    if (!roomStatus.sessionId) {
+      navigate('/rooms');
+    }
+
     socket.current = connectSocket();
     socket.current.on('connect_error', (err) => console.error(err));
     socket.current.on('receiveCurrentSession', (session: any) =>
-      setRoomStatus(session)
+      setRoomStatus((state) => ({ state, ...session }))
     );
     socket.current.on('receiveCurrentURI', (currentURI: string[]) =>
       setRoomStatus((state) => ({ ...state, currentURI }))
@@ -54,6 +61,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       path: '/v1/webplayer',
       query: {
         token: `Bearer ${token}`,
+        sessionId: roomStatus.sessionId,
       },
     });
   };

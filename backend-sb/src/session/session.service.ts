@@ -35,7 +35,7 @@ export class SessionService {
       roomAccess,
       currentDJ: omittedVarUser,
       currentURI: [_.sample(this.defaultSongURIs)],
-      connectedUsers: [omittedVarUser],
+      connectedUsers: [],
       startsAt: Date.now(),
       endsAt: Date.now() + 10 * 60 * 1000,
       webplayer: {
@@ -62,7 +62,7 @@ export class SessionService {
       for (const sessionId of scanResult[1]) {
         const fetchedSession: Session | undefined = JSON.parse(await this.redisClient.get(sessionId));
         if (fetchedSession && fetchedSession.roomAccess === RoomAccess.PUBLIC) {
-          sessions.push();
+          sessions.push(fetchedSession);
         }
       }
       return sessions;
@@ -73,7 +73,7 @@ export class SessionService {
   }
 
   async getSessionById(id: string): Promise<Session> {
-    const session: Session | undefined = JSON.parse(await this.redisClient.get(id));
+    const session: Session | undefined = JSON.parse(await this.redisClient.get(`session:${id}`));
     if (!session) {
       throw new BadRequestException(`Session ID ${id} does not exist!`);
     }
@@ -81,26 +81,9 @@ export class SessionService {
   }
 
   async updateSession(session: Session): Promise<Session> {
-    const updatedSession: Session = {
-      id: session.id,
-      name: session.name,
-      description: session.description,
-      roomAccess: session.roomAccess,
-      currentDJ: session.currentDJ,
-      currentURI: session.currentURI,
-      connectedUsers: session.connectedUsers,
-      startsAt: session.startsAt,
-      endsAt: session.endsAt,
-      webplayer: {
-        isPlaying: session.webplayer.isPlaying,
-        songStartedAt: session.webplayer.songStartedAt,
-        songPausedAt: session.webplayer.songPausedAt,
-      },
-    };
-
     try {
-      await this.redisClient.set(session.id, JSON.stringify(updatedSession), 'KEEPTTL');
-      return updatedSession;
+      await this.redisClient.set(session.id, JSON.stringify(session), 'KEEPTTL');
+      return session;
     } catch (error) {
       this.logger.error(`Error during session update on: ${error}`);
       throw new InternalServerErrorException(`Error during session update on: ${error}`);

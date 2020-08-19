@@ -74,3 +74,19 @@ export const resumeSong = async (token: string) => {
     }
   );
 };
+
+export const fetchSessions = async (token: string | null) => {
+  return axios.get(`${UrlEnums.API_URL}/session`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const createSession = async (token: string | null, data: any) => {
+  return axios.post(`${UrlEnums.API_URL}/session`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
