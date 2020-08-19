@@ -40,7 +40,8 @@ export const Webplayer: React.FC<Props> = (props) => {
 
   // initializing the spotify SDK
   useEffect(() => {
-    if (player.current) {
+    // @ts-ignore
+    if (window.Spotify) {
       // reiniatizale on spotify token refresh
       initialization();
     } else {
@@ -50,7 +51,18 @@ export const Webplayer: React.FC<Props> = (props) => {
 
     (async () => await loadScript())();
 
-    return () => player.current.disconnect();
+    return () => {
+      if (player.current) {
+        player.current.removeListener('initialization_error');
+        player.current.removeListener('authentication_error');
+        player.current.removeListener('account_error');
+        player.current.removeListener('playback_error');
+        player.current.removeListener('player_state_changed');
+        player.current.removeListener('ready');
+        player.current.removeListener('not_ready');
+        player.current.disconnect();
+      }
+    };
   }, [spotifyToken]);
 
   // on URI change from djroom play the new song
@@ -105,6 +117,7 @@ export const Webplayer: React.FC<Props> = (props) => {
     });
 
     player.current.connect();
+    console.log('connected');
   };
 
   const handlePlayerError = ({ message }) => {
