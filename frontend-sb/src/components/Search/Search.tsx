@@ -39,7 +39,9 @@ export const Search: React.FC<Props> = (props) => {
 
   const handleClickURIs = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     const { uris } = e.currentTarget.dataset;
-    // emitSearchedURIs(uris.split(','));
+    if (uris) {
+      emitSearchedURIs(uris.split(','));
+    }
   };
 
   return (

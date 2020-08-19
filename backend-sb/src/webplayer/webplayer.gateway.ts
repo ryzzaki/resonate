@@ -46,7 +46,6 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
       session.startsAt = Date.now();
       session.endsAt = Date.now() + 10 * 60 * 1000;
     }
-    console.log(session);
     session.connectedUsers.push(user);
     this.logger.verbose(`A user has connected! Current number of users: ${session.connectedUsers.length}`);
     this.server.to(socket.id).emit('receiveCurrentSession', session);
@@ -54,7 +53,6 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     // Set the song start after the broadcast, because DJ doesnt need to know when the song starts
     session.webplayer.songStartedAt = Date.now();
     await this.sessionService.updateSession(session);
-    console.log(session);
   }
 
   async handleDisconnect(socket: Socket) {
