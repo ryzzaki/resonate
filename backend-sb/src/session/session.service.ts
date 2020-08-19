@@ -82,7 +82,7 @@ export class SessionService {
 
   async updateSession(session: Session): Promise<Session> {
     try {
-      await this.redisClient.set(session.id, JSON.stringify(session), 'KEEPTTL');
+      await this.redisClient.set(`session:${session.id}`, JSON.stringify(session), 'KEEPTTL');
       return session;
     } catch (error) {
       this.logger.error(`Error during session update on: ${error}`);
