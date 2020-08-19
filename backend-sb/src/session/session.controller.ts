@@ -10,17 +10,17 @@ import { Session } from './interfaces/session.interface';
 export class SessionController {
   constructor(private readonly sessionService: SessionService) {}
 
+  @Get()
+  getAllPublicSessions(): Promise<Session[]> {
+    // do not ever return the private rooms
+    // getting all public rooms is not guarded
+    return this.sessionService.getAllPublicSessions();
+  }
+
   @Post()
   @UseGuards(AuthGuard())
   createSession(@Body(ValidationPipe) createSessionDto: CreateSessionDto, @GetUser() user: User): Promise<Session> {
     return this.sessionService.createSession(createSessionDto, user);
-  }
-
-  @Get()
-  @UseGuards(AuthGuard())
-  getAllPublicSessions(): Promise<Session[]> {
-    // do not ever return the private rooms
-    return this.sessionService.getAllPublicSessions();
   }
 
   @Get('/:id')
