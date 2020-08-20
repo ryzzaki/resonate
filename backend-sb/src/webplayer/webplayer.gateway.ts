@@ -45,13 +45,12 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
       session.currentDJ = user;
       session.startsAt = Date.now();
       session.endsAt = Date.now() + 10 * 60 * 1000;
+      session.webplayer.songStartedAt = Date.now();
     }
     session.connectedUsers.push(user);
     this.logger.verbose(`A user has connected! Current number of users: ${session.connectedUsers.length}`);
     this.server.to(socket.id).emit('receiveCurrentSession', session);
     this.server.to(session.id).emit('receiveUsers', session.connectedUsers);
-    // Set the song start after the broadcast, because DJ doesnt need to know when the song starts
-    session.webplayer.songStartedAt = Date.now();
     await this.sessionService.updateSession(session);
   }
 
@@ -61,15 +60,21 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     const user = await this.webplayerService.getUserUsingJwtToken(jwtToken);
     session.connectedUsers = session.connectedUsers.filter((val) => val.id !== user.id);
     if (user.id === session.currentDJ.id) {
-      session.connectedUsers.length > 0 ? await this.selectNewDJ(user, socket) : (session.currentDJ = null);
-      this.server.to(session.id).emit('receiveNewDJ', session.currentDJ);
+      console.log('k: ' + (session.connectedUsers.length > 0));
+      if (session.connectedUsers.length > 0) {
+        session.currentDJ = _.sample(session.connectedUsers);
+        session.startsAt = Date.now();
+        this.server.to(session.id).emit('receiveNewDJ', session.currentDJ);
+      } else {
+        session.currentDJ = null;
+      }
     }
     this.logger.verbose(`A user has disconnected! Current number of users: ${session.connectedUsers.length}`);
-    this.server.to(session.id).emit('receiveUsers', session.connectedUsers);
     await this.sessionService.updateSession(session);
     // gracefully exit the room
     socket.leave(session.id);
-    return socket.disconnect();
+    socket.disconnect();
+    return this.server.to(session.id).emit('receiveUsers', session.connectedUsers);
   }
 
   @UseGuards(WsAuthGuard)
@@ -110,10 +115,10 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     const session = await this.getSessionFromSocketQueryId(socket);
     this.isPermittedForUser(user, session);
     session.currentURI = uris;
+    session.webplayer.songStartedAt = Date.now();
     this.logger.verbose(`Newly selected URI: ${session.currentURI}`);
     this.server.to(session.id).emit('receiveCurrentURI', session.currentURI);
     this.server.to(session.id).emit('receiveCurrentSongStart', session.webplayer.songStartedAt);
-    session.webplayer.songStartedAt = Date.now();
     await this.sessionService.updateSession(session);
   }
 
@@ -123,8 +128,10 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     const session = await this.getSessionFromSocketQueryId(socket);
     this.isPermittedForUser(user, session);
     const connectedUsersWithoutDJ = session.connectedUsers.filter((val) => val.id !== user.id);
+    console.log(connectedUsersWithoutDJ);
     session.currentDJ = _.sample(connectedUsersWithoutDJ);
     session.startsAt = Date.now();
+    console.log(session);
     this.server.to(session.id).emit('receiveNewDJ', session.currentDJ);
     await this.sessionService.updateSession(session);
   }
@@ -139,7 +146,6 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     const session = await this.getSessionFromSocketQueryId(socket);
     this.isPermittedForUser(user, session);
     if (!state) {
-      // TODO: there might be a big timing gap between the pause and spotify pausing the song, we need to check if the UX fits well enough for the technical problem
       session.webplayer.songPausedAt = Date.now();
     } else {
       session.webplayer.songStartedAt = session.webplayer.songStartedAt + (Date.now() - session.webplayer.songPausedAt);

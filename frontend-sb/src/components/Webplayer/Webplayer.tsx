@@ -51,6 +51,7 @@ export const Webplayer: React.FC<Props> = (props) => {
 
     (async () => await loadScript())();
 
+    // player cleanup
     return () => {
       if (player.current) {
         player.current.removeListener('initialization_error');
@@ -78,10 +79,10 @@ export const Webplayer: React.FC<Props> = (props) => {
 
     if (status.paused) {
       window.clearInterval(playerInterval.current);
-      setStatus((state) => ({ ...state, unsync: true }));
     } else {
       playerInterval.current = window.setInterval(handleIntervalUpdate, 100);
     }
+    return () => window.clearInterval(playerInterval.current);
   }, [status.paused]);
 
   useEffect(() => {
@@ -137,10 +138,8 @@ export const Webplayer: React.FC<Props> = (props) => {
   const handlePlayerReady = ({ device_id }) => {
     console.log('Ready with Device ID', device_id);
     // Play the song at the right start
-    const songStart = roomStatus.webplayer.songStartedAt
-      ? Date.now() - roomStatus.webplayer.songStartedAt
-      : 0;
-    play(device_id, songStart);
+    // TODO: Test the gap
+    play(device_id, Date.now() - roomStatus.webplayer.songStartedAt);
     setStatus((state) => ({
       ...state,
       deviceId: device_id,
@@ -155,13 +154,10 @@ export const Webplayer: React.FC<Props> = (props) => {
     } else {
       setStatus((state) => ({
         ...state,
-        progressMs: roomStatus.webplayer.songStartedAt
-          ? songState.position
-          : !songState.position
-          ? 0
-          : state.progressMs,
+        progressMs: songState.position,
         currentTrack: songState.track_window.current_track,
         paused: songState.paused,
+        unsync: songState.paused,
       }));
     }
   };
@@ -169,9 +165,9 @@ export const Webplayer: React.FC<Props> = (props) => {
   const handleIntervalUpdate = (e: number | undefined) => {
     setStatus((state) => {
       const progressMs = state.progressMs + 100;
+      // max length = 100 slider input value -> find the (current ms / the track length) * 100
       const progressInDuration =
         state.progressMs / state.currentTrack.duration_ms;
-      // max length = 100 slider input value -> find the (current ms / the track length) * 100
       return {
         ...state,
         progressMs,
@@ -189,7 +185,11 @@ export const Webplayer: React.FC<Props> = (props) => {
   };
 
   const handleResync = () => {
-    play(status.deviceId, Date.now() - roomStatus.webplayer.songStartedAt);
+    // make the offset variable more dynamic
+    play(
+      status.deviceId,
+      Date.now() - roomStatus.webplayer.songStartedAt + 100
+    );
     setStatus((state) => ({ ...state, unsync: false }));
   };
 
