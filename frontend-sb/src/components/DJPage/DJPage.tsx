@@ -51,6 +51,12 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
     socket.current.on('receiveUsers', (connectedUsers: any) =>
       setRoomStatus((state) => ({ ...state, connectedUsers }))
     );
+    socket.current.on('receiveCurrentSongStart', (songStartedAt: number) =>
+      setRoomStatus((state) => ({
+        ...state,
+        webplayer: { ...state.webplayer, songStartedAt },
+      }))
+    );
 
     return () => socket.current.disconnect();
   }, []);
@@ -69,7 +75,8 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
   const emitSearchedURIs = (uris: string[]) =>
     socket.current.emit('rebroadcastSelectedURI', uris);
 
-  const emitSliderPos = (e: any) => {};
+  const emitSliderPos = (progressMs: number) =>
+    socket.current.emit('rebroadcastSongStartedAt', Date.now() - progressMs);
 
   const emitSelectNewDJ = () => socket.current.emit('selectNewDJ');
 

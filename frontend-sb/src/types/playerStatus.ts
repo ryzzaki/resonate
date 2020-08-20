@@ -5,7 +5,6 @@ type playerStatus = {
   unsync: boolean;
   errorType: string;
   deviceId: string;
-  position: number;
   progressMs: number;
 };
 

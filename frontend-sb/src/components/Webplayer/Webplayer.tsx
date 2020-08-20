@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import loadScript from '../../utils/loadScript';
 import roomStatus from '../../types/roomStatus';
 import playerStatus from '../../types/playerStatus';
 import { playSong } from '../../utils/api';
 import { WebplayerView } from './Webplayer.view';
+import debouncer from '../../utils/debouncer';
 
 type Props = {
   roomStatus: roomStatus;
@@ -11,7 +12,7 @@ type Props = {
   token: string;
   isDJ: boolean;
   handleAuthError: () => void;
-  emitSliderPos: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  emitSliderPos: (progressMs: number) => void;
 };
 
 export const Webplayer: React.FC<Props> = (props) => {
@@ -31,7 +32,6 @@ export const Webplayer: React.FC<Props> = (props) => {
     unsync: false,
     errorType: '',
     deviceId: '',
-    position: 0,
     progressMs: 0,
   });
 
@@ -67,11 +67,12 @@ export const Webplayer: React.FC<Props> = (props) => {
   }, [spotifyToken]);
 
   // on URI change from djroom play the new song
+  // on songStartedAt change the play position
   useEffect(() => {
     if (status.isInitializing) return;
 
-    play(status.deviceId);
-  }, [roomStatus.currentURI]);
+    play(status.deviceId, Date.now() - roomStatus.webplayer.songStartedAt);
+  }, [roomStatus.currentURI, roomStatus.webplayer.songStartedAt]);
 
   // player slider logic, setInterval on play / clearInterval of pause
   useEffect(() => {
@@ -118,7 +119,6 @@ export const Webplayer: React.FC<Props> = (props) => {
     });
 
     player.current.connect();
-    console.log('connected');
   };
 
   const handlePlayerError = ({ message }) => {
@@ -157,39 +157,37 @@ export const Webplayer: React.FC<Props> = (props) => {
         progressMs: songState.position,
         currentTrack: songState.track_window.current_track,
         paused: songState.paused,
-        unsync: songState.paused,
+        unsync: songState.paused ? true : state.unsync,
       }));
     }
   };
 
-  const handleIntervalUpdate = (e: number | undefined) => {
-    setStatus((state) => {
-      const progressMs = state.progressMs + 100;
-      // max length = 100 slider input value -> find the (current ms / the track length) * 100
-      const progressInDuration =
-        state.progressMs / state.currentTrack.duration_ms;
-      return {
-        ...state,
-        progressMs,
-        position: progressInDuration > 100 ? 100 : progressInDuration * 100,
-      };
-    });
+  const handleIntervalUpdate = (e: number | undefined) =>
+    setStatus((state) => ({ ...state, progressMs: state.progressMs + 100 }));
+
+  const debounceSlider = useCallback(
+    debouncer((progressMs: number) => {
+      emitSliderPos(progressMs);
+    }, 100),
+    [status.deviceId]
+  );
+
+  const handleSliderPos = (progressMs: number) => {
+    if (isDJ) {
+      debounceSlider(progressMs);
+    }
   };
 
   const handlePlayState = () => {
     if (status.paused) {
-      player.current.resume();
+      handleResync();
     } else {
       player.current.pause();
     }
   };
 
   const handleResync = () => {
-    // make the offset variable more dynamic
-    play(
-      status.deviceId,
-      Date.now() - roomStatus.webplayer.songStartedAt + 100
-    );
+    play(status.deviceId, Date.now() - roomStatus.webplayer.songStartedAt);
     setStatus((state) => ({ ...state, unsync: false }));
   };
 
@@ -206,7 +204,7 @@ export const Webplayer: React.FC<Props> = (props) => {
       isDJ={isDJ}
       handleResync={handleResync}
       handlePlayState={handlePlayState}
-      emitSliderPos={emitSliderPos}
+      handleSliderPos={handleSliderPos}
     />
   );
 };

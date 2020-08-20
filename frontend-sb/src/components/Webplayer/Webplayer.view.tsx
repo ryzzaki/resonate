@@ -1,4 +1,5 @@
 import React from 'react';
+import { VideoSeekSlider } from 'react-video-seek-slider';
 import playerStatus from '../../types/playerStatus';
 import { ReactComponent as Play } from '../../assets/icons/play.svg';
 import { ReactComponent as Pause } from '../../assets/icons/pause.svg';
@@ -8,11 +9,17 @@ type Props = {
   status: playerStatus;
   handleResync: () => void;
   handlePlayState: () => void;
-  emitSliderPos: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSliderPos: (progressMs: number) => void;
 };
 
 export const WebplayerView: React.FC<Props> = (props) => {
-  const { isDJ, handleResync, handlePlayState, status, emitSliderPos } = props;
+  const {
+    isDJ,
+    handleResync,
+    handlePlayState,
+    status,
+    handleSliderPos,
+  } = props;
 
   if (status.isInitializing)
     return (
@@ -46,14 +53,12 @@ export const WebplayerView: React.FC<Props> = (props) => {
           </span>
         </div>
       )}
-      <div>
-        <input
-          type="range"
-          className="w-full block"
-          value={status.position}
-          onChange={() => {}}
-        />
-      </div>
+      <VideoSeekSlider
+        max={status.currentTrack.duration_ms}
+        currentTime={status.progressMs}
+        onChange={handleSliderPos}
+        hideHoverTime
+      />
       <div className="grid grid-cols-3 p-10">
         <div className="flex items-center">
           <div className="flex-shrink-0 mr-10">

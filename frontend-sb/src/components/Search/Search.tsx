@@ -1,14 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { searchSongs } from '../../utils/api';
 import { SearchView } from './Search.view';
-
-function debouncer(func: (...params: any[]) => any, delay: number) {
-  let timer: any | undefined = undefined;
-  return function (this: any, ...args: any[]) {
-    clearTimeout(timer);
-    timer = setTimeout(() => func.apply(this, args), delay);
-  };
-}
+import debouncer from '../../utils/debouncer';
 
 type Props = {
   token: string;

@@ -60,7 +60,6 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     const user = await this.webplayerService.getUserUsingJwtToken(jwtToken);
     session.connectedUsers = session.connectedUsers.filter((val) => val.id !== user.id);
     if (user.id === session.currentDJ.id) {
-      console.log('k: ' + (session.connectedUsers.length > 0));
       if (session.connectedUsers.length > 0) {
         session.currentDJ = _.sample(session.connectedUsers);
         session.startsAt = Date.now();
@@ -117,7 +116,21 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     session.currentURI = uris;
     session.webplayer.songStartedAt = Date.now();
     this.logger.verbose(`Newly selected URI: ${session.currentURI}`);
-    this.server.to(session.id).emit('receiveCurrentURI', session.currentURI);
+    this.server.to(session.id).emit('receiveCurrentSession', session);
+    await this.sessionService.updateSession(session);
+  }
+
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage('rebroadcastSongStartedAt')
+  async onSongStartChange(
+    @MessageBody() songStartedAt: number,
+    @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User,
+    @ConnectedSocket() socket: Socket
+  ) {
+    const session = await this.getSessionFromSocketQueryId(socket);
+    this.isPermittedForUser(user, session);
+    session.webplayer.songStartedAt = songStartedAt;
+    this.logger.verbose(`SongStarted changed: ${session.webplayer.songStartedAt}`);
     this.server.to(session.id).emit('receiveCurrentSongStart', session.webplayer.songStartedAt);
     await this.sessionService.updateSession(session);
   }

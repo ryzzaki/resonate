@@ -15,7 +15,7 @@ type Props = {
   handleAuthError: () => void;
   emitSelectNewDJ: () => void;
   emitSearchedURIs: (uris: string[]) => void;
-  emitSliderPos: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  emitSliderPos: (progressMs: number) => void;
 };
 
 export const DJPageView: React.FC<Props> = (props) => {

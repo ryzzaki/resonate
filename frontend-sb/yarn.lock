@@ -9222,6 +9222,11 @@ react-scripts@3.4.1:
   optionalDependencies:
     fsevents "2.1.2"
 
+react-video-seek-slider@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/react-video-seek-slider/-/react-video-seek-slider-2.1.2.tgz#4beffefcf4b1518dbcd2d0814f33d4472106ed0b"
+  integrity sha512-nZq6GLAK+hPeJgS87LLTkGjM4tNrWUw9yLSvSaKIor50PfEShqRyd1xBowwyNE4siQ22wEJlyUXKh9h249oT/w==
+
 react@16.13.1:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react/-/react-16.13.1.tgz#2e818822f1a9743122c063d6410d85c1e3afe48e"
