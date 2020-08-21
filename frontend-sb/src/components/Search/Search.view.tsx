@@ -3,11 +3,11 @@ import React from 'react';
 type Props = {
   results: any;
   handleSearch: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleClickURIs: (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => void;
+  handleClick: (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => void;
 };
 
 export const SearchView: React.FC<Props> = (props) => {
-  const { results, handleSearch, handleClickURIs } = props;
+  const { results, handleSearch, handleClick } = props;
 
   return (
     <div>
@@ -30,7 +30,7 @@ export const SearchView: React.FC<Props> = (props) => {
                   data-uris={track.uri}
                   key={track.id}
                   className="group flex mb-10 cursor-pointer hover:bg-skinpink"
-                  onClick={handleClickURIs}
+                  onClick={handleClick}
                 >
                   <img
                     className="h-60 w-60 object-cover mr-10"
@@ -70,10 +70,10 @@ export const SearchView: React.FC<Props> = (props) => {
             <ul className="mb-30">
               {results.albums.items.map((album: any) => (
                 <li
-                  data-uris={album.uri}
+                  data-album={album.uri}
                   key={album.id}
                   className="group flex mb-10 cursor-pointer hover:bg-skinpink"
-                  onClick={handleClickURIs}
+                  onClick={handleClick}
                 >
                   <img
                     className="h-60 w-60 object-cover mr-10"

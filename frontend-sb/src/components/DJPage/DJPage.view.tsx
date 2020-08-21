@@ -14,7 +14,7 @@ type Props = {
   handleSignOut: () => void;
   handleAuthError: () => void;
   emitSelectNewDJ: () => void;
-  emitSearchedURIs: (uris: string[]) => void;
+  emitSearchedURI: (uri: string) => void;
   emitSliderPos: (progressMs: number) => void;
 };
 
@@ -27,7 +27,7 @@ export const DJPageView: React.FC<Props> = (props) => {
     spotifyToken,
     token,
     emitSliderPos,
-    emitSearchedURIs,
+    emitSearchedURI,
     emitSelectNewDJ,
   } = props;
 
@@ -100,7 +100,7 @@ export const DJPageView: React.FC<Props> = (props) => {
       </aside>
       <main className="flex-col flex flex-1 bg-darkblue ml-30rem">
         <div className="p-20 pr-40 flex-1">
-          <Search token={token} emitSearchedURIs={emitSearchedURIs} />
+          <Search token={token} emitSearchedURI={emitSearchedURI} />
         </div>
         <div className="mt-auto bottom-0 sticky bg-darkblue">
           {roomStatus.currentURI.length ? (

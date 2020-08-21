@@ -19,6 +19,7 @@ import { GetUser } from '../auth/decorators/get-user.decorator';
 import { ExecCtxTypeEnum } from '../auth/interfaces/executionContext.enum';
 import { Session } from '../session/interfaces/session.interface';
 import * as _ from 'lodash';
+import axios from 'axios';
 
 @WebSocketGateway(<GatewayMetadata>{ path: '/v1/webplayer', transports: ['websocket'] })
 export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -110,10 +111,23 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
 
   @UseGuards(WsAuthGuard)
   @SubscribeMessage('rebroadcastSelectedURI')
-  async onURIChange(@MessageBody() uris: string[], @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
+  async onURIChange(@MessageBody() uri: string, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
     const session = await this.getSessionFromSocketQueryId(socket);
     this.isPermittedForUser(user, session);
-    session.currentURI = uris;
+    if (uri.includes('spotify:album:')) {
+      try {
+        const { data } = await axios.get(`https://api.spotify.com/v1/albums/${uri.replace('spotify:album:', '')}/tracks`, {
+          headers: {
+            Authorization: `Bearer ${user.accessToken}`,
+          },
+        });
+        session.currentURI = data.items.map((track) => track.uri);
+      } catch (err) {
+        throw err;
+      }
+    } else {
+      session.currentURI = [uri];
+    }
     session.webplayer.songStartedAt = Date.now();
     this.logger.verbose(`Newly selected URI: ${session.currentURI}`);
     this.server.to(session.id).emit('receiveCurrentSession', session);
@@ -141,10 +155,8 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     const session = await this.getSessionFromSocketQueryId(socket);
     this.isPermittedForUser(user, session);
     const connectedUsersWithoutDJ = session.connectedUsers.filter((val) => val.id !== user.id);
-    console.log(connectedUsersWithoutDJ);
     session.currentDJ = _.sample(connectedUsersWithoutDJ);
     session.startsAt = Date.now();
-    console.log(session);
     this.server.to(session.id).emit('receiveNewDJ', session.currentDJ);
     await this.sessionService.updateSession(session);
   }

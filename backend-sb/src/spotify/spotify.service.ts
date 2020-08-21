@@ -20,14 +20,14 @@ export class SpotifyService {
       .get(url, {
         headers: { Authorization: `Bearer ${user.accessToken}` },
       })
-      .catch(e => {
+      .catch((e) => {
         this.logger.error(`Unable to authorize Spotify client on ${e} using the current access token!`);
         throw new BadRequestException(`Unable to authorize Spotify client using the current access token!`);
       });
     return response.data;
   }
 
-  async playSongForDeviceId(deviceId: string, data: { uris: string[] }, user: User): Promise<void> {
+  async playSongForDeviceId(deviceId: string, data: { uris: string[]; position_ms?: number }, user: User): Promise<void> {
     const url = `${SpotifyUrlEnums.SPOTIFY_API}/me/player/play?${qs.stringify({
       device_id: deviceId,
     })}`;
@@ -37,7 +37,7 @@ export class SpotifyService {
           Authorization: `Bearer ${user.accessToken}`,
         },
       })
-      .catch(e => {
+      .catch((e) => {
         this.logger.error(`Unable to authorize Spotify client on ${e} using the current access token!`);
         throw new BadRequestException(`Unable to authorize Spotify client using the current access token!`);
       });
@@ -56,7 +56,7 @@ export class SpotifyService {
           },
         }
       )
-      .catch(e => {
+      .catch((e) => {
         this.logger.error(`Unable to authorize Spotify client on ${e} using the current access token!`);
         throw new BadRequestException(`Unable to authorize Spotify client using the current access token!`);
       });
