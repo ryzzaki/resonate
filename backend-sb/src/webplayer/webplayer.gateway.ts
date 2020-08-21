@@ -13,14 +13,13 @@ import { Server, Socket } from 'socket.io';
 import { WebplayerService } from './webplayer.service';
 import { Logger, UseGuards, ForbiddenException } from '@nestjs/common';
 import { SessionService } from '../session/session.service';
+import { SpotifyService } from '../spotify/spotify.service';
 import { User } from '../auth/entities/user.entity';
 import { WsAuthGuard } from '../auth/decorators/websocket.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { ExecCtxTypeEnum } from '../auth/interfaces/executionContext.enum';
 import { Session } from '../session/interfaces/session.interface';
-import axios from 'axios';
 import * as _ from 'lodash';
-import { SpotifyService } from '../spotify/spotify.service';
 
 @WebSocketGateway(<GatewayMetadata>{ path: '/v1/webplayer', transports: ['websocket'] })
 export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -147,6 +146,16 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     session.currentDJ = _.sample(connectedUsersWithoutDJ);
     session.startsAt = Date.now();
     this.server.to(session.id).emit('receiveNewDJ', session.currentDJ);
+    await this.sessionService.updateSession(session);
+  }
+
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage('sendChatMessage')
+  async sendChatMessage(@MessageBody() message: string, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
+    const session = await this.getSessionFromSocketQueryId(socket);
+    const basicUser = _.omit(user, ['email', 'accessToken', 'refreshToken', 'subscription', 'tokenVer']);
+    session.chat.push({ sentAt: Date.now(), sender: basicUser, message });
+    this.server.to(session.id).emit('receiveChatLog', session.chat);
     await this.sessionService.updateSession(session);
   }
 

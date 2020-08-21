@@ -1,17 +1,26 @@
 import { User } from '../../auth/entities/user.entity';
 import { RoomAccess } from './roomAccess.enum';
 
+type BasicUser = Omit<User, 'email' | 'accessToken' | 'refreshToken' | 'subscription' | 'tokenVer'>;
+
 export interface Session {
   id: string;
   name: string;
   roomAccess: RoomAccess;
   description: string | undefined;
-  currentDJ: Omit<User, 'email' | 'accessToken' | 'refreshToken' | 'subscription' | 'tokenVer'> | null;
+  currentDJ: BasicUser | null;
   currentURI: string[] | undefined;
-  connectedUsers: Omit<User, 'email' | 'accessToken' | 'refreshToken' | 'subscription' | 'tokenVer'>[];
+  connectedUsers: BasicUser[];
   startsAt: number;
   endsAt: number;
   webplayer: {
     songStartedAt: number | undefined;
   };
+  chat: Message[];
+}
+
+interface Message {
+  sentAt: number;
+  sender: BasicUser;
+  message: string;
 }

@@ -41,6 +41,7 @@ export class SessionService {
       webplayer: {
         songStartedAt: Date.now(),
       },
+      chat: [],
     };
     this.redisClient.set(`session:${newSession.id}`, JSON.stringify(newSession), 'EX', 86400, (err, result) => {
       if (err) {
