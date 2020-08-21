@@ -72,10 +72,7 @@ export class AuthService {
     }
     const refreshToken = await this.generateToken(user.id, AuthTypeEnums.REFRESH, user.tokenVer);
     const accessToken = await this.generateToken(user.id, AuthTypeEnums.ACCESS);
-    res
-      .cookie('refresh_tkn_v1', refreshToken, cookieConfig)
-      .status(302)
-      .redirect(`${UrlEnums.BASE_URL}/auth/#access_token=${accessToken}`);
+    res.cookie('refresh_tkn_v1', refreshToken, cookieConfig).status(302).redirect(`${UrlEnums.BASE_URL}/auth/#access_token=${accessToken}`);
     return;
   }
 
@@ -171,17 +168,19 @@ export class AuthService {
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
     });
-    const responseData = (await axios
-      .post(url, grant, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${await this.getBase64AuthHeader()}`,
-        },
-      })
-      .catch(e => {
-        this.logger.error(`Unable to authorize Spotify client on ${e}`);
-        throw new InternalServerErrorException(`Unable to authorize Spotify client`);
-      })).data as SpotifyPayloadInterface;
+    const responseData = (
+      await axios
+        .post(url, grant, {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Basic ${await this.getBase64AuthHeader()}`,
+          },
+        })
+        .catch((e) => {
+          this.logger.error(`Unable to authorize Spotify client on ${e}`);
+          throw new InternalServerErrorException(`Unable to authorize Spotify client`);
+        })
+    ).data as SpotifyPayloadInterface;
     return { accessToken: responseData.access_token, refreshToken: responseData.refresh_token };
   }
 

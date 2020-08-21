@@ -12,8 +12,6 @@ export interface Session {
   startsAt: number;
   endsAt: number;
   webplayer: {
-    isPlaying: boolean;
     songStartedAt: number | undefined;
-    songPausedAt: number | undefined;
   };
 }

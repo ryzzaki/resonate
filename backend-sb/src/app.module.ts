@@ -8,8 +8,8 @@ import { redisModuleConfig } from './config/redis.config';
 import { SpotifyModule } from './spotify/spotify.module';
 import { WebplayerModule } from './webplayer/webplayer.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { SessionModule } from './session/session.module';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -18,10 +18,10 @@ import { SessionModule } from './session/session.module';
     AuthModule,
     SpotifyModule,
     WebplayerModule,
+    SessionModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', '..', '..', './frontend-sb/build'),
     }),
-    SessionModule,
   ],
   controllers: [AppController],
 })

@@ -39,9 +39,7 @@ export class SessionService {
       startsAt: Date.now(),
       endsAt: Date.now() + 10 * 60 * 1000,
       webplayer: {
-        isPlaying: true,
         songStartedAt: Date.now(),
-        songPausedAt: undefined,
       },
     };
     this.redisClient.set(`session:${newSession.id}`, JSON.stringify(newSession), 'EX', 86400, (err, result) => {

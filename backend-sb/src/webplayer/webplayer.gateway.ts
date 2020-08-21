@@ -18,14 +18,19 @@ import { WsAuthGuard } from '../auth/decorators/websocket.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { ExecCtxTypeEnum } from '../auth/interfaces/executionContext.enum';
 import { Session } from '../session/interfaces/session.interface';
-import * as _ from 'lodash';
 import axios from 'axios';
+import * as _ from 'lodash';
+import { SpotifyService } from '../spotify/spotify.service';
 
 @WebSocketGateway(<GatewayMetadata>{ path: '/v1/webplayer', transports: ['websocket'] })
 export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private logger = new Logger('WebplayerGateway');
 
-  constructor(private readonly webplayerService: WebplayerService, private readonly sessionService: SessionService) {}
+  constructor(
+    private readonly webplayerService: WebplayerService,
+    private readonly sessionService: SessionService,
+    private readonly spotifyService: SpotifyService
+  ) {}
 
   @WebSocketServer()
   private readonly server: Server;
@@ -102,29 +107,13 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
   }
 
   @UseGuards(WsAuthGuard)
-  @SubscribeMessage('getSongPause')
-  async getSongPause(@ConnectedSocket() socket: Socket) {
-    const session = await this.getSessionFromSocketQueryId(socket);
-    this.server.to(session.id).emit('receiveCurrentSongPause', session.webplayer.songPausedAt);
-    await this.sessionService.updateSession(session);
-  }
-
-  @UseGuards(WsAuthGuard)
   @SubscribeMessage('rebroadcastSelectedURI')
   async onURIChange(@MessageBody() uri: string, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
     const session = await this.getSessionFromSocketQueryId(socket);
     this.isPermittedForUser(user, session);
     if (uri.includes('spotify:album:')) {
-      try {
-        const { data } = await axios.get(`https://api.spotify.com/v1/albums/${uri.replace('spotify:album:', '')}/tracks`, {
-          headers: {
-            Authorization: `Bearer ${user.accessToken}`,
-          },
-        });
-        session.currentURI = data.items.map((track) => track.uri);
-      } catch (err) {
-        throw err;
-      }
+      const { data } = await this.spotifyService.getAlbumTracks(user, uri);
+      session.currentURI = data.items.map((track: { uri: string }) => track.uri);
     } else {
       session.currentURI = [uri];
     }
@@ -144,7 +133,7 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     const session = await this.getSessionFromSocketQueryId(socket);
     this.isPermittedForUser(user, session);
     session.webplayer.songStartedAt = songStartedAt;
-    this.logger.verbose(`SongStarted changed: ${session.webplayer.songStartedAt}`);
+    this.logger.verbose(`SongStartedAt changed: ${session.webplayer.songStartedAt}`);
     this.server.to(session.id).emit('receiveCurrentSongStart', session.webplayer.songStartedAt);
     await this.sessionService.updateSession(session);
   }
@@ -158,26 +147,6 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     session.currentDJ = _.sample(connectedUsersWithoutDJ);
     session.startsAt = Date.now();
     this.server.to(session.id).emit('receiveNewDJ', session.currentDJ);
-    await this.sessionService.updateSession(session);
-  }
-
-  @UseGuards(WsAuthGuard)
-  @SubscribeMessage('updateWebplayerState')
-  async setWebplayerState(
-    @MessageBody() state: boolean,
-    @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User,
-    @ConnectedSocket() socket: Socket
-  ) {
-    const session = await this.getSessionFromSocketQueryId(socket);
-    this.isPermittedForUser(user, session);
-    if (!state) {
-      session.webplayer.songPausedAt = Date.now();
-    } else {
-      session.webplayer.songStartedAt = session.webplayer.songStartedAt + (Date.now() - session.webplayer.songPausedAt);
-      session.webplayer.songPausedAt = undefined;
-    }
-    session.webplayer.isPlaying = state;
-    this.server.to(session.id).emit('receiveCurrentWebplayerState', session.webplayer.isPlaying);
     await this.sessionService.updateSession(session);
   }
 

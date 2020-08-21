@@ -7,5 +7,6 @@ import { AuthModule } from '../auth/auth.module';
   imports: [AuthModule],
   controllers: [SpotifyController],
   providers: [SpotifyService],
+  exports: [SpotifyService],
 })
 export class SpotifyModule {}
