@@ -151,17 +151,17 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     await this.sessionService.updateSession(session);
   }
 
-  // @UseGuards(WsAuthGuard)
-  // @SubscribeMessage('selectNextTrack')
-  // async selectNextTrack(@MessageBody() uri: string, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
-  //   const session = await this.getSessionFromSocketQueryId(socket);
-  //   this.isPermittedForUser(user, session);
-  //   session.webplayer.uri = uri;
-  //   session.webplayer.songStartedAt = Date.now();
-  //   this.logger.verbose(`Playing next in queue: ${session.webplayer.uri}`);
-  //   this.server.to(session.id).emit('receiveCurrentSession', session);
-  //   await this.sessionService.updateSession(session);
-  // }
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage('selectNextTrack')
+  async selectNextTrack(@MessageBody() uri: string, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
+    const session = await this.getSessionFromSocketQueryId(socket);
+    this.isPermittedForUser(user, session);
+    session.webplayer.uri = uri;
+    session.webplayer.songStartedAt = Date.now();
+    this.logger.verbose(`Playing next in queue: ${session.webplayer.uri}`);
+    this.server.to(session.id).emit('receiveCurrentSession', session);
+    await this.sessionService.updateSession(session);
+  }
 
   @UseGuards(WsAuthGuard)
   @SubscribeMessage('sendChatMessage')

@@ -13,9 +13,9 @@ type Props = {
   token: string;
   roomState: Session;
   emitSelectNewDJ: () => void;
-  // emitNextTrack: (uri: string) => void;
   emitSearchedURI: (uri: string) => void;
   emitSliderPos: (progressMs: number) => void;
+  emitNextTrack: (uri: string) => void;
 };
 
 export const PartyView: React.FC<Props> = (props) => {
@@ -27,6 +27,7 @@ export const PartyView: React.FC<Props> = (props) => {
     emitSearchedURI,
     emitSelectNewDJ,
     emitSliderPos,
+    emitNextTrack,
   } = props;
 
   const handleSignOut = useSignout();
@@ -110,6 +111,8 @@ export const PartyView: React.FC<Props> = (props) => {
               spotifyToken={spotifyToken}
               roomState={roomState}
               emitSliderPos={emitSliderPos}
+              emitNextTrack={emitNextTrack}
+              emitSearchedURI={emitSearchedURI}
             />
           ) : (
             <p className="text-center text-pink p-20">Connecting...</p>

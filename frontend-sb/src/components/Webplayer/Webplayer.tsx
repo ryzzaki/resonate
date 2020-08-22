@@ -14,10 +14,20 @@ type Props = {
   isDJ: boolean;
   roomState: Session;
   emitSliderPos: (progressMs: number) => void;
+  emitNextTrack: (uri: string) => void;
+  emitSearchedURI: (uri: string) => void;
 };
 
 export const Webplayer: React.FC<Props> = (props) => {
-  const { token, isDJ, spotifyToken, roomState, emitSliderPos } = props;
+  const {
+    token,
+    isDJ,
+    spotifyToken,
+    roomState,
+    emitSliderPos,
+    emitNextTrack,
+    emitSearchedURI,
+  } = props;
 
   const [status, setStatus] = useState<playerStatus>({
     currentTrack: {},
@@ -26,6 +36,7 @@ export const Webplayer: React.FC<Props> = (props) => {
     unsync: false,
     deviceId: '',
     errorType: '',
+    duration: 0,
     progressMs: 0,
   });
 
@@ -87,15 +98,31 @@ export const Webplayer: React.FC<Props> = (props) => {
     return () => window.clearInterval(playerInterval.current);
   }, [status.paused]);
 
-  // useEffect(() => {
-  //   // on track change, check if its not from spotify player
-  //   setStatus((state) => ({
-  //     ...state,
-  //     unsync:
-  //       status.currentTrack.uri &&
-  //       roomStatus.uris[0] !== status.currentTrack.uri,
-  //   }));
-  // }, [status.currentTrack.uri]);
+  useEffect(() => {
+    if (status.isInitializing) return;
+
+    const currentTrack = status.currentTrack.uri;
+
+    if (!roomState.uris.includes(currentTrack)) {
+      if (isDJ) {
+        console.log('new song from spotfiy');
+        emitSearchedURI(currentTrack);
+      } else {
+        setStatus((state) => ({ ...state, unsync: true }));
+      }
+      return;
+    }
+
+    if (
+      isDJ &&
+      roomState.webplayer.uri &&
+      roomState.webplayer.uri !== currentTrack
+    ) {
+      console.log('new song from album');
+      emitNextTrack(currentTrack);
+      return;
+    }
+  }, [status.currentTrack.uri]);
 
   const initialization = () => {
     // @ts-ignore
@@ -158,23 +185,15 @@ export const Webplayer: React.FC<Props> = (props) => {
     if (!songState) {
       setStatus((state) => ({ ...state, isInitializing: true }));
     } else {
-      setStatus((state) => {
-        // if (
-        //   isDJ &&
-        //   state.nextTracks.id === songState.track_window.current_track.id
-        // ) {
-        //   console.log('k');
-        //   emitNextTrack(songState.track_window.current_track.uri);
-        // }
-        return {
-          ...state,
-          progressMs: songState.position,
-          currentTrack: songState.track_window.current_track,
-          nextTracks: songState.track_window?.next_tracks[0],
-          paused: songState.paused,
-          unsync: songState.paused ? true : state.unsync,
-        };
-      });
+      setStatus((state) => ({
+        ...state,
+        progressMs: songState.position,
+        duration: songState.duration,
+        currentTrack: songState.track_window.current_track,
+        nextTracks: songState.track_window?.next_tracks[0],
+        paused: songState.paused,
+        unsync: songState.paused ? true : state.unsync,
+      }));
     }
   };
 

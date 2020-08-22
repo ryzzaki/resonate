@@ -82,8 +82,8 @@ export const Party: React.FC<RouteComponentProps<Props>> = () => {
 
   const emitSelectNewDJ = () => socket.current.emit('selectNewDJ');
 
-  // const emitNextTrack = (uri: string) =>
-  //   socket.current.emit('selectNextTrack', uri);
+  const emitNextTrack = (uri: string) =>
+    socket.current.emit('selectNextTrack', uri);
 
   return (
     <PartyView
@@ -94,6 +94,7 @@ export const Party: React.FC<RouteComponentProps<Props>> = () => {
       emitSliderPos={emitSliderPos}
       emitSelectNewDJ={emitSelectNewDJ}
       emitSearchedURI={emitSearchedURI}
+      emitNextTrack={emitNextTrack}
     />
   );
 };
