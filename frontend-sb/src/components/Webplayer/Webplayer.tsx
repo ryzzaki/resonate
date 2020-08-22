@@ -105,7 +105,6 @@ export const Webplayer: React.FC<Props> = (props) => {
 
     if (!roomState.uris.includes(currentTrack)) {
       if (isDJ) {
-        console.log('new song from spotfiy');
         emitSearchedURI(currentTrack);
       } else {
         setStatus((state) => ({ ...state, unsync: true }));
@@ -118,7 +117,6 @@ export const Webplayer: React.FC<Props> = (props) => {
       roomState.webplayer.uri &&
       roomState.webplayer.uri !== currentTrack
     ) {
-      console.log('new song from album');
       emitNextTrack(currentTrack);
       return;
     }
@@ -181,7 +179,6 @@ export const Webplayer: React.FC<Props> = (props) => {
   };
 
   const handlePlayerStateChange = (songState: any) => {
-    console.log(songState);
     if (!songState) {
       setStatus((state) => ({ ...state, isInitializing: true }));
     } else {

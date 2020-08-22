@@ -66,27 +66,29 @@ export class SessionService {
         }
       }
       return sessions;
-    } catch (error) {
-      this.logger.error(`Error during session fetching on: ${error}`);
-      throw new InternalServerErrorException(`Error during session fetching on: ${error}`);
+    } catch (e) {
+      this.logger.error(`Error during session fetching on: ${e}`);
+      throw new InternalServerErrorException(`Error during session fetching on: ${e}`);
     }
   }
 
   async getSessionById(id: string): Promise<Session> {
-    const session: Session | undefined = JSON.parse(await this.redisClient.get(`session:${id}`));
-    if (!session) {
-      throw new BadRequestException(`Session ID ${id} does not exist!`);
+    try {
+      const session: Session = JSON.parse(await this.redisClient.get(`session:${id}`));
+      return session as Session;
+    } catch (e) {
+      this.logger.error(`Session ID ${id} does not exist! Trace: ${e}`);
+      throw new BadRequestException(`Session ID ${id} does not exist! Trace: ${e}`);
     }
-    return session as Session;
   }
 
   async updateSession(session: Session): Promise<Session> {
     try {
       await this.redisClient.set(`session:${session.id}`, JSON.stringify(session), 'KEEPTTL');
       return session;
-    } catch (error) {
-      this.logger.error(`Error during session update on: ${error}`);
-      throw new InternalServerErrorException(`Error during session update on: ${error}`);
+    } catch (e) {
+      this.logger.error(`Error during session update on: ${e}`);
+      throw new InternalServerErrorException(`Error during session update on: ${e}`);
     }
   }
 }
