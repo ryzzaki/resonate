@@ -7,38 +7,38 @@ import {
   MessageBody,
   GatewayMetadata,
   WsException,
+  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { WebplayerService } from './webplayer.service';
 import { Logger, UseGuards, ForbiddenException } from '@nestjs/common';
-import { WsAuthGuard } from '../auth/decorators/websocket.guard';
+import { SessionService } from '../session/session.service';
+import { SpotifyService } from '../spotify/spotify.service';
 import { User } from '../auth/entities/user.entity';
+import { WsAuthGuard } from '../auth/decorators/websocket.guard';
 import { GetUser } from '../auth/decorators/get-user.decorator';
 import { ExecCtxTypeEnum } from '../auth/interfaces/executionContext.enum';
+import { Session } from '../session/interfaces/session.interface';
 import * as _ from 'lodash';
 
 @WebSocketGateway(<GatewayMetadata>{ path: '/v1/webplayer', transports: ['websocket'] })
 export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private logger = new Logger('WebplayerGateway');
 
-  constructor(private readonly webplayerService: WebplayerService) {}
+  constructor(
+    private readonly webplayerService: WebplayerService,
+    private readonly sessionService: SessionService,
+    private readonly spotifyService: SpotifyService
+  ) {}
 
   @WebSocketServer()
   private readonly server: Server;
-  private session: Session = {
-    currentDJ: undefined,
-    startsAt: Date.now(),
-    currentURI: undefined,
-    connectedUsers: [],
-    webplayer: {
-      isPlaying: true,
-      songStartedAt: undefined,
-      songPausedAt: undefined,
-    },
-  };
 
   async handleConnection(socket: Socket) {
     const jwtToken = <string>socket.handshake.query.token.replace('Bearer ', '');
+    const session = await this.getSessionFromSocketQueryId(socket);
+    // IMPORTANT: join the correct room uuid
+    socket.join(session.id);
     const user = _.omit(await this.webplayerService.getUserUsingJwtToken(jwtToken), [
       'email',
       'accessToken',
@@ -46,115 +46,141 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
       'subscription',
       'tokenVer',
     ]);
-    if (!this.session.currentDJ && this.session.connectedUsers.length === 0) {
-      this.session.currentDJ = user;
-      this.session.startsAt = Date.now();
-      this.session.endsAt = Date.now() + 10 * 60 * 1000;
+    if (!session.currentDJ && session.connectedUsers.length === 0) {
+      session.currentDJ = user;
+      session.startsAt = Date.now();
+      session.endsAt = Date.now() + 10 * 60 * 1000;
+      session.webplayer.songStartedAt = Date.now();
     }
-    this.session.connectedUsers.push(user);
-    this.logger.verbose(`A user has connected! Current number of users: ${this.session.connectedUsers.length}`);
-    // Play a default song if the state is fresh
-    this.logger.verbose(
-      `${this.session.currentURI ? `Initiating with current URI: ${this.session.currentURI}` : `No current URI found... playing default`}`
-    );
-    if (!this.session.currentURI) {
-      this.session.currentURI = ['spotify:track:7qEKqBCD2vE5vIBsrUitpD'];
-    }
-    this.server.to(socket.id).emit('receiveCurrentSession', this.session);
-    this.server.emit('receiveUsers', this.session.connectedUsers);
-    // Set the song start after the broadcast, because DJ doesnt need to know when the song starts
-    this.session.webplayer.songStartedAt = Date.now();
+    session.connectedUsers.push(user);
+    this.logger.verbose(`A user has connected! Current number of users: ${session.connectedUsers.length}`);
+    this.server.to(socket.id).emit('receiveCurrentSession', session);
+    this.server.to(session.id).emit('receiveUsers', session.connectedUsers);
+    await this.sessionService.updateSession(session);
   }
 
   async handleDisconnect(socket: Socket) {
     const jwtToken = <string>socket.handshake.query.token.replace('Bearer ', '');
+    const session = await this.getSessionFromSocketQueryId(socket);
     const user = await this.webplayerService.getUserUsingJwtToken(jwtToken);
-    this.session.connectedUsers = this.session.connectedUsers.filter(val => val.id !== user.id);
-    if (user.id === this.session.currentDJ.id) {
-      this.session.connectedUsers.length > 0 ? await this.selectNewDJ(user) : (this.session.currentDJ = undefined);
-      this.server.emit('receiveNewDJ', this.session.currentDJ);
+    session.connectedUsers = session.connectedUsers.filter((val) => val.id !== user.id);
+    if (user.id === session.currentDJ.id) {
+      if (session.connectedUsers.length > 0) {
+        session.currentDJ = _.sample(session.connectedUsers);
+        session.startsAt = Date.now();
+        this.server.to(session.id).emit('receiveNewDJ', session.currentDJ);
+      } else {
+        session.currentDJ = null;
+      }
     }
-    this.logger.verbose(`A user has disconnected! Current number of users: ${this.session.connectedUsers.length}`);
-    this.server.emit('receiveUsers', this.session.connectedUsers);
-    return socket.disconnect();
+    this.logger.verbose(`A user has disconnected! Current number of users: ${session.connectedUsers.length}`);
+    await this.sessionService.updateSession(session);
+    // gracefully exit the room
+    socket.leave(session.id);
+    socket.disconnect();
+    return this.server.to(session.id).emit('receiveUsers', session.connectedUsers);
   }
 
   @UseGuards(WsAuthGuard)
   @SubscribeMessage('getSession')
-  async getSession() {
-    this.server.emit('receiveCurrentSession', this.session);
+  async getSession(@ConnectedSocket() socket: Socket) {
+    const session = await this.getSessionFromSocketQueryId(socket);
+    this.server.to(session.id).emit('receiveCurrentSession', session);
+    await this.sessionService.updateSession(session);
   }
 
   @UseGuards(WsAuthGuard)
   @SubscribeMessage('getUsers')
-  async getUsers() {
-    this.server.emit('receiveUsers', this.session.connectedUsers);
+  async getUsers(@ConnectedSocket() socket: Socket) {
+    const session = await this.getSessionFromSocketQueryId(socket);
+    this.server.to(session.id).emit('receiveUsers', session.connectedUsers);
+    await this.sessionService.updateSession(session);
   }
 
   @UseGuards(WsAuthGuard)
   @SubscribeMessage('getSongStart')
-  async getSongStart() {
-    this.server.emit('receiveCurrentSongStart', this.session.webplayer.songStartedAt);
-  }
-
-  @UseGuards(WsAuthGuard)
-  @SubscribeMessage('getSongPause')
-  async getSongPause() {
-    this.server.emit('receiveCurrentSongPause', this.session.webplayer.songPausedAt);
+  async getSongStart(@ConnectedSocket() socket: Socket) {
+    const session = await this.getSessionFromSocketQueryId(socket);
+    this.server.to(session.id).emit('receiveCurrentSongStart', session.webplayer.songStartedAt);
+    await this.sessionService.updateSession(session);
   }
 
   @UseGuards(WsAuthGuard)
   @SubscribeMessage('rebroadcastSelectedURI')
-  async onURIChange(@MessageBody() uris: string[], @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User) {
-    this.isPermittedForUser(user);
-    this.session.currentURI = uris;
-    this.logger.verbose(`Newly selected URI: ${this.session.currentURI}`);
-    this.server.emit('receiveCurrentURI', this.session.currentURI);
-    this.server.emit('receiveCurrentSongStart', this.session.webplayer.songStartedAt);
-    this.session.webplayer.songStartedAt = Date.now();
+  async onURIChange(@MessageBody() uri: string, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
+    const session = await this.getSessionFromSocketQueryId(socket);
+    this.isPermittedForUser(user, session);
+    if (uri.includes('spotify:album:')) {
+      const { data } = await this.spotifyService.getAlbumTracks(user, uri);
+      session.uris = data.items.map((track: { uri: string }) => track.uri);
+      session.webplayer.uri = session.uris[0];
+    } else {
+      session.uris = [uri];
+      session.webplayer.uri = '';
+    }
+    session.webplayer.songStartedAt = Date.now();
+    this.logger.verbose(`Newly selected URI: ${session.uris}`);
+    this.server.to(session.id).emit('receiveCurrentSession', session);
+    await this.sessionService.updateSession(session);
+  }
+
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage('rebroadcastSongStartedAt')
+  async onSongStartChange(
+    @MessageBody() songStartedAt: number,
+    @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User,
+    @ConnectedSocket() socket: Socket
+  ) {
+    const session = await this.getSessionFromSocketQueryId(socket);
+    this.isPermittedForUser(user, session);
+    session.webplayer.songStartedAt = songStartedAt;
+    this.logger.verbose(`SongStartedAt changed: ${session.webplayer.songStartedAt}`);
+    this.server.to(session.id).emit('receiveCurrentSongStart', session.webplayer.songStartedAt);
+    await this.sessionService.updateSession(session);
   }
 
   @UseGuards(WsAuthGuard)
   @SubscribeMessage('selectNewDJ')
-  async selectNewDJ(@GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User) {
-    this.isPermittedForUser(user);
-    const connectedUsersWithoutDJ = this.session.connectedUsers.filter(val => val.id !== user.id);
-    this.session.currentDJ = _.sample(connectedUsersWithoutDJ);
-    this.session.startsAt = Date.now();
-    this.server.emit('receiveNewDJ', this.session.currentDJ);
+  async selectNewDJ(@GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
+    const session = await this.getSessionFromSocketQueryId(socket);
+    this.isPermittedForUser(user, session);
+    const connectedUsersWithoutDJ = session.connectedUsers.filter((val) => val.id !== user.id);
+    session.currentDJ = _.sample(connectedUsersWithoutDJ);
+    session.startsAt = Date.now();
+    this.server.to(session.id).emit('receiveNewDJ', session.currentDJ);
+    await this.sessionService.updateSession(session);
   }
 
   @UseGuards(WsAuthGuard)
-  @SubscribeMessage('updateWebplayerState')
-  async setWebplayerState(@MessageBody() state: boolean, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User) {
-    this.isPermittedForUser(user);
-    if (!state) {
-      // TODO: there might be a big timing gap between the pause and spotify pausing the song, we need to check if the UX fits well enougth for the technical problem
-      this.session.webplayer.songPausedAt = Date.now();
-    } else {
-      this.session.webplayer.songStartedAt = this.session.webplayer.songStartedAt + (Date.now() - this.session.webplayer.songPausedAt);
-      this.session.webplayer.songPausedAt = undefined;
-    }
-    this.session.webplayer.isPlaying = state;
-    this.server.emit('receiveCurrentWebplayerState', this.session.webplayer.isPlaying);
+  @SubscribeMessage('selectNextTrack')
+  async selectNextTrack(@MessageBody() uri: string, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
+    const session = await this.getSessionFromSocketQueryId(socket);
+    this.isPermittedForUser(user, session);
+    session.webplayer.uri = uri;
+    session.webplayer.songStartedAt = Date.now();
+    this.logger.verbose(`Playing next in queue: ${session.webplayer.uri}`);
+    this.server.to(session.id).emit('receiveCurrentSession', session);
+    await this.sessionService.updateSession(session);
   }
 
-  private isPermittedForUser(user: User) {
-    if (user.id !== this.session.currentDJ.id) {
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage('sendChatMessage')
+  async sendChatMessage(@MessageBody() message: string, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
+    const session = await this.getSessionFromSocketQueryId(socket);
+    const basicUser = _.omit(user, ['email', 'accessToken', 'refreshToken', 'subscription', 'tokenVer']);
+    session.chat.push({ sentAt: Date.now(), sender: basicUser, message });
+    this.server.to(session.id).emit('receiveChatLog', session.chat);
+    await this.sessionService.updateSession(session);
+  }
+
+  async getSessionFromSocketQueryId(socket: Socket): Promise<Session> {
+    const id = <string>socket.handshake.query.sessionId;
+    return await this.sessionService.getSessionById(id);
+  }
+
+  private isPermittedForUser(user: User, session: Session) {
+    if (user.id !== session.currentDJ.id) {
       throw new WsException(ForbiddenException);
     }
   }
-}
-
-interface Session {
-  currentDJ: _.Omit<User, 'email' | 'accessToken' | 'refreshToken' | 'subscription' | 'tokenVer'> | undefined;
-  currentURI: string[] | undefined;
-  connectedUsers: _.Omit<User, 'email' | 'accessToken' | 'refreshToken' | 'subscription' | 'tokenVer'>[];
-  startsAt: number;
-  endsAt?: number;
-  webplayer: {
-    isPlaying: boolean;
-    songStartedAt: number | undefined;
-    songPausedAt: number | undefined;
-  };
 }

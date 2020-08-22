@@ -1,38 +1,38 @@
 import React from 'react';
-import { Search } from '../Search';
+import Session from '../../types/session';
+import { Link } from '@reach/router';
+import { useSignout } from '../../utils/hooks';
+import { Search } from '../Search/Search';
 import { Webplayer } from '../Webplayer/Webplayer';
-import roomStatus from '../../types/roomStatus';
 
 const randomUserIcons = ['🎸', '🎹', '🎺', '🎻', '🪕', '🎷', '🥁', '🎤'];
 
 type Props = {
-  roomStatus: roomStatus;
+  isDJ: boolean;
   spotifyToken: string;
   token: string;
-  isDJ: boolean;
-  handleSignOut: () => void;
-  handleAuthError: () => void;
+  roomState: Session;
   emitSelectNewDJ: () => void;
-  emitPlayState: (state: boolean) => void;
-  emitSearchedURIs: (uris: string[]) => void;
-  emitSliderPos: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  emitSearchedURI: (uri: string) => void;
+  emitSliderPos: (progressMs: number) => void;
+  emitNextTrack: (uri: string) => void;
 };
 
-export const DJPageView: React.FC<Props> = (props) => {
+export const PartyView: React.FC<Props> = (props) => {
   const {
-    roomStatus,
     isDJ,
-    handleSignOut,
-    handleAuthError,
     spotifyToken,
     token,
-    emitSliderPos,
-    emitPlayState,
-    emitSearchedURIs,
+    roomState,
+    emitSearchedURI,
     emitSelectNewDJ,
+    emitSliderPos,
+    emitNextTrack,
   } = props;
 
-  const showDJChangeOption = isDJ && roomStatus.connectedUsers.length > 1;
+  const handleSignOut = useSignout();
+
+  const showDJChangeOption = isDJ && roomState.connectedUsers.length > 1;
 
   return (
     <div className="min-h-screen flex">
@@ -42,11 +42,11 @@ export const DJPageView: React.FC<Props> = (props) => {
         </h1>
         <div className="mt-40 bg-white p-20">
           <ul>
-            {roomStatus?.connectedUsers.map((result: any) => (
+            {roomState?.connectedUsers.map((result: any) => (
               <li key={result.id} className="group flex mb-5">
                 <div className="pt-5">
                   <h5 className="font-semibold text-darkblue w-full whitespace-no-wrap overflow-hidden">
-                    {roomStatus?.currentDJ?.id === result.id ? (
+                    {roomState?.currentDJ?.id === result.id ? (
                       <span className="text-black">
                         [DJ] 🎧 {result.displayName}
                       </span>
@@ -76,6 +76,11 @@ export const DJPageView: React.FC<Props> = (props) => {
         )}
         <ul className="mt-auto flex text-darkblue font-medium px-20 text-14">
           <li className="mr-20">
+            <div className="cursor-pointer">
+              <Link to="/rooms">Rooms</Link>
+            </div>
+          </li>
+          <li className="mr-20">
             <div className="cursor-pointer">Settings</div>
           </li>
           <li className="mr-20">
@@ -96,20 +101,21 @@ export const DJPageView: React.FC<Props> = (props) => {
       </aside>
       <main className="flex-col flex flex-1 bg-darkblue ml-30rem">
         <div className="p-20 pr-40 flex-1">
-          <Search token={token} emitSearchedURIs={emitSearchedURIs} />
+          <Search token={token} emitSearchedURI={emitSearchedURI} />
         </div>
-        <div className="mt-auto sticky bottom-0 bg-darkblue">
-          {roomStatus.currentURI.length ? (
+        <div className="mt-auto bottom-0 sticky bg-darkblue">
+          {roomState.uris.length ? (
             <Webplayer
-              roomStatus={roomStatus}
+              isDJ={isDJ}
               token={token}
               spotifyToken={spotifyToken}
-              handleAuthError={handleAuthError}
-              emitPlayState={emitPlayState}
+              roomState={roomState}
               emitSliderPos={emitSliderPos}
+              emitNextTrack={emitNextTrack}
+              emitSearchedURI={emitSearchedURI}
             />
           ) : (
-            <p>connecting...</p>
+            <p className="text-center text-pink p-20">Connecting...</p>
           )}
         </div>
       </main>

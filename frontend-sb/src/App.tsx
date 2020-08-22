@@ -4,10 +4,13 @@ import { fetchUser } from './utils/api';
 import { Routes } from './routes';
 
 function App() {
-  const [token, setToken] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+
   const [user, setUser] = useState<any>({});
+  const [token, setToken] = useState<string>('');
 
   useEffect(() => {
+    setLoading(true);
     const access_token = localStorage.getItem('access_key');
     async function fetchUserAndRedirect() {
       try {
@@ -17,16 +20,19 @@ function App() {
       } catch (err) {
         console.error(err);
       }
+      setLoading(false);
     }
     if (access_token && window.location.pathname !== '/auth/') {
       fetchUserAndRedirect();
+    } else {
+      setLoading(false);
     }
   }, []);
 
   return (
     <div className="App">
       <AuthContext.Provider value={{ token, setToken, user, setUser }}>
-        <Routes token={token} />
+        {loading ? <p>Loading...</p> : <Routes token={token} />}
       </AuthContext.Provider>
     </div>
   );

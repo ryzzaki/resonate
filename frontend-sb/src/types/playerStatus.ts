@@ -2,9 +2,10 @@ type playerStatus = {
   currentTrack: any;
   isInitializing: boolean;
   paused: boolean;
-  errorType: string;
+  unsync: boolean;
   deviceId: string;
-  position: number;
+  errorType: string;
+  duration: number;
   progressMs: number;
 };
 

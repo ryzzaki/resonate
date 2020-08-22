@@ -33,6 +33,7 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-scripts": "3.4.1",
+    "react-video-seek-slider": "^2.1.2",
     "socket.io-client": "2.3.0",
     "typescript": "3.7.2"
   },
@@ -42,7 +43,7 @@
     "cross-env": "7.0.2",
     "postcss-cli": "7.1.1",
     "prettier": "2.0.4",
-    "tailwindcss": "1.2.0",
+    "tailwindcss": "1.4.0",
     "tslint": "6.1.1",
     "tslint-config-prettier": "1.18.0",
     "tslint-react": "4.2.0"

@@ -1,45 +1,55 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import loadScript from '../../utils/loadScript';
-import roomStatus from '../../types/roomStatus';
+import Session from '../../types/session';
+import playData from '../../types/playData';
 import playerStatus from '../../types/playerStatus';
 import { playSong } from '../../utils/api';
+import debouncer from '../../utils/debouncer';
 import { WebplayerView } from './Webplayer.view';
+import { useRefresh } from '../../utils/hooks';
 
 type Props = {
-  roomStatus: roomStatus;
   spotifyToken: string;
   token: string;
-  handleAuthError: () => void;
-  emitPlayState: (state: boolean) => void;
-  emitSliderPos: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  isDJ: boolean;
+  roomState: Session;
+  emitSliderPos: (progressMs: number) => void;
+  emitNextTrack: (uri: string) => void;
+  emitSearchedURI: (uri: string) => void;
 };
 
 export const Webplayer: React.FC<Props> = (props) => {
   const {
-    roomStatus,
     token,
+    isDJ,
     spotifyToken,
-    handleAuthError,
-    emitPlayState,
+    roomState,
     emitSliderPos,
+    emitNextTrack,
+    emitSearchedURI,
   } = props;
 
   const [status, setStatus] = useState<playerStatus>({
     currentTrack: {},
     isInitializing: true,
     paused: true,
-    errorType: '',
+    unsync: false,
     deviceId: '',
-    position: 0,
+    errorType: '',
+    duration: 0,
     progressMs: 0,
   });
 
   const player = useRef<any>(null);
   const playerInterval = useRef<any>(null);
 
+  const handleRefresh = useRefresh();
+
   // initializing the spotify SDK
   useEffect(() => {
-    if (player.current) {
+    // @ts-ignore
+    if (window.Spotify) {
+      // reiniatizale on spotify token refresh
       initialization();
     } else {
       // @ts-ignore
@@ -48,15 +58,33 @@ export const Webplayer: React.FC<Props> = (props) => {
 
     (async () => await loadScript())();
 
-    return () => player.current.disconnect();
+    // player cleanup
+    return () => {
+      if (player.current) {
+        player.current.removeListener('initialization_error');
+        player.current.removeListener('authentication_error');
+        player.current.removeListener('account_error');
+        player.current.removeListener('playback_error');
+        player.current.removeListener('player_state_changed');
+        player.current.removeListener('ready');
+        player.current.removeListener('not_ready');
+        player.current.disconnect();
+      }
+    };
   }, [spotifyToken]);
 
-  // on URI change from djroom play the new song
+  // on URI and songstart change from djroom, play the the updated song
   useEffect(() => {
     if (status.isInitializing) return;
 
-    play(status.deviceId);
-  }, [roomStatus.currentURI]);
+    play(status.deviceId, {
+      uris: roomState.uris,
+      position_ms: Date.now() - roomState.webplayer.songStartedAt,
+      offset: {
+        uri: roomState.webplayer.uri,
+      },
+    });
+  }, [roomState.uris, roomState.webplayer.songStartedAt]);
 
   // player slider logic, setInterval on play / clearInterval of pause
   useEffect(() => {
@@ -67,21 +95,34 @@ export const Webplayer: React.FC<Props> = (props) => {
     } else {
       playerInterval.current = window.setInterval(handleIntervalUpdate, 100);
     }
+    return () => window.clearInterval(playerInterval.current);
   }, [status.paused]);
 
   useEffect(() => {
-    setStatus((state) => ({
-      ...state,
-      errorType:
-        status.currentTrack.uri &&
-        roomStatus.currentURI[0] !== status.currentTrack.uri
-          ? 'Player out of sync, please reload'
-          : '',
-    }));
+    if (status.isInitializing) return;
+
+    const currentTrack = status.currentTrack.uri;
+
+    if (!roomState.uris.includes(currentTrack)) {
+      if (isDJ) {
+        emitSearchedURI(currentTrack);
+      } else {
+        setStatus((state) => ({ ...state, unsync: true }));
+      }
+      return;
+    }
+
+    if (
+      isDJ &&
+      roomState.webplayer.uri &&
+      roomState.webplayer.uri !== currentTrack
+    ) {
+      emitNextTrack(currentTrack);
+      return;
+    }
   }, [status.currentTrack.uri]);
 
   const initialization = () => {
-    console.log('initializing with: ' + spotifyToken);
     // @ts-ignore
     player.current = new Spotify.Player({
       getOAuthToken: (cb) => {
@@ -109,8 +150,7 @@ export const Webplayer: React.FC<Props> = (props) => {
   const handlePlayerError = ({ message }) => {
     console.error(message);
     if (message === 'Authentication failed') {
-      handleAuthError();
-      return;
+      return handleRefresh();
     }
 
     setStatus((state) => ({
@@ -120,14 +160,17 @@ export const Webplayer: React.FC<Props> = (props) => {
     }));
   };
 
+  // Play the song at the right start on first load
   const handlePlayerReady = ({ device_id }) => {
     console.log('Ready with Device ID', device_id);
-    if (roomStatus.webplayer.isPlaying) {
-      const songStart = roomStatus.webplayer.songStartedAt
-        ? Date.now() - roomStatus.webplayer.songStartedAt
-        : 0;
-      play(device_id, songStart);
-    }
+    // TODO: Test the gap
+    play(device_id, {
+      uris: roomState.uris,
+      position_ms: Date.now() - roomState.webplayer.songStartedAt,
+      offset: {
+        uri: roomState.webplayer.uri,
+      },
+    });
     setStatus((state) => ({
       ...state,
       deviceId: device_id,
@@ -136,62 +179,68 @@ export const Webplayer: React.FC<Props> = (props) => {
   };
 
   const handlePlayerStateChange = (songState: any) => {
-    console.log(songState);
-
     if (!songState) {
       setStatus((state) => ({ ...state, isInitializing: true }));
     } else {
       setStatus((state) => ({
         ...state,
-        progressMs: roomStatus.webplayer.songStartedAt
-          ? songState.position
-          : !songState.position
-          ? 0
-          : state.progressMs,
+        progressMs: songState.position,
+        duration: songState.duration,
         currentTrack: songState.track_window.current_track,
+        nextTracks: songState.track_window?.next_tracks[0],
         paused: songState.paused,
+        unsync: songState.paused ? true : state.unsync,
       }));
     }
   };
 
-  const handleIntervalUpdate = (e: number | undefined) => {
-    setStatus((state) => {
-      const progressMs = state.progressMs + 100;
-      const progressInDuration =
-        state.progressMs / state.currentTrack.duration_ms;
+  const handleIntervalUpdate = (e: number | undefined) =>
+    setStatus((state) => ({ ...state, progressMs: state.progressMs + 100 }));
 
-      // max length = 100 slider input value -> find the (current ms / the track length) * 100
-      return {
-        ...state,
-        progressMs,
-        position: progressInDuration > 100 ? 100 : progressInDuration * 100,
-      };
-    });
+  const debounceSlider = useCallback(
+    debouncer((progressMs: number) => {
+      emitSliderPos(progressMs);
+    }, 100),
+    [status.deviceId]
+  );
+
+  const handleSliderPos = (progressMs: number) => {
+    if (isDJ) {
+      debounceSlider(progressMs);
+    }
   };
 
-  const handlePlayState = (state: boolean) => {
-    if (!status.currentTrack.id) {
-      play(status.deviceId, Date.now() - roomStatus.webplayer.songStartedAt);
+  const handlePlayState = () => {
+    if (status.paused) {
+      handleResync();
     } else {
-      emitPlayState(state);
+      player.current.pause();
     }
   };
 
-  const play = async (deviceId: string, position_ms?: number) => {
-    if (roomStatus.currentURI) {
-      playSong(token, deviceId, {
-        uris: roomStatus.currentURI,
-        position_ms,
-      });
-    }
+  const handleResync = () => {
+    play(status.deviceId, {
+      uris: roomState.uris,
+      position_ms: Date.now() - roomState.webplayer.songStartedAt,
+      offset: {
+        uri: roomState.webplayer.uri,
+      },
+    });
+    setStatus((state) => ({ ...state, unsync: false }));
+  };
+
+  const play = async (deviceId: string, data: playData) => {
+    const { offset, ...rest } = data;
+    playSong(token, deviceId, offset?.uri ? data : rest);
   };
 
   return (
     <WebplayerView
       status={status}
-      paused={status.paused}
-      emitPlayState={handlePlayState}
-      emitSliderPos={emitSliderPos}
+      isDJ={isDJ}
+      handleResync={handleResync}
+      handlePlayState={handlePlayState}
+      handleSliderPos={handleSliderPos}
     />
   );
 };
