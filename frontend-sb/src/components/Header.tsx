@@ -15,7 +15,7 @@ const Header: React.FC<HeaderProps> = (props) => {
             SonicBoom <span className="font-body text-14 md:text-18">v1.0</span>
           </h1>
         </div>
-        <div className="flex hidden md:visible md:flex w-1/2 justify-end m-10 mr-25">
+        <div className="flex md:visible md:flex w-1/2 justify-end m-10 mr-25">
           <a href={`${UrlEnums.API_URL}/auth/spotify`}>
             <button className="bg-transparent hover:bg-verydarkgray text-green hover:text-green border border-green font-heading py-5 px-10 rounded">
               <img

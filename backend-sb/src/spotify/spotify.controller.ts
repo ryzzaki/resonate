@@ -5,6 +5,7 @@ import { SearchQueryDto } from './dto/search-query.dto';
 import { GetUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from '../auth/entities/user.entity';
 import { WebplayerStateEnum } from './interface/webplayerState.enum';
+import { playData } from './interface/playData';
 
 @Controller('/v1/spotify')
 @UseGuards(AuthGuard())
@@ -19,7 +20,7 @@ export class SpotifyController {
 
   @Put('/play')
   @UseGuards(AuthGuard())
-  playSongForDeviceId(@Query('deviceId') deviceId: string, @Body() data: { uris: string[]; position_ms?: number }, @GetUser() user: User) {
+  playSongForDeviceId(@Query('deviceId') deviceId: string, @Body() data: playData, @GetUser() user: User) {
     return this.spotifyService.playSongForDeviceId(deviceId, data, user);
   }
 

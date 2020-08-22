@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { UrlEnums } from '../enums/urls.enum';
+import playData from '../types/playData';
 
 export const fetchUser = async (token: string | null) => {
   return axios.get(`${UrlEnums.API_URL}/auth/private/user`, {
@@ -38,7 +39,7 @@ export const searchSongs = async (token: string, search: string) => {
 export const playSong = async (
   token: string,
   deviceId: string,
-  data: { uris: string[]; position_ms?: number }
+  data: playData
 ) => {
   return axios.put(
     `${UrlEnums.API_URL}/spotify/play?deviceId=${deviceId}`,

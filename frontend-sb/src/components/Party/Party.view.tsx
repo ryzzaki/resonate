@@ -1,37 +1,37 @@
 import React from 'react';
+import Session from '../../types/session';
+import { Link } from '@reach/router';
+import { useSignout } from '../../utils/hooks';
 import { Search } from '../Search/Search';
 import { Webplayer } from '../Webplayer/Webplayer';
-import roomStatus from '../../types/roomStatus';
-import { Link } from '@reach/router';
 
 const randomUserIcons = ['🎸', '🎹', '🎺', '🎻', '🪕', '🎷', '🥁', '🎤'];
 
 type Props = {
-  roomStatus: roomStatus;
+  isDJ: boolean;
   spotifyToken: string;
   token: string;
-  isDJ: boolean;
-  handleSignOut: () => void;
-  handleAuthError: () => void;
+  roomState: Session;
   emitSelectNewDJ: () => void;
+  // emitNextTrack: (uri: string) => void;
   emitSearchedURI: (uri: string) => void;
   emitSliderPos: (progressMs: number) => void;
 };
 
-export const DJPageView: React.FC<Props> = (props) => {
+export const PartyView: React.FC<Props> = (props) => {
   const {
-    roomStatus,
     isDJ,
-    handleSignOut,
-    handleAuthError,
     spotifyToken,
     token,
-    emitSliderPos,
+    roomState,
     emitSearchedURI,
     emitSelectNewDJ,
+    emitSliderPos,
   } = props;
 
-  const showDJChangeOption = isDJ && roomStatus.connectedUsers.length > 1;
+  const handleSignOut = useSignout();
+
+  const showDJChangeOption = isDJ && roomState.connectedUsers.length > 1;
 
   return (
     <div className="min-h-screen flex">
@@ -41,11 +41,11 @@ export const DJPageView: React.FC<Props> = (props) => {
         </h1>
         <div className="mt-40 bg-white p-20">
           <ul>
-            {roomStatus?.connectedUsers.map((result: any) => (
+            {roomState?.connectedUsers.map((result: any) => (
               <li key={result.id} className="group flex mb-5">
                 <div className="pt-5">
                   <h5 className="font-semibold text-darkblue w-full whitespace-no-wrap overflow-hidden">
-                    {roomStatus?.currentDJ?.id === result.id ? (
+                    {roomState?.currentDJ?.id === result.id ? (
                       <span className="text-black">
                         [DJ] 🎧 {result.displayName}
                       </span>
@@ -103,13 +103,12 @@ export const DJPageView: React.FC<Props> = (props) => {
           <Search token={token} emitSearchedURI={emitSearchedURI} />
         </div>
         <div className="mt-auto bottom-0 sticky bg-darkblue">
-          {roomStatus.currentURI.length ? (
+          {roomState.uris.length ? (
             <Webplayer
               isDJ={isDJ}
-              roomStatus={roomStatus}
               token={token}
               spotifyToken={spotifyToken}
-              handleAuthError={handleAuthError}
+              roomState={roomState}
               emitSliderPos={emitSliderPos}
             />
           ) : (

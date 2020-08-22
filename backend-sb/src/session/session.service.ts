@@ -34,11 +34,12 @@ export class SessionService {
       description,
       roomAccess,
       currentDJ: omittedVarUser,
-      currentURI: [_.sample(this.defaultSongURIs)],
+      uris: [_.sample(this.defaultSongURIs)],
       connectedUsers: [],
       startsAt: Date.now(),
       endsAt: Date.now() + 10 * 60 * 1000,
       webplayer: {
+        uri: '',
         songStartedAt: Date.now(),
       },
       chat: [],

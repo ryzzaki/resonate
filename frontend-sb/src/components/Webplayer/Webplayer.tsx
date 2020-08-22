@@ -1,42 +1,38 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import loadScript from '../../utils/loadScript';
-import roomStatus from '../../types/roomStatus';
+import Session from '../../types/session';
+import playData from '../../types/playData';
 import playerStatus from '../../types/playerStatus';
 import { playSong } from '../../utils/api';
-import { WebplayerView } from './Webplayer.view';
 import debouncer from '../../utils/debouncer';
+import { WebplayerView } from './Webplayer.view';
+import { useRefresh } from '../../utils/hooks';
 
 type Props = {
-  roomStatus: roomStatus;
   spotifyToken: string;
   token: string;
   isDJ: boolean;
-  handleAuthError: () => void;
+  roomState: Session;
   emitSliderPos: (progressMs: number) => void;
 };
 
 export const Webplayer: React.FC<Props> = (props) => {
-  const {
-    roomStatus,
-    token,
-    isDJ,
-    spotifyToken,
-    handleAuthError,
-    emitSliderPos,
-  } = props;
+  const { token, isDJ, spotifyToken, roomState, emitSliderPos } = props;
 
   const [status, setStatus] = useState<playerStatus>({
     currentTrack: {},
     isInitializing: true,
     paused: true,
     unsync: false,
-    errorType: '',
     deviceId: '',
+    errorType: '',
     progressMs: 0,
   });
 
   const player = useRef<any>(null);
   const playerInterval = useRef<any>(null);
+
+  const handleRefresh = useRefresh();
 
   // initializing the spotify SDK
   useEffect(() => {
@@ -66,13 +62,18 @@ export const Webplayer: React.FC<Props> = (props) => {
     };
   }, [spotifyToken]);
 
-  // on URI change from djroom play the new song
-  // on songStartedAt change the play position
+  // on URI and songstart change from djroom, play the the updated song
   useEffect(() => {
     if (status.isInitializing) return;
 
-    play(status.deviceId, Date.now() - roomStatus.webplayer.songStartedAt);
-  }, [roomStatus.currentURI, roomStatus.webplayer.songStartedAt]);
+    play(status.deviceId, {
+      uris: roomState.uris,
+      position_ms: Date.now() - roomState.webplayer.songStartedAt,
+      offset: {
+        uri: roomState.webplayer.uri,
+      },
+    });
+  }, [roomState.uris, roomState.webplayer.songStartedAt]);
 
   // player slider logic, setInterval on play / clearInterval of pause
   useEffect(() => {
@@ -86,15 +87,15 @@ export const Webplayer: React.FC<Props> = (props) => {
     return () => window.clearInterval(playerInterval.current);
   }, [status.paused]);
 
-  useEffect(() => {
-    // on track change, check if its not from spotify player
-    setStatus((state) => ({
-      ...state,
-      unsync:
-        status.currentTrack.uri &&
-        roomStatus.currentURI[0] !== status.currentTrack.uri,
-    }));
-  }, [status.currentTrack.uri]);
+  // useEffect(() => {
+  //   // on track change, check if its not from spotify player
+  //   setStatus((state) => ({
+  //     ...state,
+  //     unsync:
+  //       status.currentTrack.uri &&
+  //       roomStatus.uris[0] !== status.currentTrack.uri,
+  //   }));
+  // }, [status.currentTrack.uri]);
 
   const initialization = () => {
     // @ts-ignore
@@ -124,8 +125,7 @@ export const Webplayer: React.FC<Props> = (props) => {
   const handlePlayerError = ({ message }) => {
     console.error(message);
     if (message === 'Authentication failed') {
-      handleAuthError();
-      return;
+      return handleRefresh();
     }
 
     setStatus((state) => ({
@@ -135,11 +135,17 @@ export const Webplayer: React.FC<Props> = (props) => {
     }));
   };
 
+  // Play the song at the right start on first load
   const handlePlayerReady = ({ device_id }) => {
     console.log('Ready with Device ID', device_id);
-    // Play the song at the right start
     // TODO: Test the gap
-    play(device_id, Date.now() - roomStatus.webplayer.songStartedAt);
+    play(device_id, {
+      uris: roomState.uris,
+      position_ms: Date.now() - roomState.webplayer.songStartedAt,
+      offset: {
+        uri: roomState.webplayer.uri,
+      },
+    });
     setStatus((state) => ({
       ...state,
       deviceId: device_id,
@@ -152,13 +158,23 @@ export const Webplayer: React.FC<Props> = (props) => {
     if (!songState) {
       setStatus((state) => ({ ...state, isInitializing: true }));
     } else {
-      setStatus((state) => ({
-        ...state,
-        progressMs: songState.position,
-        currentTrack: songState.track_window.current_track,
-        paused: songState.paused,
-        unsync: songState.paused ? true : state.unsync,
-      }));
+      setStatus((state) => {
+        // if (
+        //   isDJ &&
+        //   state.nextTracks.id === songState.track_window.current_track.id
+        // ) {
+        //   console.log('k');
+        //   emitNextTrack(songState.track_window.current_track.uri);
+        // }
+        return {
+          ...state,
+          progressMs: songState.position,
+          currentTrack: songState.track_window.current_track,
+          nextTracks: songState.track_window?.next_tracks[0],
+          paused: songState.paused,
+          unsync: songState.paused ? true : state.unsync,
+        };
+      });
     }
   };
 
@@ -187,15 +203,19 @@ export const Webplayer: React.FC<Props> = (props) => {
   };
 
   const handleResync = () => {
-    play(status.deviceId, Date.now() - roomStatus.webplayer.songStartedAt);
+    play(status.deviceId, {
+      uris: roomState.uris,
+      position_ms: Date.now() - roomState.webplayer.songStartedAt,
+      offset: {
+        uri: roomState.webplayer.uri,
+      },
+    });
     setStatus((state) => ({ ...state, unsync: false }));
   };
 
-  const play = async (deviceId: string, position_ms?: number) => {
-    playSong(token, deviceId, {
-      uris: roomStatus.currentURI,
-      position_ms,
-    });
+  const play = async (deviceId: string, data: playData) => {
+    const { offset, ...rest } = data;
+    playSong(token, deviceId, offset?.uri ? data : rest);
   };
 
   return (

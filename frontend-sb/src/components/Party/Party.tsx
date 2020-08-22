@@ -3,56 +3,58 @@ import io from 'socket.io-client';
 import { UrlEnums } from '../../enums/urls.enum';
 import { RouteComponentProps, navigate } from '@reach/router';
 import { AuthContext } from '../../context/AuthContext';
-import { refreshUser, signOutUser } from '../../utils/api';
-import roomStatus from '../../types/roomStatus';
-import { DJPageView } from './DJPage.view';
+import Session from '../../types/session';
+import { PartyView } from './Party.view';
+import { RoomAccess } from '../../enums/RoomAccess';
+import { playSong } from '../../utils/api';
 
 type Props = {};
 
-export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
-  const { token, setToken, user, setUser } = useContext(AuthContext);
+export const Party: React.FC<RouteComponentProps<Props>> = () => {
+  const { token, user } = useContext(AuthContext);
 
   const socket = useRef<any>({ current: null });
 
-  const [roomStatus, setRoomStatus] = useState<roomStatus>({
-    sessionId: window.location?.search?.replace('?sessionId=', ''),
+  const [roomState, setRoomState] = useState<Session>({
+    id: window.location?.search?.replace('?sessionId=', ''),
     name: '',
+    roomAccess: RoomAccess.PUBLIC,
     description: '',
     currentDJ: undefined,
     connectedUsers: [],
-    currentURI: [],
+    uris: [],
     startsAt: 0,
     endsAt: 0,
     webplayer: {
+      uri: '',
       songStartedAt: 0,
-      songPausedAt: 0,
     },
   });
 
-  const isDJ = roomStatus.currentDJ?.id === user.id;
+  const isDJ = roomState.currentDJ?.id === user.id;
 
   // initializing socket connection
   useEffect(() => {
-    if (!roomStatus.sessionId) {
+    if (!roomState.id) {
       navigate('/rooms');
     }
 
     socket.current = connectSocket();
-    socket.current.on('connect_error', (err) => console.error(err));
+
+    socket.current.on('connect_error', (err) => {
+      console.error(err);
+    });
     socket.current.on('receiveCurrentSession', (session: any) =>
-      setRoomStatus((state) => ({ state, ...session }))
-    );
-    socket.current.on('receiveCurrentURI', (currentURI: string[]) =>
-      setRoomStatus((state) => ({ ...state, currentURI }))
+      setRoomState((state) => ({ state, ...session }))
     );
     socket.current.on('receiveNewDJ', (currentDJ: any) =>
-      setRoomStatus((state) => ({ ...state, currentDJ }))
+      setRoomState((state) => ({ ...state, currentDJ }))
     );
     socket.current.on('receiveUsers', (connectedUsers: any) =>
-      setRoomStatus((state) => ({ ...state, connectedUsers }))
+      setRoomState((state) => ({ ...state, connectedUsers }))
     );
     socket.current.on('receiveCurrentSongStart', (songStartedAt: number) =>
-      setRoomStatus((state) => ({
+      setRoomState((state) => ({
         ...state,
         webplayer: { ...state.webplayer, songStartedAt },
       }))
@@ -67,7 +69,7 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
       path: '/v1/webplayer',
       query: {
         token: `Bearer ${token}`,
-        sessionId: roomStatus.sessionId,
+        sessionId: roomState.id,
       },
     });
   };
@@ -80,37 +82,18 @@ export const DJPage: React.FC<RouteComponentProps<Props>> = () => {
 
   const emitSelectNewDJ = () => socket.current.emit('selectNewDJ');
 
-  // Refresh token on error, if fail -> signout
-  const handleAuthError = async () => {
-    try {
-      const { data } = await refreshUser(token);
-      setToken(data.accessToken);
-      setUser({ ...user, accessToken: data.spotifyAccessToken });
-      // TODO: missing something here, a trigger to reinitialize the player
-    } catch (err) {
-      console.log(err);
-      handleSignOut();
-    }
-  };
-
-  const handleSignOut = () => {
-    localStorage.removeItem('access_key');
-    setUser({});
-    setToken('');
-    return signOutUser();
-  };
+  // const emitNextTrack = (uri: string) =>
+  //   socket.current.emit('selectNextTrack', uri);
 
   return (
-    <DJPageView
+    <PartyView
       spotifyToken={user.accessToken}
       token={token}
       isDJ={isDJ}
-      handleAuthError={handleAuthError}
-      handleSignOut={handleSignOut}
+      roomState={roomState}
       emitSliderPos={emitSliderPos}
       emitSelectNewDJ={emitSelectNewDJ}
       emitSearchedURI={emitSearchedURI}
-      roomStatus={roomStatus}
     />
   );
 };

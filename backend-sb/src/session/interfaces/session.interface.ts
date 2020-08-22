@@ -9,11 +9,12 @@ export interface Session {
   roomAccess: RoomAccess;
   description: string | undefined;
   currentDJ: BasicUser | null;
-  currentURI: string[] | undefined;
+  uris: string[] | undefined;
   connectedUsers: BasicUser[];
   startsAt: number;
   endsAt: number;
   webplayer: {
+    uri: string | undefined;
     songStartedAt: number | undefined;
   };
   chat: Message[];

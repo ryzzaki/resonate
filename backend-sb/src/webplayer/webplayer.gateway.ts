@@ -112,12 +112,14 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     this.isPermittedForUser(user, session);
     if (uri.includes('spotify:album:')) {
       const { data } = await this.spotifyService.getAlbumTracks(user, uri);
-      session.currentURI = data.items.map((track: { uri: string }) => track.uri);
+      session.uris = data.items.map((track: { uri: string }) => track.uri);
+      session.webplayer.uri = session.uris[0];
     } else {
-      session.currentURI = [uri];
+      session.uris = [uri];
+      session.webplayer.uri = '';
     }
     session.webplayer.songStartedAt = Date.now();
-    this.logger.verbose(`Newly selected URI: ${session.currentURI}`);
+    this.logger.verbose(`Newly selected URI: ${session.uris}`);
     this.server.to(session.id).emit('receiveCurrentSession', session);
     await this.sessionService.updateSession(session);
   }
@@ -148,6 +150,18 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     this.server.to(session.id).emit('receiveNewDJ', session.currentDJ);
     await this.sessionService.updateSession(session);
   }
+
+  // @UseGuards(WsAuthGuard)
+  // @SubscribeMessage('selectNextTrack')
+  // async selectNextTrack(@MessageBody() uri: string, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
+  //   const session = await this.getSessionFromSocketQueryId(socket);
+  //   this.isPermittedForUser(user, session);
+  //   session.webplayer.uri = uri;
+  //   session.webplayer.songStartedAt = Date.now();
+  //   this.logger.verbose(`Playing next in queue: ${session.webplayer.uri}`);
+  //   this.server.to(session.id).emit('receiveCurrentSession', session);
+  //   await this.sessionService.updateSession(session);
+  // }
 
   @UseGuards(WsAuthGuard)
   @SubscribeMessage('sendChatMessage')

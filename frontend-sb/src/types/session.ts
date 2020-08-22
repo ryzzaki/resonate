@@ -1,18 +1,20 @@
 import sessionUser from './sessionUser';
+import { RoomAccess } from '../enums/RoomAccess';
 
-type roomStatus = {
+type session = {
+  id: string;
   name: string;
+  roomAccess: RoomAccess;
   description: string | undefined;
-  sessionId: string;
   currentDJ: sessionUser | undefined;
-  currentURI: string[];
+  uris: string[];
   connectedUsers: sessionUser[];
   startsAt: number;
   endsAt: number;
   webplayer: {
-    songPausedAt: number;
+    uri: string;
     songStartedAt: number;
   };
 };
 
-export default roomStatus;
+export default session;
