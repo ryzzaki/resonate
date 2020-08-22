@@ -87,24 +87,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => (
             <p className="text-16 p-10 m-10">
               <span className="font-heading">Nope!</span> SonicBoom is{' '}
               <span className="font-heading text-green">completely free</span>{' '}
-              to use! It is also{' '}
-              <a
-                className="underline text-blue"
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://github.com/ryzzaki/SonicBoom/blob/master/LICENSE"
-              >
-                MIT licensed
-              </a>{' '}
-              - feel free to contribute to the{' '}
-              <a
-                className="underline text-blue"
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://github.com/ryzzaki/SonicBoom"
-              >
-                open sourced code!
-              </a>
+              to use!
             </p>
           </div>
         </div>
