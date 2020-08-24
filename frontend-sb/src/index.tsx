@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './assets/styles/main.css';
 import './assets/styles/slider.css';
+import './assets/styles/range.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 

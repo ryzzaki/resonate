@@ -5,6 +5,7 @@ export const AuthContext = React.createContext({
   user: {
     accessToken: '',
     id: '',
+    displayName: '',
   },
   setToken: (token: string) => {},
   setUser: (user: any) => {},

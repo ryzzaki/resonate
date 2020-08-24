@@ -32,8 +32,13 @@ const sizes = {
   '38': '38px',
   '40': '40px',
   '60': '60px',
+  '80': '80px',
   '100': '100px',
   '200': '200px',
+  '5rem': '5rem',
+  '10rem': '10rem',
+  '15rem': '15rem',
+  '20rem': '20rem',
   '30rem': '30rem',
 };
 
@@ -42,9 +47,17 @@ const insets = {
   '0': '0',
   '-2': '-2rem',
   '-3': '-3rem',
+  '0.5': '0.5rem',
+  '1': '1rem',
   '3': '3rem',
   '4': '4rem',
   '5': '5rem',
+};
+
+const flex = {
+  '1': '1',
+  '2': '2',
+  auto: 'auto',
 };
 
 module.exports = {
@@ -60,22 +73,13 @@ module.exports = {
     },
     colors: {
       transparent: 'transparent',
-      black: '#000',
-      brownblack: '#242021',
       white: '#fff',
-      gray: '#606060',
-      darkgray: '#1a202c',
-      verydarkgray: '#11141c',
-      green: '#1db954',
-      lightgreen: '#15d600',
-      blue: '#0282eb',
-      // yellow100: '#373416',
-      // yellow200: '##28240f',
-      // yellow300: '#191919',
-      skinpink: '#f8ccd2',
-      darkskinpink: '#e4a7af',
-      pink: '#f453a9',
-      darkblue: '#203264',
+      grey: '#5c595f',
+      greylight: '#77767b',
+      black: '#000',
+      black2: '#100e1c',
+      black2light: '#1d1b28',
+      blue: '#1483ff',
     },
     fontSize: sizes,
     fontFamily: {
@@ -86,9 +90,11 @@ module.exports = {
     },
     extend: {
       spacing: sizes,
-      maxWidth: sizes,
     },
+    maxWidth: sizes,
+    minWidth: sizes,
     inset: insets,
+    flex: flex,
   },
   variants: {
     textColor: ['group-hover'],

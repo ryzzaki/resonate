@@ -52,30 +52,6 @@ export const playSong = async (
   );
 };
 
-export const pauseSong = async (token: string) => {
-  return axios.put(
-    `${UrlEnums.API_URL}/spotify/pause`,
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-};
-
-export const resumeSong = async (token: string) => {
-  return axios.put(
-    `${UrlEnums.API_URL}/spotify/resume`,
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-};
-
 export const fetchSessions = async (token: string | null) => {
   return axios.get(`${UrlEnums.API_URL}/session`, {
     headers: {
