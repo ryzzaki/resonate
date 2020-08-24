@@ -43,17 +43,10 @@ export const WebplayerView: React.FC<Props> = (props) => {
       {status.unsync && (
         <button
           onClick={handleResync}
-          className="absolute left-1/2 -top-3 transform -translate-x-1/2 z-10 mx-auto text-white font-bold text-14 px-20 py-5 uppercase"
+          className="absolute bg-black2 rounded left-1/2 -top-3 transform -translate-x-1/2 z-10 mx-auto text-white font-bold text-14 px-20 py-5 uppercase"
         >
           Player out of sync, resync with dj room
         </button>
-      )}
-      {!isDJ && (
-        <div className="group bg-darkblue bg-opacity-0 hover:bg-opacity-75 flex cursor-not-allowed absolute z-10 w-full h-full">
-          <span className="opacity-0 group-hover:opacity-100 m-auto text-pink font-semibold">
-            Allowed for DJ only
-          </span>
-        </div>
       )}
       <div className="grid grid-cols-3 px-20 bg-black2">
         <div className="flex items-center">

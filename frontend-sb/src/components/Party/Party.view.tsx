@@ -68,6 +68,7 @@ export const PartyView: React.FC<Props> = (props) => {
                 users={roomState.connectedUsers}
                 currentDJ={roomState.currentDJ}
                 isDJ={isDJ}
+                emitSelectNewDJ={emitSelectNewDJ}
               />
             </div>
           </div>

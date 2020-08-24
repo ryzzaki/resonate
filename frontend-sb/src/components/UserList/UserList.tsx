@@ -7,10 +7,11 @@ type Props = {
   users: sessionUser[];
   currentDJ: sessionUser | undefined;
   isDJ: boolean;
+  emitSelectNewDJ: () => void;
 };
 
 export const UserList: React.FC<Props> = (props) => {
-  const { users, currentDJ, isDJ } = props;
+  const { users, currentDJ, isDJ, emitSelectNewDJ } = props;
 
   return (
     <div className="px-20 flex flex-col h-full">
@@ -47,8 +48,11 @@ export const UserList: React.FC<Props> = (props) => {
       </ul>
       {isDJ && users.length > 0 && (
         <div className="flex">
-          <button className="text-grey font-bold text-center bg-black2light hover:bg-white hover:text-black2 px-30 py-5 rounded-full">
-            Leave DJ set
+          <button
+            onClick={emitSelectNewDJ}
+            className="text-grey font-bold text-center bg-black2light hover:bg-white hover:text-black2 px-30 py-5 rounded-full"
+          >
+            Leave DJ seat
           </button>
         </div>
       )}
