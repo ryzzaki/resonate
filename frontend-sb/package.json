@@ -32,6 +32,7 @@
     "postcss-preset-env": "6.7.0",
     "react": "16.13.1",
     "react-dom": "16.13.1",
+    "react-ga": "^3.1.2",
     "react-scripts": "3.4.1",
     "react-video-seek-slider": "^2.1.2",
     "socket.io-client": "2.3.0",
