@@ -49,13 +49,6 @@ export const WebplayerView: React.FC<Props> = (props) => {
           Player out of sync, resync with dj room
         </button>
       )}
-      {!isDJ && (
-        <div className="group bg-darkblue bg-opacity-0 hover:bg-opacity-75 flex cursor-not-allowed absolute z-10 w-full h-full">
-          <span className="opacity-0 group-hover:opacity-100 m-auto text-pink font-semibold">
-            Allowed for DJ only
-          </span>
-        </div>
-      )}
       <VideoSeekSlider
         max={status.currentTrack.duration_ms}
         currentTime={status.progressMs}
