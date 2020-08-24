@@ -3,6 +3,7 @@ import { VideoSeekSlider } from 'react-video-seek-slider';
 import playerStatus from '../../types/playerStatus';
 import { ReactComponent as Play } from '../../assets/icons/play.svg';
 import { ReactComponent as Pause } from '../../assets/icons/pause.svg';
+import { ReactComponent as VolumeIcon } from '../../assets/icons/volume.svg';
 
 type Props = {
   isDJ: boolean;
@@ -66,7 +67,7 @@ export const WebplayerView: React.FC<Props> = (props) => {
             <h3 className="text-white font-bold w-full whitespace-no-wrap overflow-hidden">
               {status.currentTrack.name}
             </h3>
-            <ul className="text-14 text-greylight flex leading-snug ">
+            <ul className="text-14 text-grey flex leading-snug ">
               {status.currentTrack.artists?.map((artist) => (
                 <li key={artist.name} className="pr-15">
                   {artist.name}
@@ -97,7 +98,10 @@ export const WebplayerView: React.FC<Props> = (props) => {
           </div>
         </div>
         <div className="flex justify-center">
-          <input type="range" value={status.volume} onChange={handleVolume} />
+          <div className="flex items-center">
+            <VolumeIcon className="fill-current text-grey mr-20" />
+            <input type="range" value={status.volume} onChange={handleVolume} />
+          </div>
         </div>
       </div>
     </div>
