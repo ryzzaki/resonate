@@ -81,9 +81,6 @@ export const PartyView: React.FC<Props> = (props) => {
             </div>
           </li>
           <li className="mr-20">
-            <div className="cursor-pointer">Settings</div>
-          </li>
-          <li className="mr-20">
             <a
               className="cursor-pointer"
               target="_blank"
