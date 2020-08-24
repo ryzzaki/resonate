@@ -87,9 +87,9 @@ export const PartyView: React.FC<Props> = (props) => {
             <a
               className="cursor-pointer"
               target="_blank"
-              href="https://github.com/ryzzaki/SonicBoom/issues"
+              href="https://docs.google.com/forms/d/e/1FAIpQLSd0CSe90QMNGb0BrsQzpfZVfuiZRlhHKr3NpTfsP71Qpb54Xg/viewform?usp=sf_link"
             >
-              Report a bug
+              Send a feedback
             </a>
           </li>
           <li>
