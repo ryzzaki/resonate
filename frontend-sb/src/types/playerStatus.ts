@@ -7,6 +7,7 @@ type playerStatus = {
   errorType: string;
   duration: number;
   progressMs: number;
+  volume: number;
 };
 
 export default playerStatus;

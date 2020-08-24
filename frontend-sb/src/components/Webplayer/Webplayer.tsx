@@ -38,6 +38,7 @@ export const Webplayer: React.FC<Props> = (props) => {
     errorType: '',
     duration: 0,
     progressMs: 0,
+    volume: 0,
   });
 
   const player = useRef<any>(null);
@@ -175,6 +176,7 @@ export const Webplayer: React.FC<Props> = (props) => {
       ...state,
       deviceId: device_id,
       isInitializing: false,
+      volume: player.current._options.volume * 100,
     }));
   };
 
@@ -229,6 +231,12 @@ export const Webplayer: React.FC<Props> = (props) => {
     setStatus((state) => ({ ...state, unsync: false }));
   };
 
+  const handleVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const volume = Number(e.target.value);
+    setStatus((state) => ({ ...state, volume }));
+    player.current.setVolume(volume / 100);
+  };
+
   const play = async (deviceId: string, data: playData) => {
     const { offset, ...rest } = data;
     playSong(token, deviceId, offset?.uri ? data : rest);
@@ -241,6 +249,7 @@ export const Webplayer: React.FC<Props> = (props) => {
       handleResync={handleResync}
       handlePlayState={handlePlayState}
       handleSliderPos={handleSliderPos}
+      handleVolume={handleVolume}
     />
   );
 };

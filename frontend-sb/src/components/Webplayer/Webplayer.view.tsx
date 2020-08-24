@@ -3,6 +3,7 @@ import { VideoSeekSlider } from 'react-video-seek-slider';
 import playerStatus from '../../types/playerStatus';
 import { ReactComponent as Play } from '../../assets/icons/play.svg';
 import { ReactComponent as Pause } from '../../assets/icons/pause.svg';
+import { ReactComponent as VolumeIcon } from '../../assets/icons/volume.svg';
 
 type Props = {
   isDJ: boolean;
@@ -10,6 +11,7 @@ type Props = {
   handleResync: () => void;
   handlePlayState: () => void;
   handleSliderPos: (progressMs: number) => void;
+  handleVolume: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export const WebplayerView: React.FC<Props> = (props) => {
@@ -19,6 +21,7 @@ export const WebplayerView: React.FC<Props> = (props) => {
     handlePlayState,
     status,
     handleSliderPos,
+    handleVolume,
   } = props;
 
   if (status.isInitializing)
@@ -88,7 +91,12 @@ export const WebplayerView: React.FC<Props> = (props) => {
             </button>
           )}
         </div>
-        <div></div>
+        <div className="flex justify-center">
+          <div className="flex items-center">
+            <VolumeIcon className="fill-current text-skinpink mr-20" />
+            <input type="range" value={status.volume} onChange={handleVolume} />
+          </div>
+        </div>
       </div>
     </div>
   );
