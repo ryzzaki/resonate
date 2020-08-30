@@ -50,7 +50,7 @@ export const Rooms: React.FC<Props> = (props) => {
     setModal(false);
   };
   return (
-    <div className="bg-darkblue min-h-screen flex flex-col relative">
+    <div className="bg-black2 min-h-screen flex flex-col relative">
       {modal && (
         <>
           <div
@@ -59,19 +59,19 @@ export const Rooms: React.FC<Props> = (props) => {
           />
           <form
             onSubmit={handleSubmit}
-            className="absolute left-1/2 top-1/2 transform -translate-y-1/2 -translate-x-1/2 bg-white flex flex-col w-30rem p-30"
+            className="bg-black2light py-40 rounded-lg shadow-xs absolute left-1/2 top-1/2 transform -translate-y-1/2 -translate-x-1/2 bg-white flex flex-col w-30rem p-30"
           >
             <input
               required
               name="name"
               onChange={handleInput}
-              className="mb-20 text-30"
+              className="mb-20 text-20 bg-black2lighter rounded p-10 text-white placeholder-greylight"
               placeholder="Name"
             />
             <input
               name="description"
               onChange={handleInput}
-              className="mb-20 text-30"
+              className="mb-20 text-20 bg-black2lighter rounded p-10 text-white placeholder-greylight"
               placeholder="Description"
             />
             <label>
@@ -81,12 +81,14 @@ export const Rooms: React.FC<Props> = (props) => {
                 checked={form.public}
                 onChange={handleCheck}
               />
-              <span className="pl-5">{form.public ? 'Public' : 'Private'}</span>
+              <span className="pl-10 text-greylight text-20">
+                {form.public ? 'Public' : 'Private'}
+              </span>
             </label>
             <button
               type="submit"
-              className="bg-pink text-white font-bold text-14
-                px-20 py-5 rounded-full uppercase"
+              className="bg-green text-white font-bold text-18
+                p-10 px-20 rounded-full uppercase"
             >
               Create
             </button>
@@ -94,10 +96,10 @@ export const Rooms: React.FC<Props> = (props) => {
         </>
       )}
       <nav className="bg-skinpink flex p-20">
-        <h1 className="text-30 text-darkblue font-bold">Rooms</h1>
+        <h1 className="text-30 text-white font-bold">Explore rooms</h1>
         <button
           onClick={() => setModal(true)}
-          className="ml-auto bg-pink text-white font-bold text-14
+          className="ml-auto bg-green text-white font-bold text-14
                 px-20 py-5 rounded-full uppercase"
         >
           Create a room
@@ -111,16 +113,16 @@ export const Rooms: React.FC<Props> = (props) => {
           <Link
             key={room.id}
             to={`/party?sessionId=${room.id}`}
-            className="bg-skinpink group hover:bg-pink p-20 w-200 cursor-pointer m-20"
+            className="bg-black2light rounded-lg group group hover:bg-white p-20 w-200 cursor-pointer m-20"
           >
             <img
-              className="pb-20"
+              className="rounded-lg"
               src="https://i.scdn.co/image/ab67706f00000002bf4545e8d7e6b7e377980995"
             />
-            <h4 className="font-bold text-30 pb-10 text-darkblue">
+            <h4 className="group-hover:text-black font-bold text-24 pt-20 pb-10 text-white">
               {room.name}
             </h4>
-            <p className="group-hover:text-darkblue text-pink">
+            <p className="group-hover:text-darkblue text-greylight">
               {room.description}
             </p>
           </Link>

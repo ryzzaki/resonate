@@ -1,6 +1,6 @@
 import React from 'react';
 import { Router, Redirect } from '@reach/router';
-import { LandingPage } from './components/LandingPage';
+import { LandingPage } from './components/Landing/LandingPage';
 import { RedirectPage } from './components/RedirectPage';
 import { Party } from './components/Party/Party';
 import { Rooms } from './components/Rooms';
@@ -9,19 +9,42 @@ type RouterProps = {
   component: React.FC;
   path: string;
   allowed: boolean;
+  location?: any;
 };
 
 const ProtectedRoute: React.FC<RouterProps> = ({
   component: Component,
   allowed,
   ...props
-}) => (allowed ? <Component {...props} /> : <Redirect to="/" noThrow />);
+}) => {
+  if (allowed) {
+    return <Component {...props} />;
+  } else {
+    if (props.path === '/party') {
+      localStorage.removeItem('redirect_url');
+      localStorage.setItem('redirect_url', `/party${props.location.search}`);
+    }
+    return <Redirect to="/" noThrow />;
+  }
+};
 
 const PublicRoute: React.FC<RouterProps> = ({
   component: Component,
   allowed,
   ...props
-}) => (allowed ? <Component {...props} /> : <Redirect to="/rooms" noThrow />);
+}) => {
+  if (allowed) {
+    return <Component {...props} />;
+  } else {
+    const redirectUrl = localStorage.getItem('redirect_url');
+    return (
+      <Redirect
+        to={props.path === '/auth' && redirectUrl ? redirectUrl : '/rooms'}
+        noThrow
+      />
+    );
+  }
+};
 
 type Props = {
   token?: string;

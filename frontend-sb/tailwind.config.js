@@ -81,8 +81,10 @@ module.exports = {
       black: '#000',
       black2: '#100e1c',
       black2light: '#1d1b28',
+      black2lighter: '#393746',
       blue: '#1483ff',
       pink: '#f3a0bd',
+      green: '#24b176',
     },
     fontSize: sizes,
     fontFamily: {
@@ -100,7 +102,7 @@ module.exports = {
     flex: flex,
   },
   variants: {
-    textColor: ['group-hover'],
+    textColor: ['group-hover', 'hover'],
     opacity: ['group-hover'],
   },
   plugins: [],

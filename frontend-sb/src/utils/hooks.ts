@@ -19,12 +19,10 @@ export const useRefresh = () => {
 };
 
 export const useSignout = () => {
-  const { setToken, setUser } = useContext(AuthContext);
   function signout() {
     localStorage.removeItem('access_key');
-    setUser({});
-    setToken('');
-    return signOutUser;
+    localStorage.removeItem('redirect_url');
+    signOutUser();
   }
 
   return signout;

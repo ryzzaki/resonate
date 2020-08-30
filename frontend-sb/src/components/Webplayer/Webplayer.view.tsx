@@ -48,13 +48,7 @@ export const WebplayerView: React.FC<Props> = (props) => {
           Player out of sync, resync with dj room
         </button>
       )}
-      <VideoSeekSlider
-        max={status.currentTrack.duration_ms}
-        currentTime={status.progressMs}
-        onChange={handleSliderPos}
-        hideHoverTime
-      />
-      <div className="grid grid-cols-3 p-10">
+      <div className="grid grid-cols-3 px-20 bg-black2">
         <div className="flex items-center">
           <div className="flex-shrink-0 mr-20">
             <img
@@ -99,12 +93,6 @@ export const WebplayerView: React.FC<Props> = (props) => {
         <div className="flex justify-center">
           <div className="flex items-center">
             <VolumeIcon className="fill-current text-grey mr-20" />
-            <input type="range" value={status.volume} onChange={handleVolume} />
-          </div>
-        </div>
-        <div className="flex justify-center">
-          <div className="flex items-center">
-            <VolumeIcon className="fill-current text-skinpink mr-20" />
             <input type="range" value={status.volume} onChange={handleVolume} />
           </div>
         </div>
