@@ -77,4 +77,19 @@ export class SpotifyService {
       });
     return res;
   }
+
+  async getPlaylistTracks(user: User, uri: string) {
+    const url = `https://api.spotify.com/v1/playlists/${uri.replace('spotify:playlist:', '')}/tracks`;
+    const res = await axios
+      .get(url, {
+        headers: {
+          Authorization: `Bearer ${user.accessToken}`,
+        },
+      })
+      .catch((e) => {
+        this.logger.error(`Unable to authorize Spotify client on ${e} using the current access token!`);
+        throw new BadRequestException(`Unable to authorize Spotify client using the current access token!`);
+      });
+    return res;
+  }
 }

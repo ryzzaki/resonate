@@ -77,8 +77,8 @@ export class SessionService {
       const session: Session = JSON.parse(await this.redisClient.get(`session:${id}`));
       return session as Session;
     } catch (e) {
-      this.logger.error(`Session ID ${id} does not exist! Trace: ${e}`);
-      throw new BadRequestException(`Session ID ${id} does not exist! Trace: ${e}`);
+      this.logger.error(`Error during session fetching on: ${e}`);
+      throw new InternalServerErrorException(`Error during session fetching on: ${e}`);
     }
   }
 

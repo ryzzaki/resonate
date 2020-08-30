@@ -69,7 +69,7 @@ export const WebplayerView: React.FC<Props> = (props) => {
             </ul>
           </div>
         </div>
-        <div className="flex flex-col items-center pt-20">
+        <div className="flex flex-col items-center pt-10">
           <div>
             {status.paused ? (
               <button onClick={handlePlayState}>

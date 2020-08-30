@@ -3,8 +3,9 @@ type playerStatus = {
   isInitializing: boolean;
   paused: boolean;
   unsync: boolean;
-  deviceId: string;
-  errorType: string;
+  contextUri: string | null;
+  deviceId: string | null;
+  errorType: string | null;
   duration: number;
   progressMs: number;
   volume: number;

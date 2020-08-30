@@ -11,7 +11,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { WebplayerService } from './webplayer.service';
-import { Logger, UseGuards, ForbiddenException } from '@nestjs/common';
+import { Logger, UseGuards, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { SessionService } from '../session/session.service';
 import { SpotifyService } from '../spotify/spotify.service';
 import { User } from '../auth/entities/user.entity';
@@ -107,15 +107,23 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
 
   @UseGuards(WsAuthGuard)
   @SubscribeMessage('rebroadcastSelectedURI')
-  async onURIChange(@MessageBody() uri: string, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
+  async onURIChange(
+    @MessageBody() payload: { uri: string; startUri?: string },
+    @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User,
+    @ConnectedSocket() socket: Socket
+  ) {
     const session = await this.getSessionFromSocketQueryId(socket);
     this.isPermittedForUser(user, session);
-    if (uri.includes('spotify:album:')) {
-      const { data } = await this.spotifyService.getAlbumTracks(user, uri);
+    if (payload.uri.includes('spotify:album:')) {
+      const { data } = await this.spotifyService.getAlbumTracks(user, payload.uri);
       session.uris = data.items.map((track: { uri: string }) => track.uri);
       session.webplayer.uri = session.uris[0];
+    } else if (payload.uri.includes('spotify:playlist:')) {
+      const { data } = await this.spotifyService.getPlaylistTracks(user, payload.uri);
+      session.uris = data.items.map((i: any) => i.track.uri);
+      session.webplayer.uri = session.uris[0];
     } else {
-      session.uris = [uri];
+      session.uris = [payload.uri];
       session.webplayer.uri = '';
     }
     session.webplayer.songStartedAt = Date.now();
@@ -175,7 +183,14 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
 
   async getSessionFromSocketQueryId(socket: Socket): Promise<Session> {
     const id = <string>socket.handshake.query.sessionId;
-    return await this.sessionService.getSessionById(id);
+    const session = await this.sessionService.getSessionById(id);
+    if (!session) {
+      this.logger.error(`Session ID ${id} does not exist!`);
+      socket.emit('connect_error', `Session ID ${id} does not exist!`);
+      throw new BadRequestException();
+    } else {
+      return session;
+    }
   }
 
   private isPermittedForUser(user: User, session: Session) {

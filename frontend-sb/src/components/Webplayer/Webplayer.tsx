@@ -34,8 +34,9 @@ export const Webplayer: React.FC<Props> = (props) => {
     isInitializing: true,
     paused: true,
     unsync: false,
-    deviceId: '',
-    errorType: '',
+    contextUri: null,
+    deviceId: null,
+    errorType: null,
     duration: 0,
     progressMs: 0,
     volume: 0,
@@ -99,29 +100,19 @@ export const Webplayer: React.FC<Props> = (props) => {
     return () => window.clearInterval(playerInterval.current);
   }, [status.paused]);
 
+  // logic for setting songs from spotify, propagate to the dj room
   useEffect(() => {
     if (status.isInitializing) return;
 
-    const currentTrack = status.currentTrack.uri;
-
-    if (!roomState.uris.includes(currentTrack)) {
-      if (isDJ) {
-        emitSearchedURI(currentTrack);
-      } else {
-        setStatus((state) => ({ ...state, unsync: true }));
-      }
-      return;
+    if (isDJ) {
+      console.log('is dj, changed');
+      // emitSearchedURI(status.contextUri);
+      console.log(status.contextUri);
+    } else {
+      console.log('not dj, changed');
+      setStatus((state) => ({ ...state, unsync: true }));
     }
-
-    if (
-      isDJ &&
-      roomState.webplayer.uri &&
-      roomState.webplayer.uri !== currentTrack
-    ) {
-      emitNextTrack(currentTrack);
-      return;
-    }
-  }, [status.currentTrack.uri]);
+  }, [status.contextUri]);
 
   const initialization = () => {
     // @ts-ignore
@@ -181,6 +172,7 @@ export const Webplayer: React.FC<Props> = (props) => {
   };
 
   const handlePlayerStateChange = (songState: any) => {
+    console.log(songState);
     if (!songState) {
       setStatus((state) => ({ ...state, isInitializing: true }));
     } else {
@@ -188,8 +180,8 @@ export const Webplayer: React.FC<Props> = (props) => {
         ...state,
         progressMs: songState.position,
         duration: songState.duration,
+        contextUri: songState.context.uri,
         currentTrack: songState.track_window.current_track,
-        nextTracks: songState.track_window?.next_tracks[0],
         paused: songState.paused,
         unsync: songState.paused ? true : state.unsync,
       }));
@@ -237,7 +229,7 @@ export const Webplayer: React.FC<Props> = (props) => {
     player.current.setVolume(volume / 100);
   };
 
-  const play = async (deviceId: string, data: playData) => {
+  const play = async (deviceId: string | null, data: playData) => {
     const { offset, ...rest } = data;
     playSong(token, deviceId, offset?.uri ? data : rest);
   };

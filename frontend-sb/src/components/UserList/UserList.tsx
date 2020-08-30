@@ -22,6 +22,16 @@ export const UserList: React.FC<Props> = (props) => {
           {currentDJ?.displayName}
         </h5>
       </div>
+      {isDJ && users.length > 1 && (
+        <div className="flex mb-20">
+          <button
+            onClick={emitSelectNewDJ}
+            className="text-grey font-bold text-center bg-black2light hover:bg-white hover:text-black2 px-30 py-5 rounded-full"
+          >
+            Leave DJ seat
+          </button>
+        </div>
+      )}
       <h3 className="text-greylight font-bold uppercase text-14">
         Users
         <span>({users.length})</span>
@@ -46,16 +56,6 @@ export const UserList: React.FC<Props> = (props) => {
             </li>
           ))}
       </ul>
-      {isDJ && users.length > 0 && (
-        <div className="flex">
-          <button
-            onClick={emitSelectNewDJ}
-            className="text-grey font-bold text-center bg-black2light hover:bg-white hover:text-black2 px-30 py-5 rounded-full"
-          >
-            Leave DJ seat
-          </button>
-        </div>
-      )}
     </div>
   );
 };

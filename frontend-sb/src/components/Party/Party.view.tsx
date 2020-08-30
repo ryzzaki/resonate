@@ -43,10 +43,11 @@ export const PartyView: React.FC<Props> = (props) => {
         </div>
         <div className="flex-1 flex flex-col">
           <div className="p-20 px-40 flex items-center text-grey">
-            <div>
+            <div className="flex items-baseline">
               <h2 className="text-30 font-bold text-greylight">
                 {roomState.name}
               </h2>
+              <p className="pl-15">{roomState.description}</p>
             </div>
             <div
               className="mr-20 ml-auto cursor-pointer"
@@ -54,9 +55,9 @@ export const PartyView: React.FC<Props> = (props) => {
             >
               Logout
             </div>
-            <div className="inline-flex pr-20 items-center bg-black2light rounded-full">
-              <AccountIcon className="fill-current text-grey w-40 h-40" />
-              <span className="pl-10">{user.displayName}</span>
+            <div className="inline-flex pr-20 items-center border-2 border-black2light rounded-full">
+              <AccountIcon className="fill-current text-grey w-30 h-30" />
+              <span className="pl-5">{user.displayName}</span>
             </div>
           </div>
           <div className="flex flex-1">

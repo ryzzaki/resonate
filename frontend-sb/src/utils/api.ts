@@ -38,7 +38,7 @@ export const searchSongs = async (token: string, search: string) => {
 
 export const playSong = async (
   token: string,
-  deviceId: string,
+  deviceId: string | null,
   data: playData
 ) => {
   return axios.put(
