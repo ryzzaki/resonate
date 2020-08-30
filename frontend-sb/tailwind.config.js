@@ -34,6 +34,11 @@ const sizes = {
   '60': '60px',
   '100': '100px',
   '200': '200px',
+  '250': '250px',
+  '300': '300px',
+  '350': '350px',
+  '500': '500px',
+  '700': '700px',
   '30rem': '30rem',
 };
 
@@ -57,6 +62,7 @@ module.exports = {
       md: '768px',
       lg: '1024px',
       xl: '1280px',
+      xxl: '1980px',
     },
     colors: {
       transparent: 'transparent',
@@ -76,6 +82,7 @@ module.exports = {
       darkskinpink: '#e4a7af',
       pink: '#f453a9',
       darkblue: '#203264',
+      spotifyGreen: '#58b899',
     },
     fontSize: sizes,
     fontFamily: {
