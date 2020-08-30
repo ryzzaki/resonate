@@ -6,8 +6,8 @@ import { Queue } from '../Queue/Queue';
 import { UserList } from '../UserList/UserList';
 import { AuthContext } from '../../context/AuthContext';
 import { useSignout } from '../../utils/hooks';
-import { UrlEnums } from '../../enums/urls.enum';
 import { ReactComponent as AccountIcon } from '../../assets/icons/account.svg';
+import { Link } from '@reach/router';
 
 type Props = {
   isDJ: boolean;
@@ -50,11 +50,17 @@ export const PartyView: React.FC<Props> = (props) => {
               </h2>
               <p className="pl-15">{roomState.description}</p>
             </div>
-            <div
+            <Link
               className="mr-20 ml-auto cursor-pointer hover:text-white"
+              to="/rooms"
+            >
+              Rooms
+            </Link>
+            <div
+              className="mr-20 cursor-pointer hover:text-white"
               onClick={handleSignOut}
             >
-              <a href={`${UrlEnums.API_URL}/auth/signout`}>Sign Out</a>
+              Sign Out
             </div>
             <div className="inline-flex pr-20 items-center border-2 border-black2light rounded-full">
               <AccountIcon className="fill-current text-grey w-30 h-30" />

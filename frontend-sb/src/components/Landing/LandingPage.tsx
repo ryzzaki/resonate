@@ -108,7 +108,23 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
               </div>
             </div>
           </section>
-          <section className="py-80">
+          <section className="py-80 ">
+            <div className="bg-green rounded-lg px-40 py-80 flex">
+              <h4 className="text-40 leading-normal font-bold mr-100">
+                Kickstarter
+              </h4>
+              <div className="flex-1">
+                <div className="mb-40 flex flex-col">
+                  <p className="text-20 font-medium">"Give us our soul"</p>
+                  <span className="ml-80">Cuong Nguyen, CEO of SonicBoom</span>
+                </div>
+                <button className="bg-white text-green font-bold text-20 p-10 px-30 rounded-full">
+                  Support us on Kickstarter
+                </button>
+              </div>
+            </div>
+          </section>
+          <section className="py-80" id="rooms">
             <h2 className="text-center text-40 font-bold mb-40">
               Explore Rooms{' '}
             </h2>

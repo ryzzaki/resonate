@@ -1,27 +1,53 @@
 import React from 'react';
 import { ReactComponent as SpotifyLogo } from '../../assets/icons/spotifyLogo.svg';
 import { UrlEnums } from '../../enums/urls.enum';
+import { useSignout } from '../../utils/hooks';
 
 interface HeaderProps {
-  title?: string;
+  noLogin?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = (props) => {
+  const { noLogin } = props;
+
+  const handleSignout = useSignout();
+
   return (
-    <header className="py-20 sticky top-0 bg-black2 bg-opacity-75">
+    <header className="mt-20 py-20 sticky top-0 bg-black2 bg-opacity-75">
       <div className="flex items-center">
-        <div className="flex-auto w-auto md:w-1/2 text-center md:text-left">
-          <h1 className="font-logoHeading text-34 text-white">SB</h1>
-        </div>
-        <div className="flex md:visible md:flex w-1/2 justify-end m-10 mr-25">
-          <a
-            href={`${UrlEnums.API_URL}/auth/spotify`}
-            className="bg-black2light hover:bg-white  hover:text-black inline-flex items-center font-semibold p-10 pr-20 rounded-full"
-          >
-            <SpotifyLogo className="w-25 h-25 mr-10" />
-            Login with Spotify
-          </a>
-        </div>
+        <div className="font-logoHeading text-34 text-white">SB</div>
+        <ul className="ml-auto flex items-center">
+          {!noLogin && (
+            <li className="mr-30">
+              <a href="#rooms">Rooms</a>
+            </li>
+          )}
+          <li className="mr-30">
+            <a>Support us</a>
+          </li>
+          <li className="mr-30">
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSd0CSe90QMNGb0BrsQzpfZVfuiZRlhHKr3NpTfsP71Qpb54Xg/viewform?usp=sf_link">
+              Bugs/Feedback
+            </a>
+          </li>
+          {!noLogin ? (
+            <li>
+              <a
+                href={`${UrlEnums.API_URL}/auth/spotify`}
+                className="bg-black2light hover:bg-white  hover:text-black inline-flex items-center font-semibold p-10 pr-20 rounded-full"
+              >
+                <SpotifyLogo className="w-25 h-25 mr-10" />
+                Login with Spotify
+              </a>
+            </li>
+          ) : (
+            <li>
+              <div className="cursor-pointer" onClick={handleSignout}>
+                Sign out
+              </div>
+            </li>
+          )}
+        </ul>
       </div>
     </header>
   );
