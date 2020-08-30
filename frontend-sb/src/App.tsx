@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AuthContext } from './context/AuthContext';
 import { fetchUser } from './utils/api';
 import { Routes } from './routes';
-import { initGA } from './utils/analytics';
+import { initGA } from './utils/ga';
 
 function App() {
   const [loading, setLoading] = useState(true);
