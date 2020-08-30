@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { refreshUser, signOutUser } from '../utils/api';
+import { refreshUser } from '../utils/api';
 
 export const useRefresh = () => {
   const { token, setToken, setUser } = useContext(AuthContext);
@@ -22,7 +22,6 @@ export const useSignout = () => {
   function signout() {
     localStorage.removeItem('access_key');
     localStorage.removeItem('redirect_url');
-    signOutUser();
   }
 
   return signout;

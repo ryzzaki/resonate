@@ -6,6 +6,7 @@ import { Queue } from '../Queue/Queue';
 import { UserList } from '../UserList/UserList';
 import { AuthContext } from '../../context/AuthContext';
 import { useSignout } from '../../utils/hooks';
+import { UrlEnums } from '../../enums/urls.enum';
 import { ReactComponent as AccountIcon } from '../../assets/icons/account.svg';
 
 type Props = {
@@ -50,10 +51,10 @@ export const PartyView: React.FC<Props> = (props) => {
               <p className="pl-15">{roomState.description}</p>
             </div>
             <div
-              className="mr-20 ml-auto cursor-pointer"
+              className="mr-20 ml-auto cursor-pointer hover:text-white"
               onClick={handleSignOut}
             >
-              Logout
+              <a href={`${UrlEnums.API_URL}/auth/signout`}>Sign Out</a>
             </div>
             <div className="inline-flex pr-20 items-center border-2 border-black2light rounded-full">
               <AccountIcon className="fill-current text-grey w-30 h-30" />

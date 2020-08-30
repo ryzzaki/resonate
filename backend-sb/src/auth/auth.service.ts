@@ -39,7 +39,8 @@ export class AuthService {
       .clearCookie('refresh_tkn_v1', {
         domain: cookieConfig.domain,
       })
-      .redirect(String(UrlEnums.BASE_URL));
+      .status(301)
+      .redirect(`${UrlEnums.BASE_URL}`);
   }
 
   async authenticateOnCallback(userData: UserDataInterface, accessToken: string, refreshToken: string): Promise<User> {

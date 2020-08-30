@@ -19,7 +19,7 @@ export const Header: React.FC<HeaderProps> = (props) => {
             className="bg-black2light hover:bg-white  hover:text-black inline-flex items-center font-semibold p-10 pr-20 rounded-full"
           >
             <SpotifyLogo className="w-25 h-25 mr-10" />
-            Login with spotify
+            Login with Spotify
           </a>
         </div>
       </div>

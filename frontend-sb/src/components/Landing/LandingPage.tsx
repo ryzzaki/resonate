@@ -58,7 +58,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
                 className="bg-black2light hover:bg-white  hover:text-black inline-flex items-center font-semibold text-18 p-15 pr-30 rounded-full"
               >
                 <SpotifyLogo className="w-35 h-35 mr-20" />
-                Login with spotify
+                Login with Spotify
               </a>
               <p className="text-greylight text-14 mt-20">
                 <span>Don't have Spotify premium?</span>{' '}
