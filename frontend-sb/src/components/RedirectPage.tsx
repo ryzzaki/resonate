@@ -16,7 +16,6 @@ export const RedirectPage: React.FC<RouteComponentProps<Props>> = (props) => {
         const { data } = await fetchUser(token);
         setUser(data);
         setToken(token);
-        navigate('/party');
       } catch (err) {
         console.error(err);
         localStorage.removeItem('access_key');

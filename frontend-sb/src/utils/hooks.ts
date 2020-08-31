@@ -1,6 +1,8 @@
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { refreshUser, signOutUser } from '../utils/api';
+import { refreshUser } from '../utils/api';
+import { navigate } from '@reach/router';
+import { UrlEnums } from '../enums/urls.enum';
 
 export const useRefresh = () => {
   const { token, setToken, setUser } = useContext(AuthContext);
@@ -19,12 +21,9 @@ export const useRefresh = () => {
 };
 
 export const useSignout = () => {
-  const { setToken, setUser } = useContext(AuthContext);
   function signout() {
     localStorage.removeItem('access_key');
-    setUser({});
-    setToken('');
-    return signOutUser;
+    window.location.href = `${UrlEnums.API_URL}/auth/signout`;
   }
 
   return signout;

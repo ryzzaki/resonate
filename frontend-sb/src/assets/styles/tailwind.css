@@ -24,6 +24,10 @@
   src: url('../fonts/Metropolis-Light.otf') format('opentype');
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-size: 16px;
   line-height: 27px;
@@ -34,88 +38,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* h1 {
-  @apply font-heading text-38 leading-size-38;
-}
-
-h2 {
-  @apply font-heading text-30;
-} */
-
 .gradient-text {
-  background: linear-gradient(90deg, #00d2ff 0%, #2455b1 100%);
+  background: linear-gradient(90deg, #d9ff00 0%, #24b176 60%, #24b18e 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-input[type='range']:focus {
-  outline: none;
-}
-
-input[type='range']::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 2px;
-  cursor: pointer;
-  background: #e4a7af;
-  border-radius: 0;
-}
-
-input[type='range']::-webkit-slider-thumb {
-  height: 14px;
-  width: 14px;
-  margin-top: -7px;
-  border-radius: 50px;
-  background: #f453a9;
-  cursor: pointer;
-}
-
-input[type='range']:focus::-webkit-slider-runnable-track {
-  background: #e4a7af;
-}
-
-input[type='range']::-moz-range-track {
-  width: 100%;
-  height: 8.4px;
-  cursor: pointer;
-  background: #e4a7af;
-}
-
-input[type='range']::-moz-range-thumb {
-  height: 36px;
-  width: 16px;
-  background: #f453a9;
-  cursor: pointer;
-}
-
-input[type='range']::-ms-track {
-  width: 100%;
-  height: 8.4px;
-  cursor: pointer;
-  background: transparent;
-  border-color: transparent;
-  border-width: 16px 0;
-  color: transparent;
-}
-
-input[type='range']::-ms-fill-lower {
-  background: #e4a7af;
-}
-
-input[type='range']::-ms-fill-upper {
-  background: #e4a7af;
-}
-
-input[type='range']::-ms-thumb {
-  height: 36px;
-  width: 16px;
-  background: #e4a7af;
-  cursor: pointer;
-}
-
-input[type='range']:focus::-ms-fill-lower {
-  background: #e4a7af;
-}
-
-input[type='range']:focus::-ms-fill-upper {
-  background: #e4a7af;
+.gradient-bg {
+  background: linear-gradient(90deg, #24b18e 0%, #24b176 60%, #d9ff00 100%);
 }

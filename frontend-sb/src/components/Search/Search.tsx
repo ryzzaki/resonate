@@ -31,13 +31,8 @@ export const Search: React.FC<Props> = (props) => {
   };
 
   const handleClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
-    const { uris, album } = e.currentTarget.dataset;
-    if (uris) {
-      emitSearchedURI(uris);
-    }
-    if (album) {
-      emitSearchedURI(album);
-    }
+    const { uri } = e.currentTarget.dataset;
+    emitSearchedURI(uri as string);
   };
 
   return (

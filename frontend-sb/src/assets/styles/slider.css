@@ -37,7 +37,7 @@
 
 .ui-video-seek-slider .track .main .buffered {
   position: absolute;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: #77767b;
   width: 100%;
   height: 100%;
   transform: scaleX(0.8);
@@ -48,7 +48,7 @@
 
 .ui-video-seek-slider .track .main .seek-hover {
   position: absolute;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: #aaa8b3;
   width: 100%;
   height: 100%;
   z-index: 1;
@@ -60,7 +60,7 @@
 
 .ui-video-seek-slider .track .main .connect {
   position: absolute;
-  background-color: #f453a9;
+  background-color: #27e98e;
   width: 100%;
   height: 100%;
   z-index: 3;
@@ -89,7 +89,7 @@
   border-radius: 100%;
   width: 100%;
   height: 100%;
-  background-color: #f453a9;
+  background-color: #27e98e;
   opacity: 0;
   transform: scale(0.4);
 }

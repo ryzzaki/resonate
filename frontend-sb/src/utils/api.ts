@@ -38,36 +38,12 @@ export const searchSongs = async (token: string, search: string) => {
 
 export const playSong = async (
   token: string,
-  deviceId: string,
+  deviceId: string | null,
   data: playData
 ) => {
   return axios.put(
     `${UrlEnums.API_URL}/spotify/play?deviceId=${deviceId}`,
     data,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-};
-
-export const pauseSong = async (token: string) => {
-  return axios.put(
-    `${UrlEnums.API_URL}/spotify/pause`,
-    {},
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-};
-
-export const resumeSong = async (token: string) => {
-  return axios.put(
-    `${UrlEnums.API_URL}/spotify/resume`,
-    {},
     {
       headers: {
         Authorization: `Bearer ${token}`,

@@ -43,6 +43,10 @@ export const Party: React.FC<RouteComponentProps<Props>> = () => {
 
     socket.current.on('connect_error', (err) => {
       console.error(err);
+      if (err === `Session ID ${roomState.id} does not exist!`) {
+        socket.current.disconnect();
+        navigate('/rooms');
+      }
     });
     socket.current.on('receiveCurrentSession', (session: any) =>
       setRoomState((state) => ({ state, ...session }))
@@ -74,8 +78,8 @@ export const Party: React.FC<RouteComponentProps<Props>> = () => {
     });
   };
 
-  const emitSearchedURI = (uri: string) =>
-    socket.current.emit('rebroadcastSelectedURI', uri);
+  const emitSearchedURI = (uri: string, startUri?: string) =>
+    socket.current.emit('rebroadcastSelectedURI', { uri, startUri });
 
   const emitSliderPos = (progressMs: number) =>
     socket.current.emit('rebroadcastSongStartedAt', Date.now() - progressMs);
