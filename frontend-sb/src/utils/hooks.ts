@@ -23,7 +23,7 @@ export const useRefresh = () => {
 export const useSignout = () => {
   function signout() {
     localStorage.removeItem('access_key');
-    navigate(`${UrlEnums.API_URL}/auth/signout`);
+    window.location.href = `${UrlEnums.API_URL}/auth/signout`;
   }
 
   return signout;

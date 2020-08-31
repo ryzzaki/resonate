@@ -2,12 +2,14 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link, RouteComponentProps, navigate } from '@reach/router';
 import { Header } from './Header';
 import { Footer } from './Footer';
-import roomGroup from '../../assets/icons/roomGroup.svg';
+import { ReactComponent as RoomGroup } from '../../assets/icons/roomGroup.svg';
 import { ReactComponent as Person } from '../../assets/images/Person.svg';
 import { ReactComponent as SpotifyLogo } from '../../assets/icons/spotifyLogo.svg';
 import { UrlEnums } from '../../enums/urls.enum';
 import { fetchSessions } from '../../utils/api';
 import { AuthContext } from '../../context/AuthContext';
+import { CTASection } from './CTASection';
+
 type Props = {};
 
 export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
@@ -63,7 +65,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
               <p className="text-greylight text-14 mt-20">
                 <span>Don't have Spotify premium?</span>{' '}
                 <a href="#" className="underline">
-                  Try it free for 2 months
+                  Try it for free for 2 months
                 </a>
               </p>
             </div>
@@ -83,7 +85,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
                 <h3 className="font-semibold text-25">Get Spotify Premium</h3>
                 <p className="text-greylight text-16 p-10 m-10">
                   To use SonicBoom, you must be subscribed to{' '}
-                  <span className="underline">Spotify Premium.</span>
+                  <span className="text-white">Spotify Premium.</span>
                 </p>
               </div>
               <div className="bg-black2light rounded-lg p-20">
@@ -92,7 +94,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
                 </div>
                 <h3 className="font-semibold text-25">Login with Spotify</h3>
                 <p className="text-greylight text-16 p-10 m-10">
-                  <span className="underline">Login to SonicBoom</span> with
+                  <span className="text-white">Login to SonicBoom</span> with
                   your Spotify account & consent to share basic information.
                 </p>
               </div>
@@ -110,59 +112,40 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
           </section>
           <section className="py-80" id="rooms">
             <h2 className="text-center text-40 font-bold mb-40">
-              {rooms.length === 0
-                ? 'There are no rooms yet...'
-                : 'Explore Rooms'}
+              {!rooms.length ? 'There are no rooms yet...' : 'Explore Rooms'}
             </h2>
-            <div className="flex flex-wrap content-center justify-center flex-1 overscroll-auto">
+            <div className="flex flex-wrap content-center justify-center flex-1 overscroll-auto max-h-30rem">
               {rooms.map((room: any) => (
                 <div
                   key={room.id}
-                  className="cursor-pointer m-20 p-10 w-250 text-white hover:bg-white hover:text-black"
+                  className="m-20 max-w-250 bg-black2light rounded-lg group group hover:bg-white p-20 cursor-pointer"
                   onClick={() => joinRoom(room.id)}
                 >
                   <img
-                    className="rounded-lg p-10 max-w-200"
+                    className="rounded-lg"
                     src="https://i.scdn.co/image/ab67706f00000002bf4545e8d7e6b7e377980995"
                   />
-                  <div className="flex item-center py-10">
-                    <p className="font-bold text-25 flex-1">{room.name}</p>
-                    <div className="flex text-right">
-                      <p className="inline mr-10">
-                        {room.connectedUsers.length}
-                      </p>
-                      <img
-                        className="inline bg-transparent mb-5"
-                        src={roomGroup}
-                        alt="Room"
-                      />
+                  <div className="py-10">
+                    <div className="flex item-center">
+                      <h4 className="group-hover:text-black font-bold text-24 text-white overflow-hidden">
+                        {room.name}
+                      </h4>
+                      <div className="flex items-center ml-auto text-greylight">
+                        <p className="inline mr-10">
+                          {room.connectedUsers.length}
+                        </p>
+                        <RoomGroup className="fill-current" />
+                      </div>
                     </div>
+                    <p className="group-hover:text-darkblue pt-10 text-greylight max-h-40 truncate">
+                      {room.description}
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
           </section>
-          <section className="py-60" id="kickstarter">
-            <div className="flex bg-green rounded-lg px-40 py-60">
-              <h4 className="text-40 leading-normal font-bold mr-100">
-                Kickstarter
-              </h4>
-              <div className="flex-1">
-                <div className="mb-40 flex flex-col">
-                  <p className="text-20 font-medium">"Give us your soul"</p>
-                  <span className="ml-80">Cuong Nguyen, CEO of SonicBoom</span>
-                </div>
-                <button className="bg-white text-green font-bold text-20 p-10 px-30 rounded-full">
-                  <a
-                    href="https://www.kickstarter.com/projects/cuongnguyen/resonate"
-                    target="_blank"
-                  >
-                    Support us on Kickstarter
-                  </a>
-                </button>
-              </div>
-            </div>
-          </section>
+          <CTASection />
         </main>
         <Footer />
       </div>

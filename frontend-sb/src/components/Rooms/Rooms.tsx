@@ -5,6 +5,7 @@ import { Link } from '@reach/router';
 import { Modal } from './Modal';
 import { Header } from '../Landing/Header';
 import { Footer } from '../Landing/Footer';
+import { CTASection } from '../Landing/CTASection';
 
 type Props = {};
 
@@ -31,23 +32,22 @@ export const Rooms: React.FC<Props> = (props) => {
   return (
     <div className="bg-black2 text-white px-80 min-h-screen flex flex-col relative">
       {modal && <Modal token={token} closeModal={() => setModal(false)} />}
-      {/* <nav className="bg-skinpink flex py-30">
-        <h1 className="text-30 text-white font-bold">Explore rooms</h1>
-        <button
-          onClick={() => setModal(true)}
-          className="ml-auto bg-green text-white font-bold text-14
-                px-20 py-5 rounded-full uppercase"
-        >
-          Create a room
-        </button>
-      </nav> */}
       <Header noLogin />
       <main className="flex-wrap content-center justify-center flex-1 pt-20 pb-80">
-        <h1 className="text-40 font-bold my-40">Explore rooms</h1>
+        <div className="flex items-center">
+          <h1 className="text-40 font-bold my-40">Explore rooms</h1>
+          <button
+            onClick={() => setModal(true)}
+            className="ml-auto bg-white text-black font-bold text-14
+                px-20 py-5 rounded-full uppercase"
+          >
+            Create a room
+          </button>
+        </div>
         {!rooms.length && (
-          <p className="text-pink text-30">No rooms (ノಠ益ಠ)ノ彡┻━┻</p>
+          <p className="text-greylight text-30">No rooms (ノಠ益ಠ)ノ彡┻━┻</p>
         )}
-        <div className="grid grid-cols-5">
+        <div className="grid grid-cols-5 gap-30">
           {rooms.map((room: any) => (
             <Link
               key={room.id}
@@ -67,28 +67,8 @@ export const Rooms: React.FC<Props> = (props) => {
             </Link>
           ))}
         </div>
-        <section className="py-60" id="kickstarter">
-          <div className="flex bg-green rounded-lg px-40 py-60">
-            <h4 className="text-40 leading-normal font-bold mr-100">
-              Kickstarter
-            </h4>
-            <div className="flex-1">
-              <div className="mb-40 flex flex-col">
-                <p className="text-20 font-medium">"Give us your soul"</p>
-                <span className="ml-80">Cuong Nguyen, CEO of SonicBoom</span>
-              </div>
-              <button className="bg-white text-green font-bold text-20 p-10 px-30 rounded-full">
-                <a
-                  href="https://www.kickstarter.com/projects/cuongnguyen/resonate"
-                  target="_blank"
-                >
-                  Support us on Kickstarter
-                </a>
-              </button>
-            </div>
-          </div>
-        </section>
       </main>
+      <CTASection />
       <Footer />
     </div>
   );

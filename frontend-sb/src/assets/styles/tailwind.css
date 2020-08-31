@@ -43,3 +43,7 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+.gradient-bg {
+  background: linear-gradient(90deg, #24b18e 0%, #24b176 60%, #d9ff00 100%);
+}

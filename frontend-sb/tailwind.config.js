@@ -38,6 +38,8 @@ const sizes = {
   '90': '90px',
   '100': '100px',
   '200': '200px',
+  '250': '250px',
+  '300': '300px',
   '5rem': '5rem',
   '10rem': '10rem',
   '15rem': '15rem',
@@ -98,6 +100,7 @@ module.exports = {
     extend: {
       spacing: sizes,
     },
+    maxHeight: sizes,
     maxWidth: sizes,
     minWidth: sizes,
     inset: insets,

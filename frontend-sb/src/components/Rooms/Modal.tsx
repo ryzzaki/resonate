@@ -40,11 +40,11 @@ export const Modal: React.FC<Props> = (props) => {
     <>
       <div
         onClick={closeModal}
-        className="absolute h-full w-full flex bg-black bg-opacity-50"
+        className="fixed left-0 top-0 right-0 bottom-0 z-10 flex bg-black bg-opacity-75"
       />
       <form
         onSubmit={handleSubmit}
-        className="bg-black2light py-40 rounded-lg shadow-xs absolute left-1/2 top-1/2 transform -translate-y-1/2 -translate-x-1/2 bg-white flex flex-col w-30rem p-30"
+        className="bg-black2light py-40 rounded-lg shadow-xs z-10 fixed left-1/2 top-1/2 transform -translate-y-1/2 -translate-x-1/2 bg-white flex flex-col w-30rem p-30"
       >
         <input
           required
