@@ -34,7 +34,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
     } else {
       localStorage.removeItem('redirect_url');
       localStorage.setItem('redirect_url', `/party?sessionId=${id}`);
-      navigate(`${UrlEnums.API_URL}/auth/spotify`);
+      window.location.href = `${UrlEnums.API_URL}/auth/spotify`;
     }
   };
 
