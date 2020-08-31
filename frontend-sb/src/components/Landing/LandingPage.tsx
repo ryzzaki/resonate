@@ -64,7 +64,12 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
               </a>
               <p className="text-greylight text-14 mt-20">
                 <span>Don't have Spotify premium?</span>{' '}
-                <a href="#" className="underline">
+                <a
+                  href="https://www.spotify.com/premium/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
                   Try it for free for 2 months
                 </a>
               </p>
