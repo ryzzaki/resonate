@@ -15,7 +15,9 @@ export const Header: React.FC<HeaderProps> = (props) => {
   return (
     <header className="mt-20 py-20 sticky top-0 bg-black2 bg-opacity-75">
       <div className="flex items-center">
-        <div className="font-logoHeading text-34 text-white">SB</div>
+        <div className="font-logoHeading text-34 text-white">
+          <a href="/#">SB</a>
+        </div>
         <ul className="ml-auto flex items-center">
           {!noLogin && (
             <li className="mr-30">
@@ -23,10 +25,13 @@ export const Header: React.FC<HeaderProps> = (props) => {
             </li>
           )}
           <li className="mr-30">
-            <a>Support us</a>
+            <a href="#kickstarter">Support us</a>
           </li>
           <li className="mr-30">
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSd0CSe90QMNGb0BrsQzpfZVfuiZRlhHKr3NpTfsP71Qpb54Xg/viewform?usp=sf_link">
+            <a
+              href="https://docs.google.com/forms/d/e/1FAIpQLSd0CSe90QMNGb0BrsQzpfZVfuiZRlhHKr3NpTfsP71Qpb54Xg/viewform?usp=sf_link"
+              target="_blank"
+            >
               Bugs/Feedback
             </a>
           </li>

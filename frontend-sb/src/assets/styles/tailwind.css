@@ -24,6 +24,10 @@
   src: url('../fonts/Metropolis-Light.otf') format('opentype');
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-size: 16px;
   line-height: 27px;

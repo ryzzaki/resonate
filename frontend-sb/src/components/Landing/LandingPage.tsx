@@ -48,14 +48,14 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
                 music sharing <br />
                 with your friends{' '}
               </h1>
-              <p className="text-20 my-40  leading-normal ">
+              <p className="text-20 my-40 leading-normal ">
                 Stream songs from your Spotify account to anyone who is
                 connected. <br />
                 Everyone listens to the same song.{' '}
               </p>
               <a
                 href={`${UrlEnums.API_URL}/auth/spotify`}
-                className="bg-black2light hover:bg-white  hover:text-black inline-flex items-center font-semibold text-18 p-15 pr-30 rounded-full"
+                className="bg-black2light hover:bg-white hover:text-black inline-flex items-center font-semibold text-18 p-10 pr-30 rounded-full"
               >
                 <SpotifyLogo className="w-35 h-35 mr-20" />
                 Login with Spotify
@@ -108,41 +108,27 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
               </div>
             </div>
           </section>
-          <section className="py-80 ">
-            <div className="bg-green rounded-lg px-40 py-80 flex">
-              <h4 className="text-40 leading-normal font-bold mr-100">
-                Kickstarter
-              </h4>
-              <div className="flex-1">
-                <div className="mb-40 flex flex-col">
-                  <p className="text-20 font-medium">"Give us our soul"</p>
-                  <span className="ml-80">Cuong Nguyen, CEO of SonicBoom</span>
-                </div>
-                <button className="bg-white text-green font-bold text-20 p-10 px-30 rounded-full">
-                  Support us on Kickstarter
-                </button>
-              </div>
-            </div>
-          </section>
           <section className="py-80" id="rooms">
             <h2 className="text-center text-40 font-bold mb-40">
-              Explore Rooms{' '}
+              {rooms.length === 0
+                ? 'There are no rooms yet...'
+                : 'Explore Rooms'}
             </h2>
-            <div className="flex flex-wrap content-center justify-center flex-1">
+            <div className="flex flex-wrap content-center justify-center flex-1 overscroll-auto">
               {rooms.map((room: any) => (
                 <div
                   key={room.id}
-                  className="cursor-pointer m-20 w-250"
+                  className="cursor-pointer m-20 p-10 w-250 text-white hover:bg-white hover:text-black"
                   onClick={() => joinRoom(room.id)}
                 >
                   <img
-                    className="rounded-lg"
+                    className="rounded-lg p-10 max-w-200"
                     src="https://i.scdn.co/image/ab67706f00000002bf4545e8d7e6b7e377980995"
                   />
                   <div className="flex item-center py-10">
                     <p className="font-bold text-25 flex-1">{room.name}</p>
                     <div className="flex text-right">
-                      <p className="text-white inline mr-10">
+                      <p className="inline mr-10">
                         {room.connectedUsers.length}
                       </p>
                       <img
@@ -154,6 +140,27 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
                   </div>
                 </div>
               ))}
+            </div>
+          </section>
+          <section className="py-60" id="kickstarter">
+            <div className="flex bg-green rounded-lg px-40 py-60">
+              <h4 className="text-40 leading-normal font-bold mr-100">
+                Kickstarter
+              </h4>
+              <div className="flex-1">
+                <div className="mb-40 flex flex-col">
+                  <p className="text-20 font-medium">"Give us your soul"</p>
+                  <span className="ml-80">Cuong Nguyen, CEO of SonicBoom</span>
+                </div>
+                <button className="bg-white text-green font-bold text-20 p-10 px-30 rounded-full">
+                  <a
+                    href="https://www.kickstarter.com/projects/cuongnguyen/resonate"
+                    target="_blank"
+                  >
+                    Support us on Kickstarter
+                  </a>
+                </button>
+              </div>
             </div>
           </section>
         </main>
