@@ -105,11 +105,9 @@ export const Webplayer: React.FC<Props> = (props) => {
     if (status.isInitializing) return;
 
     if (isDJ) {
-      console.log('is dj, changed');
       // emitSearchedURI(status.contextUri);
       console.log(status.contextUri);
     } else {
-      console.log('not dj, changed');
       setStatus((state) => ({ ...state, unsync: true }));
     }
   }, [status.contextUri]);

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AuthContext } from './context/AuthContext';
 import { fetchUser } from './utils/api';
 import { Routes } from './routes';
-import { initGA } from './utils/ga';
+import { initGA } from './utils/analytics';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -11,7 +11,7 @@ function App() {
   const [token, setToken] = useState<string>('');
 
   useEffect(() => {
-    // initGA();
+    initGA();
     setLoading(true);
     const access_token = localStorage.getItem('access_key');
     async function fetchUserAndRedirect() {

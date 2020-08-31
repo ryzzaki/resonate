@@ -32,7 +32,6 @@ export const Search: React.FC<Props> = (props) => {
 
   const handleClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     const { uri } = e.currentTarget.dataset;
-    console.log(uri);
     emitSearchedURI(uri as string);
   };
 
