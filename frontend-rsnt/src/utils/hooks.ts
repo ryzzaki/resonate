@@ -1,7 +1,6 @@
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { refreshUser } from '../utils/api';
-import { navigate } from '@reach/router';
+import { refreshUser } from './api';
 import { UrlEnums } from '../enums/urls.enum';
 
 export const useRefresh = () => {

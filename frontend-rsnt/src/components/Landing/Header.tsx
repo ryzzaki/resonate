@@ -16,7 +16,7 @@ export const Header: React.FC<HeaderProps> = (props) => {
     <header className="mt-25 py-15 sticky top-0 text-greylight bg-black2">
       <div className="flex items-center">
         <div className="font-logoHeading text-34 text-white">
-          <a href="/#">SB</a>
+          <a href="/#">Resonate</a>
         </div>
         <ul className="ml-auto flex items-center">
           {!noLogin && (

@@ -20,7 +20,7 @@ import { join } from 'path';
     WebplayerModule,
     SessionModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', '..', './frontend-sb/build'),
+      rootPath: join(__dirname, '..', '..', '..', './frontend-rsnt/build'),
     }),
   ],
   controllers: [AppController],
