@@ -46,7 +46,7 @@ export class SpotifyService {
 
   async updatePlayerState(user: User, playerState: WebplayerStateEnum): Promise<void> {
     const isPause = playerState === WebplayerStateEnum.PAUSE;
-    const url = `https://api.spotify.com/v1/me/player/${isPause ? 'pause' : 'play'}`;
+    const url = `${SpotifyUrlEnums.SPOTIFY_API}/me/player/${isPause ? 'pause' : 'play'}`;
     await axios
       .put(
         url,
@@ -64,7 +64,7 @@ export class SpotifyService {
   }
 
   async getAlbumTracks(user: User, uri: string) {
-    const url = `https://api.spotify.com/v1/albums/${uri.replace('spotify:album:', '')}/tracks`;
+    const url = `${SpotifyUrlEnums.SPOTIFY_API}/albums/${uri.replace('spotify:album:', '')}/tracks`;
     const res = await axios
       .get(url, {
         headers: {
@@ -79,7 +79,7 @@ export class SpotifyService {
   }
 
   async getPlaylistTracks(user: User, uri: string) {
-    const url = `https://api.spotify.com/v1/playlists/${uri.replace('spotify:playlist:', '')}/tracks`;
+    const url = `${SpotifyUrlEnums.SPOTIFY_API}/playlists/${uri.replace('spotify:playlist:', '')}/tracks`;
     const res = await axios
       .get(url, {
         headers: {
