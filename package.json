@@ -1,5 +1,5 @@
 {
-  "name": "sonicboom",
+  "name": "resonate",
   "version": "0.0.1",
   "description": "A Spotify Web Player which lets your friends & strangers DJ the playlist for a specific amount of time before randomly selecting someone else.",
   "author": "Cuong Nguyen <cuong.nugi@gmail.com>",
@@ -15,10 +15,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ryzzaki/SonicBoom.git"
+    "url": "git+https://github.com/ryzzaki/Resonate.git"
   },
   "bugs": {
-    "url": "https://github.com/ryzzaki/SonicBoom/issues"
+    "url": "https://github.com/ryzzaki/Resonate/issues"
   },
-  "homepage": "https://github.com/ryzzaki/SonicBoom#readme"
+  "homepage": "https://github.com/ryzzaki/Resonate#readme"
 }

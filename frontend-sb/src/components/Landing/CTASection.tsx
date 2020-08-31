@@ -9,7 +9,7 @@ export const CTASection: React.FC<Props> = (props) => (
       <div className="flex-1">
         <div className="mb-40 flex flex-col">
           <p className="text-20 font-medium">"Give us your soul"</p>
-          <span className="ml-80">Cuong Nguyen, CEO of SonicBoom</span>
+          <span className="ml-80">Cuong Nguyen, CEO of Resonate</span>
         </div>
         <button className="bg-white text-green font-bold text-20 p-10 px-30 rounded-full">
           <a

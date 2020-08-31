@@ -89,7 +89,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
                 </div>
                 <h3 className="font-semibold text-25">Get Spotify Premium</h3>
                 <p className="text-greylight text-16 p-10 m-10">
-                  To use SonicBoom, you must be subscribed to{' '}
+                  To use Resonate, you must be subscribed to{' '}
                   <span className="text-white">Spotify Premium.</span>
                 </p>
               </div>
@@ -99,7 +99,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
                 </div>
                 <h3 className="font-semibold text-25">Login with Spotify</h3>
                 <p className="text-greylight text-16 p-10 m-10">
-                  <span className="text-white">Login to SonicBoom</span> with
+                  <span className="text-white">Login to Resonate</span> with
                   your Spotify account & consent to share basic information.
                 </p>
               </div>
