@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Link, RouteComponentProps, navigate } from '@reach/router';
+import { RouteComponentProps, navigate } from '@reach/router';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { ReactComponent as RoomGroup } from '../../assets/icons/roomGroup.svg';
@@ -57,7 +57,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
               </p>
               <a
                 href={`${UrlEnums.API_URL}/auth/spotify`}
-                className="bg-black2light hover:bg-white hover:text-black inline-flex items-center font-semibold text-18 p-10 pr-30 rounded-full"
+                className="bg-black2light hover:bg-white hover:text-black inline-flex items-center font-semibold text-18 p-10 pr-30 rounded-full transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110"
               >
                 <SpotifyLogo className="w-35 h-35 mr-20" />
                 Login with Spotify
@@ -128,6 +128,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
                 >
                   <img
                     className="rounded-lg"
+                    alt="song cover"
                     src="https://i.scdn.co/image/ab67706f00000002bf4545e8d7e6b7e377980995"
                   />
                   <div className="py-10">

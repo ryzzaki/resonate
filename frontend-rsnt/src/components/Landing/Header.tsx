@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = (props) => {
             <li>
               <a
                 href={`${UrlEnums.API_URL}/auth/spotify`}
-                className="bg-black2lighter hover:bg-white text-white  hover:text-black inline-flex items-center font-semibold p-10 pr-20 rounded-full"
+                className="bg-black2lighter hover:bg-white text-white  hover:text-black inline-flex items-center font-semibold p-10 pr-20 rounded-full transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110"
               >
                 <SpotifyLogo className="w-25 h-25 mr-10" />
                 Login with Spotify
