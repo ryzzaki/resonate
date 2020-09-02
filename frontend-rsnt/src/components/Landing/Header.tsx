@@ -29,7 +29,8 @@ export const Header: React.FC<HeaderProps> = (props) => {
           </li>
           <li className="mr-30 hover:text-white">
             <a
-              href="https://docs.google.com/forms/d/e/1FAIpQLSd0CSe90QMNGb0BrsQzpfZVfuiZRlhHKr3NpTfsP71Qpb54Xg/viewform?usp=sf_link"
+              href="https://musicxp.typeform.com/to/WgGETI7v"
+              rel="noopener noreferrer"
               target="_blank"
             >
               Bugs/Feedback
