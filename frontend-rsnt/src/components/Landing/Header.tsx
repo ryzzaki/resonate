@@ -16,7 +16,7 @@ export const Header: React.FC<HeaderProps> = (props) => {
     <header className="mt-25 py-15 sticky top-0 text-greylight bg-black2">
       <div className="flex items-center">
         <div className="font-logoHeading text-34 text-white">
-          <a href="/#">SB</a>
+          <a href="/#">Resonate</a>
         </div>
         <ul className="ml-auto flex items-center">
           {!noLogin && (
@@ -29,7 +29,8 @@ export const Header: React.FC<HeaderProps> = (props) => {
           </li>
           <li className="mr-30 hover:text-white">
             <a
-              href="https://docs.google.com/forms/d/e/1FAIpQLSd0CSe90QMNGb0BrsQzpfZVfuiZRlhHKr3NpTfsP71Qpb54Xg/viewform?usp=sf_link"
+              href="https://musicxp.typeform.com/to/WgGETI7v"
+              rel="noopener noreferrer"
               target="_blank"
             >
               Bugs/Feedback
@@ -39,7 +40,7 @@ export const Header: React.FC<HeaderProps> = (props) => {
             <li>
               <a
                 href={`${UrlEnums.API_URL}/auth/spotify`}
-                className="bg-black2lighter hover:bg-white text-white  hover:text-black inline-flex items-center font-semibold p-10 pr-20 rounded-full"
+                className="bg-black2lighter hover:bg-white text-white  hover:text-black inline-flex items-center font-semibold p-10 pr-20 rounded-full transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110"
               >
                 <SpotifyLogo className="w-25 h-25 mr-10" />
                 Login with Spotify

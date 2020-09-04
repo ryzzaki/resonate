@@ -1,17 +1,13 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { fetchSessions } from '../../utils/api';
-import { Link } from '@reach/router';
 import { Modal } from './Modal';
 import { Header } from '../Landing/Header';
 import { Footer } from '../Landing/Footer';
 import { CTASection } from '../Landing/CTASection';
+import { RoomCard } from './RoomCard';
 
-type Props = {};
-
-export const Rooms: React.FC<Props> = (props) => {
-  const {} = props;
-
+export const Rooms: React.FC = () => {
   const { token } = useContext(AuthContext);
 
   const [rooms, setRooms] = useState([]);
@@ -49,22 +45,7 @@ export const Rooms: React.FC<Props> = (props) => {
         )}
         <div className="grid grid-cols-5 gap-30">
           {rooms.map((room: any) => (
-            <Link
-              key={room.id}
-              to={`/party?sessionId=${room.id}`}
-              className="bg-black2light rounded-lg group group hover:bg-white p-20 cursor-pointer"
-            >
-              <img
-                className="rounded-lg"
-                src="https://i.scdn.co/image/ab67706f00000002bf4545e8d7e6b7e377980995"
-              />
-              <h4 className="group-hover:text-black font-bold text-24 pt-20 pb-10 text-white">
-                {room.name}
-              </h4>
-              <p className="group-hover:text-darkblue text-greylight">
-                {room.description}
-              </p>
-            </Link>
+            <RoomCard token={token} room={room} />
           ))}
         </div>
       </main>

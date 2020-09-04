@@ -1,7 +1,7 @@
 {
-  "name": "backend-sb",
+  "name": "backend-rsnt",
   "version": "0.0.1",
-  "description": "SonicBoom Backend Server",
+  "description": "Resonate Backend Server",
   "author": "Cuong Nguyen <cuong.nugi@gmail.com>",
   "license": "MIT",
   "scripts": {

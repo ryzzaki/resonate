@@ -1,24 +1,24 @@
 {
-  "name": "sonicboom",
+  "name": "resonate",
   "version": "0.0.1",
   "description": "A Spotify Web Player which lets your friends & strangers DJ the playlist for a specific amount of time before randomly selecting someone else.",
   "author": "Cuong Nguyen <cuong.nugi@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "be:install": "cd ./backend-sb && yarn install --prod=false && yarn build && yarn prestart:prod",
-    "fe:install": "cd ./frontend-sb && yarn install --prod=false && yarn build",
+    "be:install": "cd ./backend-rsnt && yarn install --prod=false && yarn build && yarn prestart:prod",
+    "fe:install": "cd ./frontend-rsnt && yarn install --prod=false && yarn build",
     "install": "yarn be:install && yarn fe:install",
-    "start": "cd ./backend-sb && yarn start:prod"
+    "start": "cd ./backend-rsnt && yarn start:prod"
   },
   "engines": {
     "node": "12.18.1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ryzzaki/SonicBoom.git"
+    "url": "git+https://github.com/ryzzaki/Resonate.git"
   },
   "bugs": {
-    "url": "https://github.com/ryzzaki/SonicBoom/issues"
+    "url": "https://github.com/ryzzaki/Resonate/issues"
   },
-  "homepage": "https://github.com/ryzzaki/SonicBoom#readme"
+  "homepage": "https://github.com/ryzzaki/Resonate#readme"
 }

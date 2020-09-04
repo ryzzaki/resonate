@@ -118,7 +118,7 @@ export const Webplayer: React.FC<Props> = (props) => {
       getOAuthToken: (cb) => {
         cb(spotifyToken);
       },
-      name: 'SonicBoom',
+      name: 'Resonate',
     });
 
     // Error handling

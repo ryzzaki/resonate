@@ -10,32 +10,32 @@ services:
   postgres:
     image: 'postgres:11.8-alpine'
     environment:
-      POSTGRES_DB: sonic_boom
+      POSTGRES_DB: resonate_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
     ports:
       - '5432:5432'
 
-  backend-sb:
+  backend-rsnt:
     build:
-      context: ./backend-sb/
+      context: ./backend-rsnt/
       dockerfile: Dockerfile.dev
     volumes:
-      - ./backend-sb:/home/app
-    env_file: ./backend-sb/.env.compose
+      - ./backend-rsnt:/home/app
+    env_file: ./backend-rsnt/.env.compose
     ports:
       - '3000:3000'
     depends_on:
       - redis
       - postgres
 
-  frontend-sb:
+  frontend-rsnt:
     build:
-      context: ./frontend-sb/
+      context: ./frontend-rsnt/
       dockerfile: Dockerfile.dev
     volumes:
-      - ./frontend-sb:/home/app
-    env_file: ./frontend-sb/.env.compose
+      - ./frontend-rsnt:/home/app
+    env_file: ./frontend-rsnt/.env.compose
     ports:
       - '3001:3001'
     stdin_open: true

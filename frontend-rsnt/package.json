@@ -1,7 +1,7 @@
 {
-  "name": "frontend-sb",
+  "name": "frontend-rsnt",
   "version": "0.1.0",
-  "description": "SonicBoom Frontend Application",
+  "description": "Resonate Frontend Application",
   "author": "Cuong Nguyen <cuong.nugi@gmail.com>",
   "license": "MIT",
   "private": true,

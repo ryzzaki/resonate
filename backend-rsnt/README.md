@@ -24,7 +24,7 @@ REFRESH_TOKEN_AGE=30000
 # Postgres Database setup
 DB_HOST="localhost"
 DB_PORT=5432
-DB_NAME="sonic_boom"
+DB_NAME="resonate_db"
 DB_USERNAME="postgres"
 DB_PASSWORD="admin"
 DB_SYNCHRONIZE=true

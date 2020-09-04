@@ -1,14 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Link, RouteComponentProps, navigate } from '@reach/router';
+import { RouteComponentProps } from '@reach/router';
 import { Header } from './Header';
 import { Footer } from './Footer';
-import { ReactComponent as RoomGroup } from '../../assets/icons/roomGroup.svg';
 import { ReactComponent as Person } from '../../assets/images/Person.svg';
 import { ReactComponent as SpotifyLogo } from '../../assets/icons/spotifyLogo.svg';
 import { UrlEnums } from '../../enums/urls.enum';
 import { fetchSessions } from '../../utils/api';
 import { AuthContext } from '../../context/AuthContext';
 import { CTASection } from './CTASection';
+import { RoomCard } from '../Rooms/RoomCard';
 
 type Props = {};
 
@@ -27,16 +27,6 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
     }
     fetchRooms();
   }, []);
-
-  const joinRoom = (id: string) => {
-    if (token) {
-      navigate(`/party?sessionId=${id}`);
-    } else {
-      localStorage.removeItem('redirect_url');
-      localStorage.setItem('redirect_url', `/party?sessionId=${id}`);
-      window.location.href = `${UrlEnums.API_URL}/auth/spotify`;
-    }
-  };
 
   return (
     <div className="bg-black2 text-white flex">
@@ -57,7 +47,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
               </p>
               <a
                 href={`${UrlEnums.API_URL}/auth/spotify`}
-                className="bg-black2light hover:bg-white hover:text-black inline-flex items-center font-semibold text-18 p-10 pr-30 rounded-full"
+                className="bg-black2light hover:bg-white hover:text-black inline-flex items-center font-semibold text-18 p-10 pr-30 rounded-full transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110"
               >
                 <SpotifyLogo className="w-35 h-35 mr-20" />
                 Login with Spotify
@@ -89,7 +79,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
                 </div>
                 <h3 className="font-semibold text-25">Get Spotify Premium</h3>
                 <p className="text-greylight text-16 p-10 m-10">
-                  To use SonicBoom, you must be subscribed to{' '}
+                  To use Resonate, you must be subscribed to{' '}
                   <span className="text-white">Spotify Premium.</span>
                 </p>
               </div>
@@ -99,7 +89,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
                 </div>
                 <h3 className="font-semibold text-25">Login with Spotify</h3>
                 <p className="text-greylight text-16 p-10 m-10">
-                  <span className="text-white">Login to SonicBoom</span> with
+                  <span className="text-white">Login to Resonate</span> with
                   your Spotify account & consent to share basic information.
                 </p>
               </div>
@@ -121,31 +111,8 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
             </h2>
             <div className="flex flex-wrap content-center justify-center flex-1 overscroll-auto max-h-30rem">
               {rooms.map((room: any) => (
-                <div
-                  key={room.id}
-                  className="m-20 max-w-250 bg-black2light rounded-lg group group hover:bg-white p-20 cursor-pointer"
-                  onClick={() => joinRoom(room.id)}
-                >
-                  <img
-                    className="rounded-lg"
-                    src="https://i.scdn.co/image/ab67706f00000002bf4545e8d7e6b7e377980995"
-                  />
-                  <div className="py-10">
-                    <div className="flex item-center">
-                      <h4 className="group-hover:text-black font-bold text-24 text-white overflow-hidden">
-                        {room.name}
-                      </h4>
-                      <div className="flex items-center ml-auto text-greylight">
-                        <p className="inline mr-10">
-                          {room.connectedUsers.length}
-                        </p>
-                        <RoomGroup className="fill-current" />
-                      </div>
-                    </div>
-                    <p className="group-hover:text-darkblue pt-10 text-greylight max-h-40 truncate">
-                      {room.description}
-                    </p>
-                  </div>
+                <div className="m-20 max-w-250">
+                  <RoomCard token={token} room={room} />
                 </div>
               ))}
             </div>
