@@ -30,6 +30,9 @@ export interface MainConfigInterface {
     clientId: string;
     clientSecret: string;
   };
+  geniusSettings: {
+    apiToken: string;
+  };
 }
 
 export type Algorithm =

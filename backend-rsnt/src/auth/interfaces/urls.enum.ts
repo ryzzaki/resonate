@@ -11,6 +11,10 @@ export enum SpotifyUrlEnums {
   SPOTIFY_API = 'https://api.spotify.com/v1',
 }
 
+export enum GeniusUrlEnums {
+  GENIUS = 'https://api.genius.com',
+}
+
 function getServerModeApiUrl(serverMode: string): any {
   switch (serverMode) {
     case 'development':
