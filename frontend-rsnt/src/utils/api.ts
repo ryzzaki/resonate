@@ -36,6 +36,22 @@ export const searchSongs = async (token: string, search: string) => {
   );
 };
 
+export const repeatSong = async (
+  token: string,
+  deviceId: string | null,
+  state: boolean
+) => {
+  return axios.put(
+    `${UrlEnums.API_URL}/spotify/repeat?state=${state}&deviceId=${deviceId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+};
+
 export const playSong = async (
   token: string,
   deviceId: string | null,

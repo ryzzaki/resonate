@@ -63,6 +63,24 @@ export class SpotifyService {
       });
   }
 
+  async updatePlayerRepeatState(deviceId: string, state: boolean, user: User): Promise<void> {
+    const url = `${SpotifyUrlEnums.SPOTIFY_API}/me/player/repeat?state=${state ? 'track' : 'off'}&device_id=${deviceId}`;
+    await axios
+      .put(
+        url,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${user.accessToken}`,
+          },
+        }
+      )
+      .catch((e) => {
+        this.logger.error(`Unable to authorize Spotify client on ${e} using the current access token!`);
+        throw new BadRequestException(`Unable to authorize Spotify client using the current access token!`);
+      });
+  }
+
   async getAlbumTracks(user: User, uri: string) {
     const url = `${SpotifyUrlEnums.SPOTIFY_API}/albums/${uri.replace('spotify:album:', '')}/tracks`;
     const res = await axios

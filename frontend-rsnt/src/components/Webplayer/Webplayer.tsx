@@ -3,7 +3,7 @@ import loadScript from '../../utils/loadScript';
 import Session from '../../types/session';
 import playData from '../../types/playData';
 import playerStatus from '../../types/playerStatus';
-import { playSong } from '../../utils/api';
+import { playSong, repeatSong } from '../../utils/api';
 import debouncer from '../../utils/debouncer';
 import { WebplayerView } from './Webplayer.view';
 import { useRefresh } from '../../utils/hooks';
@@ -171,6 +171,7 @@ export const Webplayer: React.FC<Props> = (props) => {
 
   const handlePlayerStateChange = (songState: any) => {
     console.log(songState);
+    // set on repeat mode if therers only one song
     if (!songState) {
       setStatus((state) => ({ ...state, isInitializing: true }));
     } else {
@@ -187,7 +188,25 @@ export const Webplayer: React.FC<Props> = (props) => {
   };
 
   const handleIntervalUpdate = (e: number | undefined) =>
-    setStatus((state) => ({ ...state, progressMs: state.progressMs + 100 }));
+    setStatus((state) => {
+      // emits the next song 1s before the current one ends
+      if (isDJ && state.progressMs && state.duration - state.progressMs < 800) {
+        const currentIndex = roomState.uris.findIndex(
+          (i) =>
+            i ===
+            (state.currentTrack.linked_from_uri
+              ? state.currentTrack.linked_from_uri
+              : state.currentTrack.uri)
+        );
+        emitNextTrack(
+          currentIndex === roomState.uris.length
+            ? roomState.uris[0]
+            : roomState.uris[currentIndex + 1]
+        );
+        return { ...state, progressMs: 0 };
+      }
+      return { ...state, progressMs: state.progressMs + 100 };
+    });
 
   const debounceSlider = useCallback(
     debouncer((progressMs: number) => {
@@ -227,7 +246,7 @@ export const Webplayer: React.FC<Props> = (props) => {
     player.current.setVolume(volume / 100);
   };
 
-  const play = async (deviceId: string | null, data: playData) => {
+  const play = (deviceId: string | null, data: playData) => {
     const { offset, ...rest } = data;
     playSong(token, deviceId, offset?.uri ? data : rest);
   };

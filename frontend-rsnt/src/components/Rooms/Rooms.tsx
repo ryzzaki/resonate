@@ -45,7 +45,7 @@ export const Rooms: React.FC = () => {
         )}
         <div className="grid grid-cols-5 gap-30">
           {rooms.map((room: any) => (
-            <RoomCard logged={!!token} room={room} />
+            <RoomCard key={room.id} logged={!!token} room={room} />
           ))}
         </div>
       </main>
