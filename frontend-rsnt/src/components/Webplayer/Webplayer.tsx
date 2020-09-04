@@ -235,7 +235,6 @@ export const Webplayer: React.FC<Props> = (props) => {
   return (
     <WebplayerView
       status={status}
-      isDJ={isDJ}
       handleResync={handleResync}
       handlePlayState={handlePlayState}
       handleSliderPos={handleSliderPos}
