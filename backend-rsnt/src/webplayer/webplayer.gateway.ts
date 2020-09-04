@@ -106,6 +106,24 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
   }
 
   @UseGuards(WsAuthGuard)
+  @SubscribeMessage('addToQueue')
+  async addToQueue(
+    @MessageBody() payload: { uri: string },
+    @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User,
+    @ConnectedSocket() socket: Socket
+  ) {
+    const data = await this.spotifyService.getAlbumTracks(user, payload.uri);
+    const session = await this.getSessionFromSocketQueryId(socket);
+    session.metadata[payload.uri] = {
+      title: data.name,
+      artists: data.artists,
+      cover: data.images.pop(),
+    };
+    this.server.to(session.id).emit('receiveQueue', { metadata: session.metadata, uris: session.uris });
+    await this.sessionService.updateSession(session);
+  }
+
+  @UseGuards(WsAuthGuard)
   @SubscribeMessage('rebroadcastSelectedURI')
   async onURIChange(
     @MessageBody() payload: { uri: string; startUri?: string },
@@ -115,12 +133,28 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     const session = await this.getSessionFromSocketQueryId(socket);
     this.isPermittedForUser(user, session);
     if (payload.uri.includes('spotify:album:')) {
-      const { data } = await this.spotifyService.getAlbumTracks(user, payload.uri);
-      session.uris = data.items.map((track: { uri: string }) => track.uri);
+      const data = await this.spotifyService.getAlbumTracks(user, payload.uri);
+      const albumCover = data.images.pop().url as string;
+      session.uris = data.tracks.items.map((track: { name: string; artists: any[]; uri: string }) => {
+        session.metadata[track.uri] = {
+          title: track.name,
+          artists: track.artists,
+          cover: albumCover,
+        };
+        return track.uri;
+      });
       session.webplayer.uri = session.uris[0];
     } else if (payload.uri.includes('spotify:playlist:')) {
-      const { data } = await this.spotifyService.getPlaylistTracks(user, payload.uri);
-      session.uris = data.items.map((i: any) => i.track.uri);
+      const data = await this.spotifyService.getPlaylistTracks(user, payload.uri);
+      const playlistCover = data.images.pop().url as string;
+      session.uris = data.tracks.items.map((i: { track: { name: string; artists: any[]; uri: string } }) => {
+        session.metadata[i.track.uri] = {
+          title: i.track.name,
+          artists: i.track.artists,
+          cover: playlistCover,
+        };
+        return i.track.uri;
+      });
       session.webplayer.uri = session.uris[0];
     } else {
       session.uris = [payload.uri];

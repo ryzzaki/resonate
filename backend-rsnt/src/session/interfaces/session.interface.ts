@@ -10,6 +10,7 @@ export interface Session {
   description: string | undefined;
   currentDJ: BasicUser | null;
   uris: string[] | undefined;
+  metadata: { [key: string]: UriMetadata };
   connectedUsers: BasicUser[];
   startsAt: number;
   endsAt: number;
@@ -24,4 +25,10 @@ interface Message {
   sentAt: number;
   sender: BasicUser;
   message: string;
+}
+
+interface UriMetadata {
+  title: string;
+  artists: any[];
+  cover: string;
 }

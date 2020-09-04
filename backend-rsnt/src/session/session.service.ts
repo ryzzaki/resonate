@@ -35,6 +35,7 @@ export class SessionService {
       roomAccess,
       currentDJ: omittedVarUser,
       uris: [_.sample(this.defaultSongURIs)],
+      metadata: {},
       connectedUsers: [],
       startsAt: Date.now(),
       endsAt: Date.now() + 10 * 60 * 1000,

@@ -17,7 +17,7 @@ export class SpotifyService {
       q: searchString,
       type: 'album,track,artist,playlist',
     })}`;
-    const response = await axios
+    const res = await axios
       .get(url, {
         headers: { Authorization: `Bearer ${user.accessToken}` },
       })
@@ -25,7 +25,7 @@ export class SpotifyService {
         this.logger.error(`Unable to authorize Spotify client on ${e} using the current access token!`);
         throw new BadRequestException(`Unable to authorize Spotify client using the current access token!`);
       });
-    return response.data;
+    return res.data;
   }
 
   async playSongForDeviceId(deviceId: string, data: playData, user: User): Promise<void> {
@@ -63,8 +63,8 @@ export class SpotifyService {
       });
   }
 
-  async getAlbumTracks(user: User, uri: string) {
-    const url = `${SpotifyUrlEnums.SPOTIFY_API}/albums/${uri.replace('spotify:album:', '')}/tracks`;
+  async getTrack(user: User, uri: string) {
+    const url = `${SpotifyUrlEnums.SPOTIFY_API}/tracks/${uri.replace('spotify:track:', '')}`;
     const res = await axios
       .get(url, {
         headers: {
@@ -75,11 +75,26 @@ export class SpotifyService {
         this.logger.error(`Unable to authorize Spotify client on ${e} using the current access token!`);
         throw new BadRequestException(`Unable to authorize Spotify client using the current access token!`);
       });
-    return res;
+    return res.data;
+  }
+
+  async getAlbumTracks(user: User, uri: string) {
+    const url = `${SpotifyUrlEnums.SPOTIFY_API}/albums/${uri.replace('spotify:album:', '')}`;
+    const res = await axios
+      .get(url, {
+        headers: {
+          Authorization: `Bearer ${user.accessToken}`,
+        },
+      })
+      .catch((e) => {
+        this.logger.error(`Unable to authorize Spotify client on ${e} using the current access token!`);
+        throw new BadRequestException(`Unable to authorize Spotify client using the current access token!`);
+      });
+    return res.data;
   }
 
   async getPlaylistTracks(user: User, uri: string) {
-    const url = `${SpotifyUrlEnums.SPOTIFY_API}/playlists/${uri.replace('spotify:playlist:', '')}/tracks`;
+    const url = `${SpotifyUrlEnums.SPOTIFY_API}/playlists/${uri.replace('spotify:playlist:', '')}`;
     const res = await axios
       .get(url, {
         headers: {
@@ -90,6 +105,6 @@ export class SpotifyService {
         this.logger.error(`Unable to authorize Spotify client on ${e} using the current access token!`);
         throw new BadRequestException(`Unable to authorize Spotify client using the current access token!`);
       });
-    return res;
+    return res.data;
   }
 }
