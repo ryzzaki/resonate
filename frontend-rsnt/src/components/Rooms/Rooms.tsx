@@ -34,8 +34,7 @@ export const Rooms: React.FC = () => {
           <h1 className="text-40 font-bold my-40">Explore rooms</h1>
           <button
             onClick={() => setModal(true)}
-            className="ml-auto bg-white text-black font-bold text-14
-                px-20 py-5 rounded-full uppercase"
+            className="ml-auto bg-greylight hover:bg-white text-black font-bold text-14 px-20 py-5 rounded-full uppercase transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110"
           >
             Create a room
           </button>

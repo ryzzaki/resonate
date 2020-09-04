@@ -3,6 +3,7 @@ import Session from '../../types/session';
 import { Search } from '../Search/Search';
 import { Webplayer } from '../Webplayer/Webplayer';
 import { Queue } from '../Queue/Queue';
+import { Lyrics } from '../Lyrics/Lyrics';
 import { UserList } from '../UserList/UserList';
 import { AuthContext } from '../../context/AuthContext';
 import { useSignout } from '../../utils/hooks';
@@ -40,7 +41,10 @@ export const PartyView: React.FC<Props> = (props) => {
       <div className="flex-1 flex">
         <div className="w-20rem">
           <Search token={token} emitSearchedURI={emitSearchedURI} />
-          <Queue />
+          <div className="flex wrap">
+            <Queue />
+            <Lyrics token={token} query={'Feel it Still'} />
+          </div>
         </div>
         <div className="flex-1 flex flex-col">
           <div className="p-20 px-40 flex items-center text-grey">
@@ -51,18 +55,18 @@ export const PartyView: React.FC<Props> = (props) => {
               <p className="pl-15">{roomState.description}</p>
             </div>
             <Link
-              className="mr-20 ml-auto cursor-pointer hover:text-white"
+              className="mr-20 ml-auto cursor-pointer hover:text-white transition duration-300 ease-in-out"
               to="/rooms"
             >
               Rooms
             </Link>
             <div
-              className="mr-20 cursor-pointer hover:text-white"
+              className="mr-20 cursor-pointer hover:text-white transition duration-300 ease-in-out"
               onClick={handleSignOut}
             >
               Sign Out
             </div>
-            <div className="inline-flex pr-20 items-center border-2 border-black2light rounded-full">
+            <div className="inline-flex pr-20 items-center border-2 border-black2light rounded-full hover:text-white hover:bg-black2light transition duration-300 ease-in-out">
               <AccountIcon className="fill-current text-grey w-30 h-30" />
               <span className="pl-5">{user.displayName}</span>
             </div>

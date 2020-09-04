@@ -67,3 +67,11 @@ export const createSession = async (token: string | null, data: any) => {
     },
   });
 };
+
+export const getLyrics = async (token: string | null, query: string) => {
+  return axios.get(`${UrlEnums.API_URL}/genius/lyrics?q=${query}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};

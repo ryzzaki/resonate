@@ -7,7 +7,7 @@ export const Queue: React.FC<Props> = (props) => {
 
   return (
     <div className="px-20">
-      <h3 className="text-greylight font-bold uppercase text-14">
+      <h3 className="text-greylight hover:text-white font-bold uppercase text-14 transition duration-300 ease-in-out cursor-pointer">
         Next in queue
       </h3>
     </div>

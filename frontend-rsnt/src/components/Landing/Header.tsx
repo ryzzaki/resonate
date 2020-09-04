@@ -20,14 +20,14 @@ export const Header: React.FC<HeaderProps> = (props) => {
         </div>
         <ul className="ml-auto flex items-center">
           {!noLogin && (
-            <li className="mr-30 hover:text-white">
+            <li className="mr-30 hover:text-white transition duration-300 ease-in-out">
               <a href="#rooms">Rooms</a>
             </li>
           )}
-          <li className="mr-30 hover:text-white">
+          <li className="mr-30 hover:text-white transition duration-300 ease-in-out">
             <a href="#kickstarter">Support us</a>
           </li>
-          <li className="mr-30 hover:text-white">
+          <li className="mr-30 hover:text-white transition duration-300 ease-in-out">
             <a
               href="https://musicxp.typeform.com/to/WgGETI7v"
               rel="noopener noreferrer"
@@ -40,7 +40,7 @@ export const Header: React.FC<HeaderProps> = (props) => {
             <li>
               <a
                 href={`${UrlEnums.API_URL}/auth/spotify`}
-                className="bg-black2lighter hover:bg-white text-white  hover:text-black inline-flex items-center font-semibold p-10 pr-20 rounded-full transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110"
+                className="bg-black2lighter hover:bg-white text-white hover:text-black inline-flex items-center font-semibold p-10 pr-20 rounded-full transition duration-500 ease-in-out transform hover:-translate-y-1 hover:scale-110"
               >
                 <SpotifyLogo className="w-25 h-25 mr-10" />
                 Login with Spotify
@@ -49,7 +49,7 @@ export const Header: React.FC<HeaderProps> = (props) => {
           ) : (
             <li>
               <div
-                className="cursor-pointer hover:text-white"
+                className="cursor-pointer hover:text-white transition duration-300 ease-in-out"
                 onClick={handleSignout}
               >
                 Sign out
