@@ -112,7 +112,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
             <div className="flex flex-wrap content-center justify-center flex-1 overscroll-auto max-h-30rem">
               {rooms.map((room: any) => (
                 <div className="m-20 max-w-250">
-                  <RoomCard token={token} room={room} />
+                  <RoomCard logged={!!token} room={room} />
                 </div>
               ))}
             </div>

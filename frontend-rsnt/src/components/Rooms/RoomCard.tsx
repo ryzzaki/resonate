@@ -2,17 +2,18 @@ import React from 'react';
 import { navigate } from '@reach/router';
 import { ReactComponent as RoomGroup } from '../../assets/icons/roomGroup.svg';
 import { UrlEnums } from '../../enums/urls.enum';
+import Session from '../../types/session';
 
 type Props = {
-  token: string;
-  room: any;
+  logged: boolean;
+  room: Session;
 };
 
 export const RoomCard: React.FC<Props> = (props) => {
-  const { token, room } = props;
+  const { logged, room } = props;
 
   const joinRoom = (id: string) => {
-    if (token) {
+    if (logged) {
       navigate(`/party?sessionId=${id}`);
     } else {
       localStorage.removeItem('redirect_url');
