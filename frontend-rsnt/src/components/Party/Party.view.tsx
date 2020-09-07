@@ -17,6 +17,7 @@ type Props = {
   roomState: Session;
   emitSelectNewDJ: () => void;
   emitSearchedURI: (uri: string) => void;
+  emitAddQueue: (uri: string) => void;
   emitSliderPos: (progressMs: number) => void;
   emitNextTrack: () => void;
 };
@@ -28,6 +29,7 @@ export const PartyView: React.FC<Props> = (props) => {
     token,
     roomState,
     emitSearchedURI,
+    emitAddQueue,
     emitSelectNewDJ,
     emitSliderPos,
     emitNextTrack,
@@ -40,7 +42,11 @@ export const PartyView: React.FC<Props> = (props) => {
     <div className="min-h-screen bg-black2 flex flex-col">
       <div className="flex-1 flex">
         <div className="w-20rem">
-          <Search token={token} emitSearchedURI={emitSearchedURI} />
+          <Search
+            token={token}
+            emitSearchedURI={emitSearchedURI}
+            emitAddQueue={emitAddQueue}
+          />
           <Queue uris={roomState.uris} />
         </div>
         <div className="flex-1 flex flex-col">
@@ -73,9 +79,7 @@ export const PartyView: React.FC<Props> = (props) => {
               <div className="flex-1 flex flex-col bg-black2light rounded-md">
                 <Lyrics
                   token={token}
-                  query={`${roomState.uris[0]?.artists.join(' ')} ${
-                    roomState.uris[0]?.title
-                  }`}
+                  query={`${roomState.uris[0]?.artists[0].name}, ${roomState.uris[0]?.title}`}
                 />
               </div>
             </div>

@@ -55,6 +55,9 @@ export const Party: React.FC<RouteComponentProps<Props>> = () => {
     socket.current.on('receiveUsers', (connectedUsers: any) =>
       setRoomState((state) => ({ ...state, connectedUsers }))
     );
+    socket.current.on('receiveQueue', (uris: any) =>
+      setRoomState((state) => ({ ...state, uris }))
+    );
     socket.current.on('receiveCurrentSongStart', (songStartedAt: number) =>
       setRoomState((state) => ({
         ...state,
@@ -82,6 +85,8 @@ export const Party: React.FC<RouteComponentProps<Props>> = () => {
   const emitSliderPos = (progressMs: number) =>
     socket.current.emit('rebroadcastSongStartedAt', Date.now() - progressMs);
 
+  const emitAddQueue = (uri: string) => socket.current.emit('addToQueue', uri);
+
   const emitSelectNewDJ = () => socket.current.emit('selectNewDJ');
 
   const emitNextTrack = () => socket.current.emit('selectNextTrack');
@@ -95,6 +100,7 @@ export const Party: React.FC<RouteComponentProps<Props>> = () => {
       emitSliderPos={emitSliderPos}
       emitSelectNewDJ={emitSelectNewDJ}
       emitSearchedURI={emitSearchedURI}
+      emitAddQueue={emitAddQueue}
       emitNextTrack={emitNextTrack}
     />
   );

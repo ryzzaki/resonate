@@ -107,19 +107,40 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
 
   @UseGuards(WsAuthGuard)
   @SubscribeMessage('addToQueue')
-  async addToQueue(
-    @MessageBody() payload: { uri: string },
-    @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User,
-    @ConnectedSocket() socket: Socket
-  ) {
-    // const data = await this.spotifyService.getAlbumTracks(user, payload.uri);
+  async addToQueue(@MessageBody() uri: string, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
     const session = await this.getSessionFromSocketQueryId(socket);
-    // session.metadata[payload.uri] = {
-    //   title: data.name,
-    //   artists: data.artists,
-    //   cover: data.images.pop(),
-    // };
-    // this.server.to(session.id).emit('receiveQueue', { metadata: session.metadata, uris: session.uris });
+    this.isPermittedForUser(user, session);
+    let addedSongs;
+    if (uri.includes('spotify:album:')) {
+      const data = await this.spotifyService.getAlbumTracks(user, uri);
+      addedSongs = data.tracks.items.map((track: any) => ({
+        uri: track.uri,
+        title: track.name,
+        artists: track.artists,
+        cover: data.images.pop().url,
+      }));
+    } else if (uri.includes('spotify:playlist:')) {
+      const data = await this.spotifyService.getPlaylistTracks(user, uri);
+      addedSongs = data.tracks.items.map(({ track }: any) => ({
+        uri: track.uri,
+        title: track.name,
+        artists: track.artists,
+        cover: track.album.images.pop().url,
+      }));
+    } else {
+      const data = await this.spotifyService.getTrack(user, uri);
+      addedSongs = [
+        {
+          uri: data.uri,
+          title: data.name,
+          artists: data.artists,
+          cover: data.album.images.pop().url,
+        },
+      ];
+    }
+    session.uris = [...session.uris, ...addedSongs];
+    this.server.to(session.id).emit('receiveQueue', session.uris);
+    this.logger.verbose(`Newly selected URI: ${uri}`);
     await this.sessionService.updateSession(session);
   }
 
@@ -201,7 +222,7 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
       session.uris.shift();
     }
     session.webplayer.songStartedAt = Date.now();
-    this.logger.verbose(`Playing next in queue: ${session.uris[0]}`);
+    this.logger.verbose(`Playing next in queue: ${session.uris[0].uri}`);
     this.server.to(session.id).emit('receiveCurrentSession', session);
     await this.sessionService.updateSession(session);
   }

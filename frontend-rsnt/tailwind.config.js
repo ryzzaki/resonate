@@ -109,6 +109,7 @@ module.exports = {
   variants: {
     textColor: ['group-hover', 'hover'],
     opacity: ['group-hover'],
+    display: ['group-hover'],
   },
   plugins: [],
 };

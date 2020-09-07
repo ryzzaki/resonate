@@ -19,7 +19,7 @@ type session = {
 export interface UriMetadata {
   uri: string;
   title: string;
-  artists: any[];
+  artists: any;
   cover: string;
 }
 

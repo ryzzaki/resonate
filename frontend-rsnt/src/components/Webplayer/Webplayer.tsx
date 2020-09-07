@@ -149,6 +149,10 @@ export const Webplayer: React.FC<Props> = (props) => {
   // Play the song at the right start on first load
   const handlePlayerReady = ({ device_id }) => {
     console.log('Ready with Device ID', device_id);
+    const volume = localStorage.getItem('volume');
+    if (volume) {
+      player.current.setVolume(Number(volume) / 100);
+    }
     // TODO: Test the gap
     play(device_id, {
       uris: [roomState.uris[0].uri],
@@ -158,7 +162,7 @@ export const Webplayer: React.FC<Props> = (props) => {
       ...state,
       deviceId: device_id,
       isInitializing: false,
-      volume: player.current._options.volume * 100,
+      volume: volume ? Number(volume) : player.current._options.volume * 100,
     }));
   };
 
@@ -223,6 +227,7 @@ export const Webplayer: React.FC<Props> = (props) => {
     const volume = Number(e.target.value);
     setStatus((state) => ({ ...state, volume }));
     player.current.setVolume(volume / 100);
+    localStorage.setItem('volume', volume.toString());
   };
 
   const play = (deviceId: string | null, data: playData) => {

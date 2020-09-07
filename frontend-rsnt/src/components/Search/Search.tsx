@@ -6,10 +6,11 @@ import debouncer from '../../utils/debouncer';
 type Props = {
   token: string;
   emitSearchedURI: (uri: string) => void;
+  emitAddQueue: (uri: string) => void;
 };
 
 export const Search: React.FC<Props> = (props) => {
-  const { token, emitSearchedURI } = props;
+  const { token, emitSearchedURI, emitAddQueue } = props;
 
   const [results, setResults] = useState<any>(null);
 
@@ -36,12 +37,18 @@ export const Search: React.FC<Props> = (props) => {
     closeSearch();
   };
 
+  const handleNext = (uri: string) => {
+    emitAddQueue(uri);
+    closeSearch();
+  };
+
   const closeSearch = () => setResults(null);
 
   return (
     <SearchView
       results={results}
       handleSearch={handleSearch}
+      handleNext={handleNext}
       handleClick={handleClick}
       closeSearch={closeSearch}
     />
