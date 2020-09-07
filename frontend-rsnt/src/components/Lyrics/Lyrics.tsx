@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getLyrics } from '../../utils/api';
+import { ReactComponent as MusicIcon } from '../../assets/icons/music.svg';
 
 type Props = {
   token: string;
@@ -8,25 +9,38 @@ type Props = {
 
 export const Lyrics: React.FC<Props> = (props) => {
   const { token, query } = props;
-  const [lyrics, setLyrics] = useState('');
 
-  const handleOnClick = () => {
-    getLyrics(token, query).then((res) => {
-      setLyrics(res.data);
-    });
+  const [lyrics, setLyrics] = useState('No lyrics');
+
+  const handleOnClick = async () => {
+    try {
+      setLyrics('Loading...');
+      const { data } = await getLyrics(token, query);
+      setLyrics(data);
+    } catch (err) {
+      setLyrics('No lyrics');
+      console.error(err);
+    }
   };
 
   return (
-    <div className="px-20">
-      <h3
-        className="text-greylight hover:text-white font-bold uppercase text-14 transition duration-300 ease-in-out cursor-pointer"
-        onClick={handleOnClick}
-      >
-        View Lyrics
-      </h3>
-      <div>
-        <p className="text-greylight w-full">{lyrics}</p>
+    <>
+      <div className="p-20">
+        <button
+          onClick={handleOnClick}
+          className="text-greylight flex font-bold text-18 hover:text-white"
+        >
+          <MusicIcon className="w-25 fill-current mr-10" />
+          Show lyrics
+        </button>
       </div>
-    </div>
+      <div className="px-20 pb-20 flex-1 overflow-auto">
+        <div className="relative h-full overflow-y-auto">
+          <p className="whitespace-pre-wrap absolute top-0 bottom-0 left-0 right-0 text-greylight leading-8 font-bold text-25">
+            {lyrics.replace('  ', '')}
+          </p>
+        </div>
+      </div>
+    </>
   );
 };

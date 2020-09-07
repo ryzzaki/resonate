@@ -20,6 +20,7 @@ export class GeniusService {
       });
       resultUrl = searchRes.data?.response?.hits[0]?.result?.url;
     } catch (e) {
+      console.log(e);
       throw new InternalServerErrorException(`Failed to fetch Genius lyrics from API on: ${e}`);
     }
     if (!resultUrl) {

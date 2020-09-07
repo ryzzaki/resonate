@@ -15,7 +15,7 @@ export const UserList: React.FC<Props> = (props) => {
 
   return (
     <div className="px-20 flex flex-col h-full">
-      <h3 className="text-greylight font-bold uppercase text-14">PARTY DJ</h3>
+      <h3 className="text-grey font-bold uppercase text-14">PARTY DJ</h3>
       <div className="flex mb-20">
         <div className="pr-10 text-20">🎧</div>
         <h5 className="font-semibold text-white w-full whitespace-no-wrap overflow-hidden">
@@ -32,7 +32,7 @@ export const UserList: React.FC<Props> = (props) => {
           </button>
         </div>
       )}
-      <h3 className="text-greylight font-bold uppercase text-14">
+      <h3 className="text-grey font-bold uppercase text-14">
         Users
         <span>({users.length})</span>
       </h3>

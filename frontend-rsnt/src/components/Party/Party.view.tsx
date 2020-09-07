@@ -7,8 +7,8 @@ import { Lyrics } from '../Lyrics/Lyrics';
 import { UserList } from '../UserList/UserList';
 import { AuthContext } from '../../context/AuthContext';
 import { useSignout } from '../../utils/hooks';
-import { ReactComponent as AccountIcon } from '../../assets/icons/account.svg';
 import { Link } from '@reach/router';
+import { ReactComponent as AccountIcon } from '../../assets/icons/account.svg';
 
 type Props = {
   isDJ: boolean;
@@ -41,10 +41,7 @@ export const PartyView: React.FC<Props> = (props) => {
       <div className="flex-1 flex">
         <div className="w-20rem">
           <Search token={token} emitSearchedURI={emitSearchedURI} />
-          <div className="flex wrap">
-            <Queue />
-            <Lyrics token={token} query={'Feel it Still'} />
-          </div>
+          <Queue />
         </div>
         <div className="flex-1 flex flex-col">
           <div className="p-20 px-40 flex items-center text-grey">
@@ -73,7 +70,9 @@ export const PartyView: React.FC<Props> = (props) => {
           </div>
           <div className="flex flex-1">
             <div className="flex flex-1 px-40">
-              <div className="flex-1 bg-black2light rounded-md"></div>
+              <div className="flex-1 flex flex-col bg-black2light rounded-md">
+                <Lyrics token={token} query={'Run joji'} />
+              </div>
             </div>
             <div className="w-15rem">
               <UserList
