@@ -52,6 +52,9 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
       session.endsAt = Date.now() + 10 * 60 * 1000;
       session.webplayer.songStartedAt = Date.now();
     }
+    if (!session.metadata) {
+      session.metadata = {};
+    }
     session.connectedUsers.push(user);
     this.logger.verbose(`A user has connected! Current number of users: ${session.connectedUsers.length}`);
     this.server.to(socket.id).emit('receiveCurrentSession', session);
@@ -198,6 +201,7 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
   async selectNextTrack(@MessageBody() uri: string, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
     const session = await this.getSessionFromSocketQueryId(socket);
     this.isPermittedForUser(user, session);
+    delete session.metadata[session.webplayer.uri];
     session.webplayer.uri = uri;
     session.webplayer.songStartedAt = Date.now();
     this.logger.verbose(`Playing next in queue: ${session.webplayer.uri}`);

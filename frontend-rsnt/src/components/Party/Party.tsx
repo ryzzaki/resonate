@@ -25,6 +25,7 @@ export const Party: React.FC<RouteComponentProps<Props>> = () => {
     uris: [],
     startsAt: 0,
     endsAt: 0,
+    metadata: {},
     webplayer: {
       uri: '',
       songStartedAt: 0,

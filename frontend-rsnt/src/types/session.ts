@@ -15,6 +15,13 @@ type session = {
     uri: string;
     songStartedAt: number;
   };
+  metadata: { [key: string]: UriMetadata };
 };
+
+export interface UriMetadata {
+  title: string;
+  artists: any[];
+  cover: string;
+}
 
 export default session;

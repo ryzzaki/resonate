@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import Session from '../../types/session';
+import Session, { UriMetadata } from '../../types/session';
 import { Search } from '../Search/Search';
 import { Webplayer } from '../Webplayer/Webplayer';
 import { Queue } from '../Queue/Queue';
@@ -41,7 +41,10 @@ export const PartyView: React.FC<Props> = (props) => {
       <div className="flex-1 flex">
         <div className="w-20rem">
           <Search token={token} emitSearchedURI={emitSearchedURI} />
-          <Queue />
+          <Queue
+            currentURI={roomState.webplayer.uri}
+            metadata={roomState.metadata}
+          />
         </div>
         <div className="flex-1 flex flex-col">
           <div className="p-20 px-40 flex items-center text-grey">
