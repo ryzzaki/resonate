@@ -104,9 +104,8 @@ export const Webplayer: React.FC<Props> = (props) => {
   useEffect(() => {
     if (status.isInitializing) return;
 
-    if (isDJ) {
-      // emitSearchedURI(status.contextUri);
-      console.log(status.contextUri);
+    if (isDJ && status.contextUri) {
+      emitSearchedURI(status.contextUri as string);
     } else {
       setStatus((state) => ({ ...state, unsync: true }));
     }
@@ -182,7 +181,7 @@ export const Webplayer: React.FC<Props> = (props) => {
         contextUri: songState.context.uri,
         currentTrack: songState.track_window.current_track,
         paused: songState.paused,
-        unsync: songState.paused ? true : state.unsync,
+        unsync: songState.paused,
       }));
     }
   };
@@ -192,12 +191,9 @@ export const Webplayer: React.FC<Props> = (props) => {
       // emits the next song 1s before the current one ends
       if (isDJ && state.progressMs && state.duration - state.progressMs < 800) {
         const currentIndex = roomState.uris.findIndex(
-          (i) =>
-            i ===
-            (state.currentTrack.linked_from_uri
-              ? state.currentTrack.linked_from_uri
-              : state.currentTrack.uri)
+          (i) => i === state.currentTrack.uri
         );
+        console.log(currentIndex);
         emitNextTrack(
           currentIndex === roomState.uris.length
             ? roomState.uris[0]
