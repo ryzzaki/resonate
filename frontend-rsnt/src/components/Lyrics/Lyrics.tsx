@@ -36,7 +36,7 @@ export const Lyrics: React.FC<Props> = (props) => {
       </div>
       <div className="px-20 pb-20 flex-1 overflow-auto">
         <div className="relative h-full overflow-y-auto">
-          <p className="whitespace-pre-wrap absolute top-0 bottom-0 left-0 right-0 text-greylight leading-8 font-bold text-25">
+          <p className="whitespace-pre-wrap absolute top-0 bottom-0 left-0 right-0 text-greylight leading-10 font-bold text-25">
             {lyrics.replace('  ', '')}
           </p>
         </div>

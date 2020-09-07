@@ -142,11 +142,11 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
       }));
     } else if (payload.uri.includes('spotify:playlist:')) {
       const data = await this.spotifyService.getPlaylistTracks(user, payload.uri);
-      session.uris = data.tracks.items.map((track: any) => ({
+      session.uris = data.tracks.items.map(({ track }: any) => ({
         uri: track.uri,
         title: track.name,
         artists: track.artists,
-        cover: data.images.pop().url,
+        cover: track.album.images.pop().url,
       }));
     } else {
       const data = await this.spotifyService.getTrack(user, payload.uri);
