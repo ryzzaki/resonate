@@ -73,9 +73,9 @@ export const PartyView: React.FC<Props> = (props) => {
               <div className="flex-1 flex flex-col bg-black2light rounded-md">
                 <Lyrics
                   token={token}
-                  query={`${
+                  query={`${roomState.uris[0]?.artists.join(' ')} ${
                     roomState.uris[0]?.title
-                  }%20${roomState.uris[0]?.artists.join('%20')}`}
+                  }`}
                 />
               </div>
             </div>
