@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { ReactComponent as SearchIcon } from '../../assets/icons/search.svg';
 import { SongItem } from './SongItem';
+import handleClickOutside from '../../utils/handleClickOutside';
 
 type Props = {
   results: any;
   handleSearch: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleClick: (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => void;
+  closeSearch: () => void;
 };
 
 enum activeState {
@@ -15,13 +17,17 @@ enum activeState {
 }
 
 export const SearchView: React.FC<Props> = (props) => {
-  const { results, handleSearch, handleClick } = props;
+  const { results, handleSearch, handleClick, closeSearch } = props;
 
   const [active, setActive] = useState(activeState.SONGS);
 
+  const ref = useRef(null);
+
+  handleClickOutside(ref, closeSearch);
+
   return (
-    <div className="p-20 pr-0 relative">
-      <div className="relative z-10">
+    <div ref={ref} className="p-20 pr-0 relative">
+      <div className="relative z-20">
         <SearchIcon className="absolute top-1/2 left-0.5 transform -translate-y-1/2 fill-current text-grey" />
         <input
           onChange={handleSearch}
@@ -30,7 +36,7 @@ export const SearchView: React.FC<Props> = (props) => {
         />
       </div>
       {results && (
-        <div className="absolute top-0 h-screen w-full pt-80 pb-90 bg-black2">
+        <div className="absolute z-10 top-0 h-screen w-full pt-80 pb-90 bg-black2">
           <div className="overflow-scroll h-full">
             <div className="flex sticky top-0 bg-black2 pb-20">
               {Object.keys(activeState).map((i) => (
@@ -81,7 +87,7 @@ export const SearchView: React.FC<Props> = (props) => {
                     uri={playlist.uri}
                     cover={playlist.images[2]?.url}
                     name={playlist.name}
-                    owner={playlist.owner.display_name}
+                    owner={playlist.owner?.display_name}
                     handleClick={handleClick}
                   />
                 ))}

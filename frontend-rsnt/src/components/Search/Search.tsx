@@ -33,13 +33,17 @@ export const Search: React.FC<Props> = (props) => {
   const handleClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     const { uri } = e.currentTarget.dataset;
     emitSearchedURI(uri as string);
+    closeSearch();
   };
+
+  const closeSearch = () => setResults(null);
 
   return (
     <SearchView
       results={results}
       handleSearch={handleSearch}
       handleClick={handleClick}
+      closeSearch={closeSearch}
     />
   );
 };

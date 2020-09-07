@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { VideoSeekSlider } from 'react-video-seek-slider';
 import playerStatus from '../../types/playerStatus';
 import { ReactComponent as Play } from '../../assets/icons/play.svg';
@@ -51,7 +51,7 @@ export const WebplayerView: React.FC<Props> = (props) => {
     );
 
   return (
-    <div className="relative">
+    <div className="relative z-10">
       {status.unsync && (
         <button
           onClick={handleResync}

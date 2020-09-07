@@ -18,7 +18,7 @@ type Props = {
   emitSelectNewDJ: () => void;
   emitSearchedURI: (uri: string) => void;
   emitSliderPos: (progressMs: number) => void;
-  emitNextTrack: (uri: string) => void;
+  emitNextTrack: () => void;
 };
 
 export const PartyView: React.FC<Props> = (props) => {
@@ -41,10 +41,7 @@ export const PartyView: React.FC<Props> = (props) => {
       <div className="flex-1 flex">
         <div className="w-20rem">
           <Search token={token} emitSearchedURI={emitSearchedURI} />
-          <Queue
-            currentURI={roomState.webplayer.uri}
-            metadata={roomState.metadata}
-          />
+          <Queue uris={roomState.uris} />
         </div>
         <div className="flex-1 flex flex-col">
           <div className="p-20 px-40 flex items-center text-grey">

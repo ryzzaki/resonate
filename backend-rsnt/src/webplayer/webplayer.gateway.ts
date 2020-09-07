@@ -52,9 +52,6 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
       session.endsAt = Date.now() + 10 * 60 * 1000;
       session.webplayer.songStartedAt = Date.now();
     }
-    if (!session.metadata) {
-      session.metadata = {};
-    }
     session.connectedUsers.push(user);
     this.logger.verbose(`A user has connected! Current number of users: ${session.connectedUsers.length}`);
     this.server.to(socket.id).emit('receiveCurrentSession', session);
@@ -115,14 +112,14 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User,
     @ConnectedSocket() socket: Socket
   ) {
-    const data = await this.spotifyService.getAlbumTracks(user, payload.uri);
+    // const data = await this.spotifyService.getAlbumTracks(user, payload.uri);
     const session = await this.getSessionFromSocketQueryId(socket);
-    session.metadata[payload.uri] = {
-      title: data.name,
-      artists: data.artists,
-      cover: data.images.pop(),
-    };
-    this.server.to(session.id).emit('receiveQueue', { metadata: session.metadata, uris: session.uris });
+    // session.metadata[payload.uri] = {
+    //   title: data.name,
+    //   artists: data.artists,
+    //   cover: data.images.pop(),
+    // };
+    // this.server.to(session.id).emit('receiveQueue', { metadata: session.metadata, uris: session.uris });
     await this.sessionService.updateSession(session);
   }
 
@@ -133,38 +130,37 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
     @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User,
     @ConnectedSocket() socket: Socket
   ) {
-    const session = await this.getSessionFromSocketQueryId(socket);
+    let session = await this.getSessionFromSocketQueryId(socket);
     this.isPermittedForUser(user, session);
     if (payload.uri.includes('spotify:album:')) {
       const data = await this.spotifyService.getAlbumTracks(user, payload.uri);
-      const albumCover = data.images.pop().url as string;
-      session.uris = data.tracks.items.map((track: { name: string; artists: any[]; uri: string }) => {
-        session.metadata[track.uri] = {
-          title: track.name,
-          artists: track.artists,
-          cover: albumCover,
-        };
-        return track.uri;
-      });
-      session.webplayer.uri = session.uris[0];
+      session.uris = data.tracks.items.map((track: any) => ({
+        uri: track.uri,
+        title: track.name,
+        artists: track.artists,
+        cover: data.images.pop().url,
+      }));
     } else if (payload.uri.includes('spotify:playlist:')) {
       const data = await this.spotifyService.getPlaylistTracks(user, payload.uri);
-      const playlistCover = data.images.pop().url as string;
-      session.uris = data.tracks.items.map((i: { track: { name: string; artists: any[]; uri: string } }) => {
-        session.metadata[i.track.uri] = {
-          title: i.track.name,
-          artists: i.track.artists,
-          cover: playlistCover,
-        };
-        return i.track.uri;
-      });
-      session.webplayer.uri = session.uris[0];
+      session.uris = data.tracks.items.map((track: any) => ({
+        uri: track.uri,
+        title: track.name,
+        artists: track.artists,
+        cover: data.images.pop().url,
+      }));
     } else {
-      session.uris = [payload.uri];
-      session.webplayer.uri = '';
+      const data = await this.spotifyService.getTrack(user, payload.uri);
+      session.uris = [
+        {
+          uri: data.uri,
+          title: data.name,
+          artists: data.artists,
+          cover: data.album.images.pop().url,
+        },
+      ];
     }
     session.webplayer.songStartedAt = Date.now();
-    this.logger.verbose(`Newly selected URI: ${session.uris}`);
+    this.logger.verbose(`Newly selected URI: ${payload.uri}`);
     this.server.to(session.id).emit('receiveCurrentSession', session);
     await this.sessionService.updateSession(session);
   }
@@ -198,13 +194,14 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
 
   @UseGuards(WsAuthGuard)
   @SubscribeMessage('selectNextTrack')
-  async selectNextTrack(@MessageBody() uri: string, @GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
+  async selectNextTrack(@GetUser(ExecCtxTypeEnum.WEBSOCKET) user: User, @ConnectedSocket() socket: Socket) {
     const session = await this.getSessionFromSocketQueryId(socket);
     this.isPermittedForUser(user, session);
-    delete session.metadata[session.webplayer.uri];
-    session.webplayer.uri = uri;
+    if (session.uris.length > 1) {
+      session.uris.shift();
+    }
     session.webplayer.songStartedAt = Date.now();
-    this.logger.verbose(`Playing next in queue: ${session.webplayer.uri}`);
+    this.logger.verbose(`Playing next in queue: ${session.uris[0]}`);
     this.server.to(session.id).emit('receiveCurrentSession', session);
     await this.sessionService.updateSession(session);
   }

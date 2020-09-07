@@ -1,5 +1,6 @@
 import React from 'react';
 import { ReactComponent as SpotifyLogo } from '../../assets/icons/spotifyLogo.svg';
+import { ReactComponent as Logo } from '../../assets/icons/Logo.svg';
 import { UrlEnums } from '../../enums/urls.enum';
 import { useSignout } from '../../utils/hooks';
 
@@ -13,11 +14,15 @@ export const Header: React.FC<HeaderProps> = (props) => {
   const handleSignout = useSignout();
 
   return (
-    <header className="mt-25 py-15 sticky top-0 text-greylight bg-black2">
+    <header className="-mx-80 px-80 mt-25 py-15 sticky z-10 top-0 text-greylight bg-black2">
       <div className="flex items-center">
-        <div className="font-logoHeading text-34 text-white">
-          <a href="/#">Resonate</a>
-        </div>
+        <a
+          href="/#"
+          className="font-logoHeading text-34 text-white flex items-center"
+        >
+          <Logo className="w-30 mr-15 pb-5" />
+          Resonate
+        </a>
         <ul className="ml-auto flex items-center">
           {!noLogin && (
             <li className="mr-30 hover:text-white transition duration-300 ease-in-out">

@@ -9,13 +9,11 @@ export interface Session {
   roomAccess: RoomAccess;
   description: string | undefined;
   currentDJ: BasicUser | null;
-  uris: string[] | undefined;
-  metadata: { [key: string]: UriMetadata };
+  uris: UriMetadata[];
   connectedUsers: BasicUser[];
   startsAt: number;
   endsAt: number;
   webplayer: {
-    uri: string | undefined;
     songStartedAt: number | undefined;
   };
   chat: Message[];
@@ -27,7 +25,8 @@ interface Message {
   message: string;
 }
 
-interface UriMetadata {
+export interface UriMetadata {
+  uri: string;
   title: string;
   artists: any[];
   cover: string;

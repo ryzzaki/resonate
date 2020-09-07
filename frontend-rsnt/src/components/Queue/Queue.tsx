@@ -3,12 +3,11 @@ import { UriMetadata } from '../../types/session';
 import { SongItem } from '../Search/SongItem';
 
 type Props = {
-  metadata: { [key: string]: UriMetadata };
-  currentURI: string;
+  uris: UriMetadata[];
 };
 
 export const Queue: React.FC<Props> = (props) => {
-  const { metadata, currentURI } = props;
+  const { uris } = props;
 
   return (
     <div className="pl-20 flex flex-col h-full">
@@ -16,23 +15,18 @@ export const Queue: React.FC<Props> = (props) => {
         Next in queue
       </h3>
       <div className="flex-1 relative">
-        {metadata && (
-          <div className="absolute top-0 left-0 bottom-0 right-0 overflow-y-scroll pb-100">
-            {/* <SongItem/> */}
-            {Object.keys(metadata)
-              .filter((i) => i !== currentURI)
-              .map((song) => (
-                <SongItem
-                  key={song}
-                  uri={song}
-                  name={metadata[song].title}
-                  cover={metadata[song].cover}
-                  artists={metadata[song].artists}
-                  handleClick={() => {}}
-                />
-              ))}
-          </div>
-        )}
+        <div className="absolute top-0 left-0 bottom-0 right-0 overflow-y-scroll pb-100">
+          {uris.slice(1).map((song) => (
+            <SongItem
+              key={song.uri}
+              uri={song.uri}
+              name={song.title}
+              cover={song.cover}
+              artists={song.artists}
+              handleClick={() => {}}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
