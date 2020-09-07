@@ -81,7 +81,7 @@ export const SearchView: React.FC<Props> = (props) => {
                     uri={playlist.uri}
                     cover={playlist.images[2]?.url}
                     name={playlist.name}
-                    owner={playlist.owner.display_name}
+                    owner={playlist.owner?.display_name}
                     handleClick={handleClick}
                   />
                 ))}
