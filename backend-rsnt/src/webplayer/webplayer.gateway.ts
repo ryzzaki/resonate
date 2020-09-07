@@ -114,7 +114,6 @@ export class WebplayerGateway implements OnGatewayConnection, OnGatewayDisconnec
   ) {
     let session = await this.getSessionFromSocketQueryId(socket);
     this.isPermittedForUser(user, session);
-    console.log(payload);
     if (payload.uri.includes('spotify:album:')) {
       const { data } = await this.spotifyService.getAlbumTracks(user, payload.uri);
       session = this.webplayerService.setMultipleURIS(
