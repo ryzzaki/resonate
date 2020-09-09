@@ -22,7 +22,7 @@ export const Search: React.FC<Props> = (props) => {
       }
       const { data } = await searchSongs(token, e.target.value);
       setResults(data);
-    }, 600),
+    }, 300),
     []
   );
 
