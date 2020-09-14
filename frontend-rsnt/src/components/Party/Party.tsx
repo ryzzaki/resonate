@@ -6,7 +6,6 @@ import { AuthContext } from '../../context/AuthContext';
 import Session from '../../types/session';
 import { PartyView } from './Party.view';
 import { RoomAccess } from '../../enums/RoomAccess';
-import { playSong } from '../../utils/api';
 
 type Props = {};
 
@@ -26,7 +25,6 @@ export const Party: React.FC<RouteComponentProps<Props>> = () => {
     startsAt: 0,
     endsAt: 0,
     webplayer: {
-      uri: '',
       songStartedAt: 0,
     },
   });
@@ -57,6 +55,9 @@ export const Party: React.FC<RouteComponentProps<Props>> = () => {
     socket.current.on('receiveUsers', (connectedUsers: any) =>
       setRoomState((state) => ({ ...state, connectedUsers }))
     );
+    socket.current.on('receiveQueue', (uris: any) =>
+      setRoomState((state) => ({ ...state, uris }))
+    );
     socket.current.on('receiveCurrentSongStart', (songStartedAt: number) =>
       setRoomState((state) => ({
         ...state,
@@ -84,10 +85,11 @@ export const Party: React.FC<RouteComponentProps<Props>> = () => {
   const emitSliderPos = (progressMs: number) =>
     socket.current.emit('rebroadcastSongStartedAt', Date.now() - progressMs);
 
+  const emitAddQueue = (uri: string) => socket.current.emit('addToQueue', uri);
+
   const emitSelectNewDJ = () => socket.current.emit('selectNewDJ');
 
-  const emitNextTrack = (uri: string) =>
-    socket.current.emit('selectNextTrack', uri);
+  const emitNextTrack = () => socket.current.emit('selectNextTrack');
 
   return (
     <PartyView
@@ -98,6 +100,7 @@ export const Party: React.FC<RouteComponentProps<Props>> = () => {
       emitSliderPos={emitSliderPos}
       emitSelectNewDJ={emitSelectNewDJ}
       emitSearchedURI={emitSearchedURI}
+      emitAddQueue={emitAddQueue}
       emitNextTrack={emitNextTrack}
     />
   );

@@ -7,14 +7,20 @@ type session = {
   roomAccess: RoomAccess;
   description: string | undefined;
   currentDJ: sessionUser | undefined;
-  uris: string[];
+  uris: UriMetadata[];
   connectedUsers: sessionUser[];
   startsAt: number;
   endsAt: number;
   webplayer: {
-    uri: string;
     songStartedAt: number;
   };
 };
+
+export interface UriMetadata {
+  uri: string;
+  title: string;
+  artists: any;
+  cover: string;
+}
 
 export default session;

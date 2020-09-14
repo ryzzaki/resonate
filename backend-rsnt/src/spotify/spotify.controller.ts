@@ -35,4 +35,10 @@ export class SpotifyController {
   resumeSong(@GetUser() user: User) {
     return this.spotifyService.updatePlayerState(user, WebplayerStateEnum.PLAY);
   }
+
+  @Put('/repeat')
+  @UseGuards(AuthGuard())
+  repeatSong(@Query('deviceId') deviceId: string, @Query('state') state: boolean, @GetUser() user: User) {
+    return this.spotifyService.updatePlayerRepeatState(deviceId, state, user);
+  }
 }

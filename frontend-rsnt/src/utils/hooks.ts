@@ -24,6 +24,5 @@ export const useSignout = () => {
     localStorage.removeItem('access_key');
     window.location.href = `${UrlEnums.API_URL}/auth/signout`;
   }
-
   return signout;
 };

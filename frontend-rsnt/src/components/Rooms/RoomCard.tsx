@@ -25,7 +25,7 @@ export const RoomCard: React.FC<Props> = (props) => {
   return (
     <div
       key={room.id}
-      className="bg-black2light rounded-lg group group hover:bg-white p-20 cursor-pointer"
+      className="bg-black2light rounded-lg group group hover:bg-white p-20 cursor-pointer transition duration-300 ease-in-out"
       onClick={() => joinRoom(room.id)}
     >
       <img

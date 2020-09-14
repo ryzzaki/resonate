@@ -6,17 +6,18 @@ import { ReactComponent as Pause } from '../../assets/icons/pause.svg';
 import { ReactComponent as VolumeIcon } from '../../assets/icons/volume.svg';
 
 type Props = {
-  isDJ: boolean;
   status: playerStatus;
   handleResync: () => void;
   handlePlayState: () => void;
   handleSliderPos: (progressMs: number) => void;
-  handleVolume: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleVolume: (
+    e: React.ChangeEvent<HTMLInputElement>,
+    mute?: boolean
+  ) => void;
 };
 
 export const WebplayerView: React.FC<Props> = (props) => {
   const {
-    isDJ,
     handleResync,
     handlePlayState,
     status,
@@ -27,7 +28,7 @@ export const WebplayerView: React.FC<Props> = (props) => {
   if (status.isInitializing)
     return (
       <div className="text-center text-grey p-20">
-        <p>LOADING...</p>
+        <p>Connecting you to art...</p>
       </div>
     );
 
@@ -38,8 +39,19 @@ export const WebplayerView: React.FC<Props> = (props) => {
       </div>
     );
 
+  const toggleVolume = () =>
+    handleVolume(
+      status.volume === 0
+        ? (({ target: { value: 100 } } as unknown) as React.ChangeEvent<
+            HTMLInputElement
+          >)
+        : (({ target: { value: 0 } } as unknown) as React.ChangeEvent<
+            HTMLInputElement
+          >)
+    );
+
   return (
-    <div className="relative">
+    <div className="relative z-10">
       {status.unsync && (
         <button
           onClick={handleResync}
@@ -92,7 +104,10 @@ export const WebplayerView: React.FC<Props> = (props) => {
         </div>
         <div className="flex justify-center">
           <div className="flex items-center">
-            <VolumeIcon className="fill-current text-grey mr-20" />
+            <VolumeIcon
+              className="fill-current text-grey mr-20 cursor-pointer"
+              onClick={toggleVolume}
+            />
             <input type="range" value={status.volume} onChange={handleVolume} />
           </div>
         </div>

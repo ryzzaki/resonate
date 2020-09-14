@@ -36,6 +36,22 @@ export const searchSongs = async (token: string, search: string) => {
   );
 };
 
+export const repeatSong = async (
+  token: string,
+  deviceId: string | null,
+  state: boolean
+) => {
+  return axios.put(
+    `${UrlEnums.API_URL}/spotify/repeat?state=${state}&deviceId=${deviceId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+};
+
 export const playSong = async (
   token: string,
   deviceId: string | null,
@@ -62,6 +78,14 @@ export const fetchSessions = async (token: string | null) => {
 
 export const createSession = async (token: string | null, data: any) => {
   return axios.post(`${UrlEnums.API_URL}/session`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const getLyrics = async (token: string | null, query: string) => {
+  return axios.get(`${UrlEnums.API_URL}/genius/lyrics?q=${query}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

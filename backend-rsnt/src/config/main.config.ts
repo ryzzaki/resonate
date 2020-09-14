@@ -35,6 +35,9 @@ const mainConfig: MainConfigInterface = {
     clientId: String(process.env.SPOTIFY_CLIENT_ID),
     clientSecret: String(process.env.SPOTIFY_CLIENT_SECRET),
   },
+  geniusSettings: {
+    apiToken: String(process.env.GENIUS_API_TOKEN),
+  },
 };
 
 export default mainConfig;

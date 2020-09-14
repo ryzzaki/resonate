@@ -3,7 +3,7 @@ import loadScript from '../../utils/loadScript';
 import Session from '../../types/session';
 import playData from '../../types/playData';
 import playerStatus from '../../types/playerStatus';
-import { playSong } from '../../utils/api';
+import { playSong, repeatSong } from '../../utils/api';
 import debouncer from '../../utils/debouncer';
 import { WebplayerView } from './Webplayer.view';
 import { useRefresh } from '../../utils/hooks';
@@ -13,8 +13,8 @@ type Props = {
   token: string;
   isDJ: boolean;
   roomState: Session;
+  emitNextTrack: () => void;
   emitSliderPos: (progressMs: number) => void;
-  emitNextTrack: (uri: string) => void;
   emitSearchedURI: (uri: string) => void;
 };
 
@@ -80,13 +80,10 @@ export const Webplayer: React.FC<Props> = (props) => {
     if (status.isInitializing) return;
 
     play(status.deviceId, {
-      uris: roomState.uris,
+      uris: [roomState.uris[0].uri],
       position_ms: Date.now() - roomState.webplayer.songStartedAt,
-      offset: {
-        uri: roomState.webplayer.uri,
-      },
     });
-  }, [roomState.uris, roomState.webplayer.songStartedAt]);
+  }, [roomState.uris[0].uri, roomState.webplayer.songStartedAt]);
 
   // player slider logic, setInterval on play / clearInterval of pause
   useEffect(() => {
@@ -104,9 +101,8 @@ export const Webplayer: React.FC<Props> = (props) => {
   useEffect(() => {
     if (status.isInitializing) return;
 
-    if (isDJ) {
-      // emitSearchedURI(status.contextUri);
-      console.log(status.contextUri);
+    if (isDJ && status.contextUri) {
+      emitSearchedURI(status.contextUri as string);
     } else {
       setStatus((state) => ({ ...state, unsync: true }));
     }
@@ -153,24 +149,26 @@ export const Webplayer: React.FC<Props> = (props) => {
   // Play the song at the right start on first load
   const handlePlayerReady = ({ device_id }) => {
     console.log('Ready with Device ID', device_id);
+    const volume = localStorage.getItem('volume');
+    if (volume) {
+      player.current.setVolume(Number(volume) / 100);
+    }
     // TODO: Test the gap
     play(device_id, {
-      uris: roomState.uris,
+      uris: [roomState.uris[0].uri],
       position_ms: Date.now() - roomState.webplayer.songStartedAt,
-      offset: {
-        uri: roomState.webplayer.uri,
-      },
     });
     setStatus((state) => ({
       ...state,
       deviceId: device_id,
       isInitializing: false,
-      volume: player.current._options.volume * 100,
+      volume: volume ? Number(volume) : player.current._options.volume * 100,
     }));
   };
 
   const handlePlayerStateChange = (songState: any) => {
     console.log(songState);
+    // set on repeat mode if therers only one song
     if (!songState) {
       setStatus((state) => ({ ...state, isInitializing: true }));
     } else {
@@ -181,13 +179,20 @@ export const Webplayer: React.FC<Props> = (props) => {
         contextUri: songState.context.uri,
         currentTrack: songState.track_window.current_track,
         paused: songState.paused,
-        unsync: songState.paused ? true : state.unsync,
+        unsync: songState.paused,
       }));
     }
   };
 
   const handleIntervalUpdate = (e: number | undefined) =>
-    setStatus((state) => ({ ...state, progressMs: state.progressMs + 100 }));
+    setStatus((state) => {
+      // emits the next song 1s before the current one ends
+      if (isDJ && state.progressMs && state.duration - state.progressMs < 800) {
+        emitNextTrack();
+        return { ...state, progressMs: 0 };
+      }
+      return { ...state, progressMs: state.progressMs + 100 };
+    });
 
   const debounceSlider = useCallback(
     debouncer((progressMs: number) => {
@@ -212,11 +217,8 @@ export const Webplayer: React.FC<Props> = (props) => {
 
   const handleResync = () => {
     play(status.deviceId, {
-      uris: roomState.uris,
+      uris: [roomState.uris[0].uri],
       position_ms: Date.now() - roomState.webplayer.songStartedAt,
-      offset: {
-        uri: roomState.webplayer.uri,
-      },
     });
     setStatus((state) => ({ ...state, unsync: false }));
   };
@@ -225,17 +227,16 @@ export const Webplayer: React.FC<Props> = (props) => {
     const volume = Number(e.target.value);
     setStatus((state) => ({ ...state, volume }));
     player.current.setVolume(volume / 100);
+    localStorage.setItem('volume', volume.toString());
   };
 
-  const play = async (deviceId: string | null, data: playData) => {
-    const { offset, ...rest } = data;
-    playSong(token, deviceId, offset?.uri ? data : rest);
+  const play = (deviceId: string | null, data: playData) => {
+    playSong(token, deviceId, data);
   };
 
   return (
     <WebplayerView
       status={status}
-      isDJ={isDJ}
       handleResync={handleResync}
       handlePlayState={handlePlayState}
       handleSliderPos={handleSliderPos}

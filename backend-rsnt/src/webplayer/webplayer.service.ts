@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '../auth/entities/user.entity';
 import { AuthService } from '../auth/auth.service';
+import { Session, UriMetadata } from '../session/interfaces/session.interface';
 
 @Injectable()
 export class WebplayerService {
