@@ -9152,7 +9152,7 @@ react-error-overlay@^6.0.7:
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.7.tgz#1dcfb459ab671d53f660a991513cb2f0a0553108"
   integrity sha512-TAv1KJFh3RhqxNvhzxj6LeT5NWklP6rDr2a0jaTfsZ5wSZWHOGeqQyejUp3xxLfPt2UpyJEcVQB/zyPcmonNFA==
 
-react-ga@^3.1.2:
+react-ga@3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/react-ga/-/react-ga-3.1.2.tgz#e13f211c51a2e5c401ea69cf094b9501fe3c51ce"
   integrity sha512-OJrMqaHEHbodm+XsnjA6ISBEHTwvpFrxco65mctzl/v3CASMSLSyUkFqz9yYrPDKGBUfNQzKCjuMJwctjlWBbw==
@@ -9227,7 +9227,7 @@ react-scripts@3.4.1:
   optionalDependencies:
     fsevents "2.1.2"
 
-react-video-seek-slider@^2.1.2:
+react-video-seek-slider@2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/react-video-seek-slider/-/react-video-seek-slider-2.1.2.tgz#4beffefcf4b1518dbcd2d0814f33d4472106ed0b"
   integrity sha512-nZq6GLAK+hPeJgS87LLTkGjM4tNrWUw9yLSvSaKIor50PfEShqRyd1xBowwyNE4siQ22wEJlyUXKh9h249oT/w==
