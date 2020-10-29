@@ -42,7 +42,7 @@
     "@types/socket.io-client": "1.4.33",
     "autoprefixer": "9.8.6",
     "cross-env": "7.0.2",
-    "postcss-cli": "7.1.1",
+    "postcss-cli": "8.2.0",
     "prettier": "2.0.4",
     "tailwindcss": "1.4.0",
     "tslint": "6.1.1",
