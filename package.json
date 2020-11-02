@@ -11,7 +11,7 @@
     "start": "cd ./backend-rsnt && yarn start:prod"
   },
   "engines": {
-    "node": "12.18.1"
+    "node": "12.19.0"
   },
   "repository": {
     "type": "git",
