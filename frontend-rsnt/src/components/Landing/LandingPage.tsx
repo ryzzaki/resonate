@@ -9,7 +9,7 @@ import { fetchSessions } from '../../utils/api';
 import { AuthContext } from '../../context/AuthContext';
 import { CTASection } from './CTASection';
 import { RoomCard } from '../Rooms/RoomCard';
-import { DesktopOnlyCockBlock } from '../DesktopOnlyCockBlock';
+import { MobileWarning } from '../MobileWarning';
 import { gaEvent } from '../../utils/analytics';
 
 type Props = {};
@@ -32,13 +32,12 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
 
   return (
     <div className="bg-black2 text-white flex">
-      <DesktopOnlyCockBlock />
+      <MobileWarning />
       <div className="mx-auto max-w-6xl xl:px-80">
         <Header />
         <main className="min-h-screen flex flex-col">
           <section className="flex flex-wrap md:flex-no-wrap py-80">
             <div>
-              <Link to="/rooms">Neco</Link>
               <h1 className="font-heading text-60 font-bold leading-none gradient-text">
                 Real time <br />
                 music sharing <br />
@@ -61,7 +60,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
                 <a
                   href="https://www.spotify.com/premium/"
                   onClick={() =>
-                    gaEvent('spotify-premium-redirect', 'external_url')
+                    gaEvent('click', 'landing', 'url', 'spotify-premium')
                   }
                   target="_blank"
                   rel="noopener noreferrer"

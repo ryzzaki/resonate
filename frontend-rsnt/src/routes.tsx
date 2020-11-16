@@ -54,7 +54,7 @@ type Props = {
 export const Routes: React.FC<Props> = ({ token }) => (
   <Router>
     <ProtectedRoute path="/party" allowed={!!token} component={Party} />
-    <PublicRoute path="/rooms" allowed={!token} component={Rooms} />
+    <ProtectedRoute path="/rooms" allowed={!!token} component={Rooms} />
     <PublicRoute path="/auth" allowed={!token} component={RedirectPage} />
     <PublicRoute path="/" allowed={!token} component={LandingPage} />
   </Router>

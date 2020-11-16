@@ -25,12 +25,12 @@ export const Modal: React.FC<Props> = (props) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    gaEvent('create_room', 'room');
     try {
       const { data } = await createSession(token, {
         ...form,
         roomAccess: form.public ? 'PUBLIC' : 'PRIVATE',
       });
+      gaEvent('click', 'room', 'create', form.name);
       navigate(`/party?sessionId=${data.id}`);
     } catch (err) {
       console.log(err);

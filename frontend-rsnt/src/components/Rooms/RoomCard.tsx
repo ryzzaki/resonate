@@ -15,7 +15,7 @@ export const RoomCard: React.FC<Props> = (props) => {
 
   const joinRoom = (id: string) => {
     if (logged) {
-      gaEvent('room_visit', 'room');
+      gaEvent('click', 'room', 'visit', id);
       navigate(`/party?sessionId=${id}`);
     } else {
       localStorage.removeItem('redirect_url');

@@ -198,7 +198,7 @@ export const Webplayer: React.FC<Props> = (props) => {
   const debounceSlider = useCallback(
     debouncer((progressMs: number) => {
       emitSliderPos(progressMs);
-      gaEvent('slider_move', 'webplayer');
+      gaEvent('slide', 'webplayer', 'ms', progressMs.toString());
     }, 100),
     [status.deviceId]
   );
@@ -212,11 +212,10 @@ export const Webplayer: React.FC<Props> = (props) => {
   const handlePlayState = () => {
     if (status.paused) {
       handleResync();
-      gaEvent('resume_song', 'webplayer');
     } else {
       player.current.pause();
-      gaEvent('pause_song', 'webplayer');
     }
+    gaEvent('click', 'webplayer', 'paused', status.paused.toString());
   };
 
   const handleResync = () => {

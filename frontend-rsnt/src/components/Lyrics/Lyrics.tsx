@@ -22,7 +22,7 @@ export const Lyrics: React.FC<Props> = (props) => {
       setLyrics('No lyrics');
       console.error(err);
     }
-    gaEvent('load_lyrics', 'lyrics');
+    gaEvent('click', 'lyrics', 'query', query);
   };
 
   return (

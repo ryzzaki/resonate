@@ -18,10 +18,17 @@ export const gaSetUser = (id: string) => {
   window.gtag('set', 'userId', id);
 };
 
-export const gaEvent = (name: string, category: string) => {
+export const gaEvent = (
+  action: string,
+  category?: string,
+  label?: string,
+  value?: string
+) => {
   if (AppConfig.serverSettings.serverMode === 'development') return;
 
-  window.gtag('event', name, {
+  window.gtag('event', action, {
     event_category: category,
+    event_label: label,
+    value,
   });
 };

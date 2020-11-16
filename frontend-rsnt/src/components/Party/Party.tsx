@@ -35,7 +35,7 @@ export const Party: React.FC<RouteComponentProps<Props>> = () => {
   // initializing socket connection
   useEffect(() => {
     if (!roomState.id) {
-      gaEvent('wrong_room_id', 'party');
+      gaEvent('error', 'party', 'type', 'wrong_room_id');
       navigate('/rooms');
     }
 
