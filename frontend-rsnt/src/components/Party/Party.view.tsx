@@ -9,6 +9,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { useSignout } from '../../utils/hooks';
 import { Link } from '@reach/router';
 import { ReactComponent as AccountIcon } from '../../assets/icons/account.svg';
+import { MobileWarning } from '../MobileWarning';
 
 type Props = {
   isDJ: boolean;
@@ -40,6 +41,7 @@ export const PartyView: React.FC<Props> = (props) => {
 
   return (
     <div className="min-h-screen bg-black2 flex flex-col">
+      <MobileWarning />
       <div className="flex-1 flex">
         <div className="w-20rem">
           <Search

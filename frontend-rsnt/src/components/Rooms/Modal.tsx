@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createSession } from '../../utils/api';
 import { navigate } from '@reach/router';
+import { gaEvent } from '../../utils/analytics';
 
 type Props = {
   token: string;
@@ -29,6 +30,7 @@ export const Modal: React.FC<Props> = (props) => {
         ...form,
         roomAccess: form.public ? 'PUBLIC' : 'PRIVATE',
       });
+      gaEvent('click', 'room', 'create', form.name);
       navigate(`/party?sessionId=${data.id}`);
     } catch (err) {
       console.log(err);

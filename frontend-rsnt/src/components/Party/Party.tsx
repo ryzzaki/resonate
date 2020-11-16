@@ -6,6 +6,7 @@ import { AuthContext } from '../../context/AuthContext';
 import Session from '../../types/session';
 import { PartyView } from './Party.view';
 import { RoomAccess } from '../../enums/RoomAccess';
+import { gaEvent } from '../../utils/analytics';
 
 type Props = {};
 
@@ -34,6 +35,7 @@ export const Party: React.FC<RouteComponentProps<Props>> = () => {
   // initializing socket connection
   useEffect(() => {
     if (!roomState.id) {
+      gaEvent('error', 'party', 'type', 'wrong_room_id');
       navigate('/rooms');
     }
 

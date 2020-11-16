@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { RouteComponentProps } from '@reach/router';
+import { Link, RouteComponentProps } from '@reach/router';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { ReactComponent as Person } from '../../assets/images/Person.svg';
@@ -9,6 +9,8 @@ import { fetchSessions } from '../../utils/api';
 import { AuthContext } from '../../context/AuthContext';
 import { CTASection } from './CTASection';
 import { RoomCard } from '../Rooms/RoomCard';
+import { MobileWarning } from '../MobileWarning';
+import { gaEvent } from '../../utils/analytics';
 
 type Props = {};
 
@@ -30,6 +32,7 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
 
   return (
     <div className="bg-black2 text-white flex">
+      <MobileWarning />
       <div className="mx-auto max-w-6xl xl:px-80">
         <Header />
         <main className="min-h-screen flex flex-col">
@@ -56,6 +59,9 @@ export const LandingPage: React.FC<RouteComponentProps<Props>> = (props) => {
                 <span>Don't have Spotify premium?</span>{' '}
                 <a
                   href="https://www.spotify.com/premium/"
+                  onClick={() =>
+                    gaEvent('click', 'landing', 'url', 'spotify-premium')
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline"

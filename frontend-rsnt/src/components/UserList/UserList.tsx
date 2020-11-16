@@ -1,5 +1,6 @@
 import React from 'react';
 import sessionUser from '../../types/sessionUser';
+import { gaEvent } from '../../utils/analytics';
 
 const randomUserIcons = ['🎸', '🎹', '🎺', '🎻', '🪕', '🎷', '🥁', '🎤'];
 
@@ -13,6 +14,11 @@ type Props = {
 export const UserList: React.FC<Props> = (props) => {
   const { users, currentDJ, isDJ, emitSelectNewDJ } = props;
 
+  const handleNewDJ = () => {
+    emitSelectNewDJ();
+    gaEvent('click', 'new_dj');
+  };
+
   return (
     <div className="px-20 flex flex-col h-full">
       <h3 className="text-grey font-bold uppercase text-14">PARTY DJ</h3>
@@ -25,7 +31,7 @@ export const UserList: React.FC<Props> = (props) => {
       {isDJ && users.length > 1 && (
         <div className="flex mb-20">
           <button
-            onClick={emitSelectNewDJ}
+            onClick={handleNewDJ}
             className="text-grey font-bold text-center bg-black2light hover:bg-white hover:text-black2 px-30 py-5 rounded-full"
           >
             Leave DJ seat

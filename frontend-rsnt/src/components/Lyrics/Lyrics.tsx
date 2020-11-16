@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { getLyrics } from '../../utils/api';
 import { ReactComponent as MusicIcon } from '../../assets/icons/music.svg';
+import { gaEvent } from '../../utils/analytics';
 
 type Props = {
   token: string;
@@ -21,6 +22,7 @@ export const Lyrics: React.FC<Props> = (props) => {
       setLyrics('No lyrics');
       console.error(err);
     }
+    gaEvent('click', 'lyrics', 'query', query);
   };
 
   return (
