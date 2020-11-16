@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createSession } from '../../utils/api';
 import { navigate } from '@reach/router';
+import { gaEvent } from '../../utils/analytics';
 
 type Props = {
   token: string;
@@ -24,6 +25,7 @@ export const Modal: React.FC<Props> = (props) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    gaEvent('create_room', 'room');
     try {
       const { data } = await createSession(token, {
         ...form,

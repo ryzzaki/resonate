@@ -7,6 +7,7 @@ import { playSong, repeatSong } from '../../utils/api';
 import debouncer from '../../utils/debouncer';
 import { WebplayerView } from './Webplayer.view';
 import { useRefresh } from '../../utils/hooks';
+import { gaEvent } from '../../utils/analytics';
 
 type Props = {
   spotifyToken: string;
@@ -197,6 +198,7 @@ export const Webplayer: React.FC<Props> = (props) => {
   const debounceSlider = useCallback(
     debouncer((progressMs: number) => {
       emitSliderPos(progressMs);
+      gaEvent('slider_move', 'webplayer');
     }, 100),
     [status.deviceId]
   );
@@ -210,8 +212,10 @@ export const Webplayer: React.FC<Props> = (props) => {
   const handlePlayState = () => {
     if (status.paused) {
       handleResync();
+      gaEvent('resume_song', 'webplayer');
     } else {
       player.current.pause();
+      gaEvent('pause_song', 'webplayer');
     }
   };
 

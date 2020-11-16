@@ -2,6 +2,7 @@ import React, { useEffect, useContext } from 'react';
 import { RouteComponentProps, navigate } from '@reach/router';
 import { AuthContext } from '../context/AuthContext';
 import { fetchUser, signOutUser } from '../utils/api';
+import { gaSetUser } from '../utils/analytics';
 
 type Props = {};
 
@@ -16,6 +17,7 @@ export const RedirectPage: React.FC<RouteComponentProps<Props>> = (props) => {
         const { data } = await fetchUser(token);
         setUser(data);
         setToken(token);
+        gaSetUser(data.id);
       } catch (err) {
         console.error(err);
         localStorage.removeItem('access_key');

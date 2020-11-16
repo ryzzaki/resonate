@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { searchSongs } from '../../utils/api';
 import { SearchView } from './Search.view';
 import debouncer from '../../utils/debouncer';
+import { gaEvent } from '../../utils/analytics';
 
 type Props = {
   token: string;
@@ -22,6 +23,7 @@ export const Search: React.FC<Props> = (props) => {
       }
       const { data } = await searchSongs(token, e.target.value);
       setResults(data);
+      gaEvent('search_song', 'search');
     }, 300),
     []
   );
@@ -35,6 +37,7 @@ export const Search: React.FC<Props> = (props) => {
     const { uri } = e.currentTarget.dataset;
     emitSearchedURI(uri as string);
     closeSearch();
+    gaEvent('select_song', 'search');
   };
 
   const handleNext = (uri: string) => {

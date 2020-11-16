@@ -6,6 +6,7 @@ import { Header } from '../Landing/Header';
 import { Footer } from '../Landing/Footer';
 import { CTASection } from '../Landing/CTASection';
 import { RoomCard } from './RoomCard';
+import { DesktopOnlyCockBlock } from '../DesktopOnlyCockBlock';
 
 export const Rooms: React.FC = () => {
   const { token } = useContext(AuthContext);
@@ -28,6 +29,7 @@ export const Rooms: React.FC = () => {
   return (
     <div className="bg-black2 text-white px-80 min-h-screen flex flex-col relative">
       {modal && <Modal token={token} closeModal={() => setModal(false)} />}
+      <DesktopOnlyCockBlock />
       <Header noLogin />
       <main className="flex-wrap content-center justify-center flex-1 pt-20 pb-80">
         <div className="flex items-center">

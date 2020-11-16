@@ -3,6 +3,7 @@ import { navigate } from '@reach/router';
 import { ReactComponent as RoomGroup } from '../../assets/icons/roomGroup.svg';
 import { UrlEnums } from '../../enums/urls.enum';
 import Session from '../../types/session';
+import { gaEvent } from '../../utils/analytics';
 
 type Props = {
   logged: boolean;
@@ -14,6 +15,7 @@ export const RoomCard: React.FC<Props> = (props) => {
 
   const joinRoom = (id: string) => {
     if (logged) {
+      gaEvent('room_visit', 'room');
       navigate(`/party?sessionId=${id}`);
     } else {
       localStorage.removeItem('redirect_url');
