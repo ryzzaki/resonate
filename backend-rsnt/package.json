@@ -43,7 +43,7 @@
     "cookie-parser": "1.4.5",
     "dotenv": "8.2.0",
     "express-rate-limit": "5.1.1",
-    "helmet": "3.22.0",
+    "helmet": "4.2.0",
     "lodash": "4.17.19",
     "nestjs-redis": "1.2.8",
     "passport": "0.4.1",
